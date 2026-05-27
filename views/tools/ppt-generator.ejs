@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="免费在线 PPT 生成器，12套模板（商务/党政/学术/科技/国际），大纲一键生成 PPTX 文件">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/ppt-generator">
+  <meta property="og:title" content="PPT 生成器 - 免费在线 PPT 制作工具">
+  <meta property="og:description" content="12套模板可选，大纲一键生成 PPTX">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PPT 生成器",
+    "description": "免费在线 PPT 生成器，多套模板可选，大纲一键生成 PPTX 文件",
+    "url": "https://ijuhe.top/tools/ppt-generator",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <div class="tool-page">
+    <h1>PPT 生成器</h1>
+
+    <form class="doc-formatter-form" method="POST" action="/tools/ppt-generator">
+      <div class="form-group">
+        <label>选择模板</label>
+        <div class="template-tabs">
+          <button type="button" class="tab-btn active" onclick="filterTemplates('all')">全部</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('domestic')">国内风格</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('international')">国际风格</button>
+        </div>
+        <div class="template-grid" id="templateGrid">
+          <% templates.forEach(function(tpl) { %>
+            <label class="tpl-card" data-category="<%= tpl.category %>">
+              <input type="radio" name="templateId" value="<%= tpl.id %>" <%= tpl.id === 'business-blue' ? 'checked' : '' %>>
+              <div class="tpl-preview" style="background:#<%= tpl.bg %>;">
+                <div class="tpl-bar" style="background:#<%= tpl.accent %>;"></div>
+                <div class="tpl-title-sample" style="color:#<%= tpl.titleColor %>;">Title</div>
+                <div class="tpl-body-sample" style="color:#<%= tpl.bodyColor %>;">Body text preview</div>
+              </div>
+              <div class="tpl-info">
+                <span class="tpl-name"><%= tpl.name %></span>
+                <span class="tpl-desc"><%= tpl.desc %></span>
+              </div>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="outline">PPT 大纲（每行=一页标题，前面加两个空格=内容要点）</label>
+        <textarea id="outline" name="outline" rows="10" placeholder="项目介绍
+  背景与目标
+  核心功能
+技术架构
+  前端选型
+  后端服务
+市场分析
+  目标用户
+  竞争格局
+未来规划
+  一季度目标
+  下半年路线图"></textarea>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error !== null) { %>
+        <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">生成 PPTX</button>
+    </form>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </div>
+
+  <script>
+    function filterTemplates(cat) {
+      document.querySelectorAll('.tpl-card').forEach(function(c) {
+        c.style.display = (cat === 'all' || c.dataset.category === cat) ? '' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

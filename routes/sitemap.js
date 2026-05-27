@@ -3,7 +3,7 @@ const router = express.Router();
 
 const tools = [
   'json-formatter', 'base64', 'qrcode', 'pdf-merge',
-  'regex-tester', 'url-codec', 'markdown', 'image-compress', 'doc-formatter',
+  'regex-tester', 'url-codec', 'markdown', 'image-compress', 'doc-formatter', 'ppt-generator',
 ];
 
 router.get('/sitemap.xml', (req, res) => {
