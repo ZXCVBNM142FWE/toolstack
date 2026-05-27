@@ -299,6 +299,107 @@ body {
   text-decoration: underline;
 }
 
+.doc-formatter-form {
+  max-width: 640px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group > label:first-child {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.form-group input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-group input[type="text"]:focus {
+  border-color: var(--primary);
+}
+
+.file-input-wrap input[type="file"] {
+  width: 100%;
+}
+
+.template-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.template-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.template-option:hover {
+  border-color: var(--primary);
+}
+
+.template-option input[type="radio"] {
+  margin-top: 2px;
+  accent-color: var(--primary);
+}
+
+.template-name {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.template-desc {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.feature-info {
+  margin-top: 32px;
+  padding: 20px 24px;
+  background: var(--code-bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.feature-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--header-color);
+}
+
+.feature-info ul {
+  padding-left: 20px;
+}
+
+.feature-info li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
 input[type="text"], input[type="file"] {
   color: var(--text);
 }

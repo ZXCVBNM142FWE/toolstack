@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式，支持课程论文、毕业论文、实验报告模板">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/doc-formatter">
+  <meta property="og:title" content="文档格式整理 - 在线学术排版工具">
+  <meta property="og:description" content="上传文档自动排版为标准学术格式">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "文档格式整理",
+    "description": "在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式",
+    "url": "https://ijuhe.top/tools/doc-formatter",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <div class="tool-page">
+    <h1>文档格式整理</h1>
+
+    <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
+      <div class="form-group">
+        <label for="doc">上传文档（.docx / .txt，最大 10MB）</label>
+        <div class="file-input-wrap">
+          <input type="file" id="doc" name="doc" accept=".docx,.txt">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="title">文档标题（可选）</label>
+        <input type="text" id="title" name="title" placeholder="输入文档标题" maxlength="200">
+      </div>
+
+      <div class="form-group">
+        <label>文档类型</label>
+        <div class="template-options">
+          <label class="template-option">
+            <input type="radio" name="template" value="course" checked>
+            <span class="template-name">课程论文</span>
+            <span class="template-desc">正文宋体小四 · 1.5倍行距 · 首行缩进</span>
+          </label>
+          <label class="template-option">
+            <input type="radio" name="template" value="thesis">
+            <span class="template-name">毕业论文</span>
+            <span class="template-desc">标题黑体二号 · 章节标题黑体三号 · 标准页边距</span>
+          </label>
+          <label class="template-option">
+            <input type="radio" name="template" value="lab">
+            <span class="template-name">实验报告</span>
+            <span class="template-desc">标题黑体小二 · 正文宋体小四 · 1.5倍行距</span>
+          </label>
+        </div>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error !== null) { %>
+        <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">生成排版文档</button>
+    </form>
+
+    <div class="feature-info">
+      <h3>排版规则</h3>
+      <ul>
+        <li><strong>正文：</strong>宋体（SimSun）小四号（12pt）</li>
+        <li><strong>标题：</strong>黑体（SimHei），课程论文二号 / 毕业论文二号 / 实验报告小二</li>
+        <li><strong>行距：</strong>1.5 倍</li>
+        <li><strong>首行缩进：</strong>2 个汉字字符</li>
+        <li><strong>页边距：</strong>上下 2.54cm，左右 3.18cm</li>
+        <li><strong>段落：</strong>按空行自动分段，短句自动识别为章节标题</li>
+      </ul>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </div>
+
+  <script>
+    function checkFile() {
+      var f = document.getElementById('doc');
+      if (!f.files.length) { alert('请先选择要上传的文件'); return false; }
+      return true;
+    }
+  </script>
+</body>
+</html>

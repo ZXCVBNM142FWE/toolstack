@@ -40,6 +40,8 @@ try {
   console.error('image-compress 加载失败:', e.message);
 }
 
+app.use('/tools/doc-formatter', require('./routes/tools/doc-formatter'));
+
 app.use('/', require('./routes/sitemap'));
 app.use('/', require('./routes/robots'));
 

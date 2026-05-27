@@ -10,6 +10,7 @@ const tools = [
   { name: 'URL 编解码', desc: '在线 URL 编码解码工具', url: '/tools/url-codec', icon: '🔗' },
   { name: 'Markdown 编辑', desc: '在线 Markdown 实时预览编辑器', url: '/tools/markdown', icon: '✍️' },
   { name: '图片压缩', desc: '在线图片压缩，支持 PNG/JPEG', url: '/tools/image-compress', icon: '🖼️' },
+  { name: '文档格式整理', desc: '自动排版为标准学术格式，支持课程论文/毕业论文/实验报告', url: '/tools/doc-formatter', icon: '📝' },
 ];
 
 router.get('/', (req, res) => {
