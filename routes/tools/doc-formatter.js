@@ -25,34 +25,56 @@ const upload = multer({
   }
 });
 
-const FONT = {
-  title: 'SimHei',
-  body: 'SimSun',
+const FONTS = {
+  simsun: { label: '宋体', name: 'SimSun' },
+  simhei: { label: '黑体', name: 'SimHei' },
+  fangsong: { label: '仿宋', name: 'FangSong' },
+  kaiti: { label: '楷体', name: 'KaiTi' },
 };
 
-function buildDoc(text, template, titleText) {
+const MARGINS = {
+  standard: { top: 1134, bottom: 1134, left: 1600, right: 1600 },
+  wide: { top: 1134, bottom: 1134, left: 2160, right: 2160 },
+  narrow: { top: 720, bottom: 720, left: 720, right: 720 },
+};
+
+const LINE_SPACING = {
+  '1.0': 240,
+  '1.25': 300,
+  '1.5': 360,
+  '2.0': 480,
+};
+
+function buildDoc(text, options) {
   const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
 
-  const headingStyle = (text, size) =>
+  const bodyFont = FONTS[options.bodyFont] || FONTS.simsun;
+  const titleFont = FONTS[options.titleFont] || FONTS.simhei;
+  const bodySize = parseInt(options.bodySize) || 24;
+  const titleSize = parseInt(options.titleSize) || 44;
+  const lineSpacing = LINE_SPACING[options.lineSpacing] || 360;
+  const firstIndent = options.indent !== 'none' ? 480 : 0;
+  const margin = MARGINS[options.margin] || MARGINS.standard;
+  const titleAlign = options.titleAlign === 'left' ? AlignmentType.LEFT : AlignmentType.CENTER;
+
+  const makeTitle = (text, size) =>
     new Paragraph({
-      children: [new TextRun({ text, font: FONT.title, size: size * 2, bold: true })],
-      alignment: AlignmentType.CENTER,
+      children: [new TextRun({ text, font: titleFont.name, size: size * 2, bold: true })],
+      alignment: titleAlign,
       spacing: { after: 400 },
     });
 
-  const bodyPara = (text) =>
+  const makeBody = (text) =>
     new Paragraph({
-      children: [new TextRun({ text, font: FONT.body, size: 24 })],
-      indent: { firstLine: 480 },
-      spacing: { line: 360, after: 120 },
+      children: [new TextRun({ text, font: bodyFont.name, size: bodySize })],
+      indent: firstIndent ? { firstLine: firstIndent } : undefined,
+      spacing: { line: lineSpacing, after: 120 },
     });
 
   const children = [];
 
-  const titleSize = template === 'lab' ? 36 : 44;
-
-  if (titleText && titleText.trim()) {
-    children.push(headingStyle(titleText.trim(), titleSize));
+  if (options.title && options.title.trim()) {
+    children.push(makeTitle(options.title.trim(), titleSize));
   }
 
   paragraphs.forEach(p => {
@@ -61,12 +83,12 @@ function buildDoc(text, template, titleText) {
     if (trimmed.length < 50 && !trimmed.includes('。') && !trimmed.includes('，')) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: trimmed, font: FONT.title, size: 32, bold: true })],
+          children: [new TextRun({ text: trimmed, font: titleFont.name, size: titleSize - 4, bold: true })],
           spacing: { before: 300, after: 200 },
         })
       );
     } else {
-      children.push(bodyPara(trimmed));
+      children.push(makeBody(trimmed));
     }
   });
 
@@ -74,20 +96,13 @@ function buildDoc(text, template, titleText) {
     styles: {
       default: {
         document: {
-          run: { font: FONT.body, size: 24 },
+          run: { font: bodyFont.name, size: bodySize },
         },
       },
     },
     sections: [{
       properties: {
-        page: {
-          margin: {
-            top: template === 'lab' ? 1270 : 1134,
-            bottom: template === 'lab' ? 1270 : 1134,
-            left: template === 'lab' ? 1440 : 1600,
-            right: template === 'lab' ? 1440 : 1600,
-          },
-        },
+        page: { margin },
       },
       children,
     }],
@@ -104,7 +119,6 @@ router.post('/', upload.single('doc'), async (req, res) => {
       return res.render('tools/doc-formatter', { title: '文档格式整理 - 在线学术排版工具', error: '请上传文件' });
     }
 
-    const template = req.body.template || 'course';
     const filePath = req.file.path;
     const ext = path.extname(req.file.originalname).toLowerCase();
 
@@ -122,9 +136,19 @@ router.post('/', upload.single('doc'), async (req, res) => {
       return res.render('tools/doc-formatter', { title: '文档格式整理 - 在线学术排版工具', error: '文件中没有检测到文字内容' });
     }
 
-    const titleText = req.body.title || '';
+    const options = {
+      bodyFont: req.body.bodyFont || 'simsun',
+      titleFont: req.body.titleFont || 'simhei',
+      bodySize: req.body.bodySize || '24',
+      titleSize: req.body.titleSize || '44',
+      lineSpacing: req.body.lineSpacing || '1.5',
+      indent: req.body.indent || 'on',
+      margin: req.body.margin || 'standard',
+      titleAlign: req.body.titleAlign || 'center',
+      title: req.body.title || '',
+    };
 
-    const doc = buildDoc(text, template, titleText);
+    const doc = buildDoc(text, options);
     const buffer = await Packer.toBuffer(doc);
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');

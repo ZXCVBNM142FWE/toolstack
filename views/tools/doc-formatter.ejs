@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式，支持课程论文、毕业论文、实验报告模板">
+  <meta name="description" content="在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式，支持自定义字体、字号、行距、缩进、页边距">
   <title><%= title %></title>
   <link rel="canonical" href="https://ijuhe.top/tools/doc-formatter">
   <meta property="og:title" content="文档格式整理 - 在线学术排版工具">
-  <meta property="og:description" content="上传文档自动排版为标准学术格式">
+  <meta property="og:description" content="上传文档自定义排版为标准学术格式">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/style.css">
   <script type="application/ld+json">
@@ -28,34 +28,94 @@
     <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
       <div class="form-group">
         <label for="doc">上传文档（.docx / .txt，最大 10MB）</label>
-        <div class="file-input-wrap">
-          <input type="file" id="doc" name="doc" accept=".docx,.txt">
-        </div>
+        <input type="file" id="doc" name="doc" accept=".docx,.txt">
       </div>
 
       <div class="form-group">
         <label for="title">文档标题（可选）</label>
-        <input type="text" id="title" name="title" placeholder="输入文档标题" maxlength="200">
+        <input type="text" id="title" name="title" placeholder="留空则自动识别" maxlength="200">
       </div>
 
       <div class="form-group">
-        <label>文档类型</label>
-        <div class="template-options">
-          <label class="template-option">
-            <input type="radio" name="template" value="course" checked>
-            <span class="template-name">课程论文</span>
-            <span class="template-desc">正文宋体小四 · 1.5倍行距 · 首行缩进</span>
-          </label>
-          <label class="template-option">
-            <input type="radio" name="template" value="thesis">
-            <span class="template-name">毕业论文</span>
-            <span class="template-desc">标题黑体二号 · 章节标题黑体三号 · 标准页边距</span>
-          </label>
-          <label class="template-option">
-            <input type="radio" name="template" value="lab">
-            <span class="template-name">实验报告</span>
-            <span class="template-desc">标题黑体小二 · 正文宋体小四 · 1.5倍行距</span>
-          </label>
+        <label>快速预设</label>
+        <div class="preset-btns">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('course')">课程论文</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('thesis')">毕业论文</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('lab')">实验报告</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="bodyFont">正文字体</label>
+          <select id="bodyFont" name="bodyFont">
+            <option value="simsun">宋体</option>
+            <option value="fangsong">仿宋</option>
+            <option value="kaiti">楷体</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleFont">标题字体</label>
+          <select id="titleFont" name="titleFont">
+            <option value="simhei" selected>黑体</option>
+            <option value="simsun">宋体</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="bodySize">正文字号</label>
+          <select id="bodySize" name="bodySize">
+            <option value="21">五号（10.5pt）</option>
+            <option value="24" selected>小四（12pt）</option>
+            <option value="28">四号（14pt）</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleSize">标题字号</label>
+          <select id="titleSize" name="titleSize">
+            <option value="32">三号（16pt）</option>
+            <option value="36">小二（18pt）</option>
+            <option value="44" selected>二号（22pt）</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="lineSpacing">行距</label>
+          <select id="lineSpacing" name="lineSpacing">
+            <option value="1.0">单倍行距</option>
+            <option value="1.25">1.25 倍</option>
+            <option value="1.5" selected>1.5 倍</option>
+            <option value="2.0">双倍行距</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="margin">页边距</label>
+          <select id="margin" name="margin">
+            <option value="standard" selected>标准（上下 2.54 左右 3.18 cm）</option>
+            <option value="wide">加宽（上下 2.54 左右 4.28 cm）</option>
+            <option value="narrow">较窄（上下 1.27 左右 1.27 cm）</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="indent">首行缩进</label>
+          <select id="indent" name="indent">
+            <option value="on" selected>2 字符</option>
+            <option value="none">无缩进</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleAlign">标题对齐</label>
+          <select id="titleAlign" name="titleAlign">
+            <option value="center" selected>居中</option>
+            <option value="left">左对齐</option>
+          </select>
         </div>
       </div>
 
@@ -66,18 +126,6 @@
       <button type="submit" class="btn btn-primary">生成排版文档</button>
     </form>
 
-    <div class="feature-info">
-      <h3>排版规则</h3>
-      <ul>
-        <li><strong>正文：</strong>宋体（SimSun）小四号（12pt）</li>
-        <li><strong>标题：</strong>黑体（SimHei），课程论文二号 / 毕业论文二号 / 实验报告小二</li>
-        <li><strong>行距：</strong>1.5 倍</li>
-        <li><strong>首行缩进：</strong>2 个汉字字符</li>
-        <li><strong>页边距：</strong>上下 2.54cm，左右 3.18cm</li>
-        <li><strong>段落：</strong>按空行自动分段，短句自动识别为章节标题</li>
-      </ul>
-    </div>
-
     <a href="/" class="back-link">← 返回首页</a>
   </div>
 
@@ -86,6 +134,22 @@
       var f = document.getElementById('doc');
       if (!f.files.length) { alert('请先选择要上传的文件'); return false; }
       return true;
+    }
+
+    var presets = {
+      course:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      thesis:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      lab:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'36', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' }
+    };
+
+    function applyPreset(name) {
+      var p = presets[name];
+      if (!p) return;
+      var keys = ['bodyFont','titleFont','bodySize','titleSize','lineSpacing','indent','margin','titleAlign'];
+      for (var i = 0; i < keys.length; i++) {
+        var el = document.getElementById(keys[i]);
+        if (el) el.value = p[keys[i]];
+      }
     }
   </script>
 </body>
