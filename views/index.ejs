@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线工具站 — 免费 JSON 格式化、Base64 编解码、二维码生成、PDF 合并等工具">
+  <meta name="keywords" content="在线工具,JSON格式化,Base64,二维码,PDF合并,正则,URL编解码,Markdown,图片压缩,免费">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://你的域名/">
+  <meta property="og:title" content="在线工具站 — 免费在线工具集合">
+  <meta property="og:description" content="免费 JSON 格式化、Base64 编解码、二维码生成、PDF 合并等在线工具，无需注册">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "在线工具站",
+    "description": "免费在线工具集合：JSON 格式化、Base64 编解码、二维码生成、PDF 合并、正则测试、URL 编解码、Markdown 编辑器、图片压缩",
+    "url": "https://你的域名/"
+  }
+  </script>
+</head>
+<body>
+  <header class="header">
+    <h1>在线工具站</h1>
+    <p class="subtitle">免费 · 快速 · 无需注册</p>
+  </header>
+
+  <main class="container">
+    <div class="tool-grid">
+      <% tools.forEach(tool => { %>
+        <a href="<%= tool.url %>" class="tool-card">
+          <div class="tool-icon"><%= tool.icon %></div>
+          <h2 class="tool-name"><%= tool.name %></h2>
+          <p class="tool-desc"><%= tool.desc %></p>
+        </a>
+      <% }) %>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 ToolStack. 所有工具免费使用。</p>
+  </footer>
+</body>
+</html>

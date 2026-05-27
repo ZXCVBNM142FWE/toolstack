@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线图片压缩工具，免费压缩 PNG/JPEG 图片，完全免费无需注册">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "图片压缩",
+    "description": "在线图片压缩工具，支持 PNG/JPEG",
+    "url": "https://你的域名/tools/image-compress",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>图片压缩</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label for="fileInput">选择图片</label>
+        <input type="file" id="fileInput" accept="image/*" style="margin-top:8px;">
+      </div>
+      <div class="tool-panel">
+        <label>原图</label>
+        <div style="flex:1;min-height:200px;display:flex;align-items:center;justify-content:center;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;overflow:hidden;">
+          <img id="originalPreview" style="max-width:100%;max-height:200px;display:none;">
+          <span id="noPreview" style="color:#adb5bd;">预览</span>
+        </div>
+        <div id="originalSize" style="font-size:0.85rem;color:#6c757d;margin-top:4px;"></div>
+      </div>
+      <div class="tool-panel">
+        <label>压缩后</label>
+        <div style="flex:1;min-height:200px;display:flex;align-items:center;justify-content:center;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;overflow:hidden;">
+          <img id="compressedPreview" style="max-width:100%;max-height:200px;display:none;">
+          <span id="noCompressed" style="color:#adb5bd;">点击压缩</span>
+        </div>
+        <div id="compressedSize" style="font-size:0.85rem;color:#6c757d;margin-top:4px;"></div>
+      </div>
+
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label for="quality">质量: <span id="qualityVal">80</span></label>
+        <input type="range" id="quality" min="1" max="100" value="80" style="width:100%;">
+      </div>
+
+      <div class="tool-actions">
+        <button id="compressBtn" class="btn btn-primary">压缩下载</button>
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+
+      <div id="error" class="error-msg" style="grid-column:1/-1;"></div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const quality = document.getElementById('quality');
+    const originalPreview = document.getElementById('originalPreview');
+    const compressedPreview = document.getElementById('compressedPreview');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+    }
+
+    quality.addEventListener('input', () => {
+      document.getElementById('qualityVal').textContent = quality.value;
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (!fileInput.files[0]) return;
+      const url = URL.createObjectURL(fileInput.files[0]);
+      originalPreview.src = url;
+      originalPreview.style.display = '';
+      document.getElementById('noPreview').style.display = 'none';
+      document.getElementById('originalSize').textContent = '原图: ' + (fileInput.files[0].size / 1024).toFixed(1) + ' KB';
+      compressedPreview.style.display = 'none';
+      document.getElementById('noCompressed').style.display = '';
+      document.getElementById('compressedSize').textContent = '';
+      hideError();
+    });
+
+    document.getElementById('compressBtn').addEventListener('click', async () => {
+      if (!fileInput.files[0]) {
+        showError('请选择一张图片');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      formData.append('quality', quality.value);
+
+      try {
+        const resp = await fetch('/tools/image-compress', { method: 'POST', body: formData });
+        if (!resp.ok) {
+          const data = await resp.json();
+          showError(data.error || '压缩失败');
+          return;
+        }
+        const result = await resp.json();
+        document.getElementById('compressedSize').textContent =
+          '压缩后: ' + (result.compressed / 1024).toFixed(1) + ' KB (' +
+          (100 - result.compressed / result.original * 100).toFixed(1) + '% 减小)';
+
+        const byteString = atob(result.data);
+        const bytes = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) bytes[i] = byteString.charCodeAt(i);
+        const blob = new Blob([bytes], { type: result.type });
+
+        const url = URL.createObjectURL(blob);
+        compressedPreview.src = url;
+        compressedPreview.style.display = '';
+        document.getElementById('noCompressed').style.display = 'none';
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'compressed.' + (result.type === 'image/png' ? 'png' : 'jpg');
+        a.click();
+
+        hideError();
+      } catch (e) {
+        showError('请求失败: ' + e.message);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      fileInput.value = '';
+      originalPreview.style.display = 'none';
+      document.getElementById('noPreview').style.display = '';
+      document.getElementById('originalSize').textContent = '';
+      compressedPreview.style.display = 'none';
+      document.getElementById('noCompressed').style.display = '';
+      document.getElementById('compressedSize').textContent = '';
+      hideError();
+    });
+  </script>
+</body>
+</html>

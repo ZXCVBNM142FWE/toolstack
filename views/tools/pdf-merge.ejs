@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线 PDF 合并工具，免费将多个 PDF 文件合并为一个，完全免费无需注册">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDF 合并",
+    "description": "在线免费 PDF 合并工具",
+    "url": "https://你的域名/tools/pdf-merge",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>PDF 合并</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label for="fileInput">选择 PDF 文件（可多选，按文件名排序合并）</label>
+        <input type="file" id="fileInput" multiple accept=".pdf" style="margin-top:8px;">
+      </div>
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label>已选文件</label>
+        <ul id="fileList" style="padding:12px;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;min-height:80px;list-style:none;font-size:0.9rem;color:#6c757d;">
+          <li>尚未选择文件</li>
+        </ul>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="mergeBtn" class="btn btn-primary">合并下载</button>
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+    }
+
+    fileInput.addEventListener('change', () => {
+      fileList.innerHTML = '';
+      if (fileInput.files.length === 0) {
+        fileList.innerHTML = '<li>尚未选择文件</li>';
+        return;
+      }
+      Array.from(fileInput.files).forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+        li.style.cssText = 'color:#212529;padding:2px 0;';
+        fileList.appendChild(li);
+      });
+      hideError();
+    });
+
+    document.getElementById('mergeBtn').addEventListener('click', async () => {
+      if (fileInput.files.length < 2) {
+        showError('请选择至少 2 个 PDF 文件');
+        return;
+      }
+
+      const formData = new FormData();
+      Array.from(fileInput.files).forEach(f => formData.append('pdfs', f));
+
+      try {
+        const resp = await fetch('/tools/pdf-merge', { method: 'POST', body: formData });
+        if (!resp.ok) {
+          const data = await resp.json();
+          showError(data.error || '合并失败');
+          return;
+        }
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'merged.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+        hideError();
+      } catch (e) {
+        showError('请求失败: ' + e.message);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      fileInput.value = '';
+      fileList.innerHTML = '<li>尚未选择文件</li>';
+      hideError();
+    });
+  </script>
+</body>
+</html>

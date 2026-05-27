@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线正则表达式测试工具，支持 g/i/m 修饰符，高亮匹配结果，完全免费">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "正则表达式测试",
+    "description": "在线正则表达式测试调试工具",
+    "url": "https://你的域名/tools/regex-tester",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>正则表达式测试</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="pattern">正则表达式</label>
+        <input type="text" id="pattern" placeholder="例如: \d{4}-\d{2}-\d{2}" style="padding:10px;border:1px solid #dee2e6;border-radius:8px;font-family:monospace;">
+        <div style="margin-top:8px;display:flex;gap:16px;">
+          <label style="font-weight:400;"><input type="checkbox" id="flagG" checked> 全局 (g)</label>
+          <label style="font-weight:400;"><input type="checkbox" id="flagI"> 忽略大小写 (i)</label>
+          <label style="font-weight:400;"><input type="checkbox" id="flagM"> 多行 (m)</label>
+        </div>
+      </div>
+      <div class="tool-panel">
+        <label for="input">测试文本</label>
+        <textarea id="input" placeholder="输入要测试的文本..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label>匹配结果</label>
+        <div id="output" style="flex:1;min-height:360px;padding:12px;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;overflow-y:auto;font-family:monospace;font-size:0.85rem;white-space:pre-wrap;"></div>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="testBtn" class="btn btn-primary">测试</button>
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const pattern = document.getElementById('pattern');
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      output.innerHTML = '';
+    }
+
+    document.getElementById('testBtn').addEventListener('click', () => {
+      try {
+        let flags = '';
+        if (document.getElementById('flagG').checked) flags += 'g';
+        if (document.getElementById('flagI').checked) flags += 'i';
+        if (document.getElementById('flagM').checked) flags += 'm';
+
+        const re = new RegExp(pattern.value, flags);
+        const escaped = input.value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const result = escaped.replace(re, (match) => '<mark>' + match + '</mark>');
+        output.innerHTML = result || '无匹配';
+        hideError();
+      } catch (e) {
+        showError('正则表达式错误: ' + e.message);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      pattern.value = '';
+      input.value = '';
+      output.innerHTML = '';
+      hideError();
+    });
+  </script>
+</body>
+</html>

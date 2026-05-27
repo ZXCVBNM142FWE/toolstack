@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线 Markdown 编辑器，支持实时预览，完全免费无需注册">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Markdown 编辑器",
+    "description": "在线 Markdown 实时预览编辑器",
+    "url": "https://你的域名/tools/markdown",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+  <style>
+    .markdown-preview { flex:1; min-height:360px; padding:16px; background:#fff; border:1px solid #dee2e6; border-radius:8px; overflow-y:auto; font-size:0.9rem; line-height:1.7; }
+    .markdown-preview h1,.markdown-preview h2,.markdown-preview h3 { margin:16px 0 8px; }
+    .markdown-preview code { background:#f1f3f5; padding:2px 6px; border-radius:4px; font-size:0.85em; }
+    .markdown-preview pre { background:#1a1a2e; color:#e0e0e0; padding:16px; border-radius:8px; overflow-x:auto; }
+    .markdown-preview pre code { background:none; padding:0; }
+    .markdown-preview blockquote { border-left:3px solid #4361ee; padding-left:12px; color:#6c757d; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>Markdown 编辑器</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">编辑</label>
+        <textarea id="input" placeholder="在这里写 Markdown..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label>预览</label>
+        <div id="preview" class="markdown-preview"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const input = document.getElementById('input');
+    const preview = document.getElementById('preview');
+
+    const defaultMd = '# 欢迎使用 Markdown\n\n' +
+      '## 标题\n' +
+      '**粗体** 和 *斜体* 文本\n\n' +
+      '### 代码块\n' +
+      '```javascript\nconsole.log("Hello World");\n```\n\n' +
+      '### 列表\n' +
+      '- 项目 1\n' +
+      '- 项目 2\n' +
+      '- 项目 3\n\n' +
+      '### 引用\n> 这是一段引用文字\n\n' +
+      '### 链接\n[访问 Google](https://www.google.com)';
+
+    input.value = defaultMd;
+    preview.innerHTML = marked.parse(defaultMd);
+
+    input.addEventListener('input', () => {
+      preview.innerHTML = marked.parse(input.value || '');
+    });
+  </script>
+</body>
+</html>

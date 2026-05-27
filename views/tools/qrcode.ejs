@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线二维码生成器，免费将文字或网址生成二维码图片">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "二维码生成",
+    "description": "在线二维码生成器",
+    "url": "https://你的域名/tools/qrcode",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>二维码生成</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">输入文本或网址</label>
+        <textarea id="input" placeholder="输入要生成二维码的文字或网址..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label>二维码</label>
+        <div style="display:flex;align-items:center;justify-content:center;min-height:360px;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;">
+          <canvas id="qrcanvas"></canvas>
+        </div>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="generateBtn" class="btn btn-primary">生成二维码</button>
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const input = document.getElementById('input');
+    const canvas = document.getElementById('qrcanvas');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      canvas.style.display = 'none';
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) {
+        showError('请输入内容');
+        return;
+      }
+      QRCode.toCanvas(canvas, text, { width: 256 }, (err) => {
+        if (err) {
+          showError('生成失败: ' + err.message);
+        } else {
+          canvas.style.display = '';
+          hideError();
+        }
+      });
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      canvas.style.display = 'none';
+      hideError();
+    });
+  </script>
+</body>
+</html>

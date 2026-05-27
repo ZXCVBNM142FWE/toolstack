@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线 URL 编解码工具，支持 URL 编码和解码，完全免费无需注册">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "URL 编解码",
+    "description": "在线 URL 编码解码工具",
+    "url": "https://你的域名/tools/url-codec",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <h1>URL 编解码</h1>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">原文</label>
+        <textarea id="input" placeholder="输入要编码或解码的 URL 文本..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label for="output">结果</label>
+        <textarea id="output" readonly placeholder="结果将显示在这里..."></textarea>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="encodeBtn" class="btn btn-primary">编码</button>
+        <button id="decodeBtn" class="btn btn-primary">解码</button>
+        <button id="clearBtn" class="btn btn-secondary">清空</button>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </main>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      output.value = '';
+    }
+
+    document.getElementById('encodeBtn').addEventListener('click', () => {
+      output.value = encodeURIComponent(input.value);
+      hideError();
+    });
+
+    document.getElementById('decodeBtn').addEventListener('click', () => {
+      try {
+        output.value = decodeURIComponent(input.value);
+        hideError();
+      } catch (e) {
+        showError('解码失败: 输入不是有效的 URL 编码字符串');
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+      hideError();
+    });
+  </script>
+</body>
+</html>
