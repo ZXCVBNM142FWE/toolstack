@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-const tmpDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, '../../tmp');
+const tmpDir = (process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT) ? '/tmp' : path.join(__dirname, '../../tmp');
 const upload = multer({ dest: tmpDir });
 
 router.get('/', (req, res) => {
