@@ -1,3 +1,41 @@
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #fff;
+  --text: #212529;
+  --text-secondary: #6c757d;
+  --border: #dee2e6;
+  --primary: #4361ee;
+  --primary-hover: #3a56d4;
+  --code-bg: #f1f3f5;
+  --btn-secondary-bg: #e9ecef;
+  --btn-secondary-text: #495057;
+  --btn-secondary-hover: #dee2e6;
+  --header-color: #1a1a2e;
+  --footer-color: #adb5bd;
+  --shadow: rgba(0,0,0,0.08);
+  --shadow-hover: rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a2e;
+    --card-bg: #16213e;
+    --text: #e0e0e0;
+    --text-secondary: #a0a0b0;
+    --border: #2a2a4a;
+    --primary: #6c8aff;
+    --primary-hover: #5a78ee;
+    --code-bg: #0f3460;
+    --btn-secondary-bg: #2a2a4a;
+    --btn-secondary-text: #c0c0d0;
+    --btn-secondary-hover: #3a3a5a;
+    --header-color: #e0e0e0;
+    --footer-color: #606080;
+    --shadow: rgba(0,0,0,0.3);
+    --shadow-hover: rgba(0,0,0,0.5);
+  }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -6,8 +44,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: #f8f9fa;
-  color: #212529;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
   display: flex;
@@ -22,12 +60,12 @@ body {
 .header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--header-color);
 }
 
 .subtitle {
   margin-top: 8px;
-  color: #6c757d;
+  color: var(--text-secondary);
   font-size: 1rem;
 }
 
@@ -36,6 +74,50 @@ body {
   margin: 0 auto;
   padding: 0 16px;
   flex: 1;
+  width: 100%;
+}
+
+.search-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.search-wrap-inner {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px 12px 40px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  pointer-events: none;
 }
 
 .tool-grid {
@@ -46,24 +128,26 @@ body {
 
 .tool-card {
   display: block;
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 28px 20px;
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px var(--shadow);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .tool-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px var(--shadow-hover);
+}
+
+.tool-card.hidden {
+  display: none;
 }
 
 .tool-icon {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #4361ee;
+  font-size: 2rem;
   margin-bottom: 12px;
 }
 
@@ -71,23 +155,30 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #1a1a2e;
+  color: var(--header-color);
 }
 
 .tool-desc {
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--text-secondary);
+}
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
 .footer {
   text-align: center;
   padding: 32px 16px;
-  color: #adb5bd;
+  color: var(--footer-color);
   font-size: 0.85rem;
 }
 
-/* ===== 工具页面公共样式 ===== */
-
+/* 工具页 */
 .tool-page {
   max-width: 900px;
   margin: 0 auto;
@@ -98,7 +189,7 @@ body {
 .tool-page h1 {
   font-size: 1.5rem;
   margin-bottom: 24px;
-  color: #1a1a2e;
+  color: var(--header-color);
 }
 
 .tool-workspace {
@@ -115,7 +206,7 @@ body {
 .tool-panel label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #495057;
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
@@ -123,25 +214,27 @@ body {
   flex: 1;
   min-height: 360px;
   padding: 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-family: "SF Mono", "Fira Code", "Consolas", monospace;
   font-size: 0.85rem;
   resize: vertical;
   outline: none;
+  background: var(--card-bg);
+  color: var(--text);
   transition: border-color 0.15s;
 }
 
 .tool-panel textarea:focus {
-  border-color: #4361ee;
+  border-color: var(--primary);
 }
 
 .tool-panel pre {
   flex: 1;
   min-height: 360px;
   padding: 12px;
-  background: #f1f3f5;
-  border: 1px solid #dee2e6;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-family: "SF Mono", "Fira Code", "Consolas", monospace;
   font-size: 0.85rem;
@@ -149,7 +242,7 @@ body {
   word-break: break-all;
   overflow-y: auto;
   margin: 0;
-  color: #212529;
+  color: var(--text);
 }
 
 .error-msg {
@@ -177,27 +270,27 @@ body {
 }
 
 .btn-primary {
-  background: #4361ee;
+  background: var(--primary);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #3a56d4;
+  background: var(--primary-hover);
 }
 
 .btn-secondary {
-  background: #e9ecef;
-  color: #495057;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
 }
 
 .btn-secondary:hover {
-  background: #dee2e6;
+  background: var(--btn-secondary-hover);
 }
 
 .back-link {
   display: inline-block;
   margin-top: 24px;
-  color: #4361ee;
+  color: var(--primary);
   text-decoration: none;
   font-size: 0.9rem;
 }
@@ -206,20 +299,32 @@ body {
   text-decoration: underline;
 }
 
-/* ===== 响应式 ===== */
+input[type="text"], input[type="file"] {
+  color: var(--text);
+}
+
+input[type="file"]::file-selector-button {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
 
 @media (max-width: 768px) {
   .tool-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-
   .tool-workspace {
     grid-template-columns: 1fr;
   }
-
-  .tool-panel textarea,
-  .tool-panel pre {
+  .tool-panel textarea, .tool-panel pre {
     min-height: 200px;
+  }
+  .search-input {
+    max-width: 100%;
   }
 }
 
@@ -227,7 +332,6 @@ body {
   .tool-grid {
     grid-template-columns: 1fr;
   }
-
   .header h1 {
     font-size: 1.5rem;
   }
