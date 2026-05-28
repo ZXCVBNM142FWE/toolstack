@@ -3,73 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI 智能体对话工具，支持 Claude / OpenAI 多模型，服务端代理转发无需 VPN">
+  <meta name="description" content="AI 智能体对话 — 支持 Claude / OpenAI / Groq / DeepSeek / Gemini，免费模型直接聊">
   <title><%= title %></title>
   <link rel="canonical" href="https://ijuhe.top/tools/api-proxy">
-  <meta property="og:title" content="AI 智能体对话 - 在线 AI 聊天">
-  <meta property="og:description" content="支持 Claude / OpenAI，服务端代理转发">
-  <meta property="og:type" content="website">
   <link rel="stylesheet" href="/style.css">
   <style>
-    .chat-container { max-width: 800px; margin: 0 auto; }
-    .chat-config { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px; }
-    .chat-config select, .chat-config input { padding: 8px 12px; border: 1px solid #d4d4d8; border-radius: 6px; font-size: 0.9rem; }
-    .chat-config select { width: 120px; }
-    .chat-config input { flex: 1; min-width: 200px; }
-    .chat-messages { background: #f8f9fa; border-radius: 10px; padding: 16px; min-height: 400px; max-height: 60vh; overflow-y: auto; margin-bottom: 12px; }
+    .chat-wrap { max-width: 800px; margin: 0 auto; }
+    .chat-config { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
+    .chat-config select, .chat-config input { padding: 8px 12px; border: 1px solid #d4d4d8; border-radius: 6px; font-size: 0.88rem; }
+    .chat-config select { min-width: 110px; }
+    .chat-config input { flex: 1; min-width: 180px; }
+    .free-tag { font-size: 0.7rem; background: #dcfce7; color: #166534; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
+    .paid-tag { font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 1px 6px; border-radius: 3px; margin-left: 4px; }
+    .chat-log { background: #f8f9fa; border-radius: 10px; padding: 16px; min-height: 400px; max-height: 58vh; overflow-y: auto; margin-bottom: 12px; }
     .msg { margin-bottom: 14px; display: flex; gap: 8px; }
     .msg.user { flex-direction: row-reverse; }
-    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+    .msg-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
     .msg.user .msg-avatar { background: #3b82f6; color: #fff; }
-    .msg.assistant .msg-avatar { background: #10b981; color: #fff; }
-    .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .msg.bot .msg-avatar { background: #10b981; color: #fff; }
+    .msg-bubble { max-width: 78%; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
     .msg.user .msg-bubble { background: #3b82f6; color: #fff; border-bottom-right-radius: 4px; }
-    .msg.assistant .msg-bubble { background: #fff; border: 1px solid #e4e4e7; border-bottom-left-radius: 4px; }
+    .msg.bot .msg-bubble { background: #fff; border: 1px solid #e4e4e7; border-bottom-left-radius: 4px; }
     .msg-meta { font-size: 0.7rem; color: #999; margin-top: 2px; }
-    .msg.user .msg-meta { text-align: right; }
-    .chat-input-row { display: flex; gap: 8px; }
-    .chat-input-row textarea { flex: 1; padding: 10px 14px; border: 1px solid #d4d4d8; border-radius: 8px; font-size: 0.9rem; resize: none; min-height: 44px; max-height: 120px; }
-    .chat-input-row button { padding: 0 20px; border: none; border-radius: 8px; background: #3b82f6; color: #fff; font-weight: 600; cursor: pointer; }
-    .chat-input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .typing-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #999; margin: 0 2px; animation: blink 1.4s infinite; }
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes blink { 0%,60%,100% { opacity: 0.3; } 30% { opacity: 1; } }
-    .err-msg { color: #e03131; font-size: 0.85rem; padding: 8px 12px; background: #fee2e2; border-radius: 6px; margin-bottom: 10px; display: none; }
-    .tip { font-size: 0.8rem; color: #999; margin-top: 8px; text-align: center; }
+    .input-row { display: flex; gap: 8px; }
+    .input-row textarea { flex: 1; padding: 10px 14px; border: 1px solid #d4d4d8; border-radius: 8px; font-size: 0.9rem; resize: none; min-height: 44px; max-height: 120px; font-family: inherit; }
+    .input-row button { padding: 0 20px; border: none; border-radius: 8px; background: #3b82f6; color: #fff; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #aaa; margin: 0 2px; animation: dot-blink 1.4s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-blink { 0%,60%,100% { opacity: 0.3; } 30% { opacity: 1; } }
+    .err-bar { color: #e03131; font-size: 0.85rem; padding: 8px 12px; background: #fee2e2; border-radius: 6px; margin-bottom: 10px; display: none; }
+    .tip-row { font-size: 0.78rem; color: #999; margin-top: 8px; text-align: center; }
+    .tip-row a { color: #3b82f6; }
+    .key-hint { font-size: 0.72rem; color: #888; margin-top: 2px; }
   </style>
 </head>
 <body>
   <div class="tool-page">
     <h1>AI 智能体对话</h1>
 
-    <div class="chat-container">
+    <div class="chat-wrap">
       <div class="chat-config">
-        <select id="provider" onchange="onProviderChange()">
-          <option value="anthropic">Claude</option>
-          <option value="openai">OpenAI</option>
+        <select id="provider" onchange="onProvider()">
+          <option value="groq">Groq<span class="free-tag">免费</span></option>
+          <option value="deepseek">DeepSeek<span class="free-tag">免费</span></option>
+          <option value="gemini">Gemini<span class="free-tag">免费</span></option>
+          <option value="anthropic">Claude<span class="paid-tag">付费</span></option>
+          <option value="openai">OpenAI<span class="paid-tag">付费</span></option>
         </select>
-        <select id="model">
-          <option value="claude-sonnet-4-6">Claude Sonnet 4.6</option>
-          <option value="claude-opus-4-7">Claude Opus 4.7</option>
-          <option value="claude-haiku-4-5">Claude Haiku 4.5</option>
-        </select>
-        <input type="password" id="apiKey" placeholder="API Key" autocomplete="off">
+        <select id="model"></select>
+        <input type="password" id="apiKey" placeholder="API Key（免费模型也需注册获取）" autocomplete="off">
+      </div>
+      <div class="key-hint" id="key-hint"></div>
+
+      <div class="err-bar" id="err-bar"></div>
+
+      <div class="chat-log" id="chat-log">
+        <div style="text-align:center;color:#999;padding:60px 0;">选一个模型，填入 API Key，开始免费对话</div>
       </div>
 
-      <div class="err-msg" id="err-msg"></div>
-
-      <div class="chat-messages" id="chat-messages">
-        <div style="text-align:center;color:#999;padding:60px 0;">
-          选择一个模型，输入 API Key，开始对话
-        </div>
+      <div class="input-row">
+        <textarea id="input" placeholder="输入消息，Enter 发送..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send();}"></textarea>
+        <button id="send-btn" onclick="send()">发送</button>
       </div>
-
-      <div class="chat-input-row">
-        <textarea id="chat-input" placeholder="输入消息..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
-        <button id="send-btn" onclick="sendMsg()">发送</button>
+      <div class="tip-row">
+        Key 只存在浏览器，服务器不记录 ·
+        <a href="#" onclick="return toggleGuide()">如何获取免费 Key？</a>
       </div>
-      <div class="tip">消息仅通过服务器转发，不会存储你的 API Key</div>
+      <div id="guide" style="display:none;font-size:0.82rem;background:#f0f9ff;padding:12px;border-radius:8px;margin-top:10px;line-height:1.8;">
+        <b>免费 API Key 获取：</b><br>
+        🔹 <b>Groq</b> → <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a> 注册即送免费额度，速度极快<br>
+        🔹 <b>DeepSeek</b> → <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a> 注册送 500 万 tokens<br>
+        🔹 <b>Gemini</b> → <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a> 谷歌账号直接领<br>
+        🔹 <b>Claude / OpenAI</b> → 需绑定境外信用卡
+      </div>
     </div>
 
     <a href="/" style="display:block;margin-top:20px;" class="back-link">← 返回首页</a>
@@ -77,41 +86,82 @@
 
   <script>
     var messages = [];
-    var chatting = false;
+    var busy = false;
 
-    // Load saved key
-    var savedKey = localStorage.getItem('ai_api_key');
-    var savedProvider = localStorage.getItem('ai_provider') || 'anthropic';
+    var providers = {
+      groq: {
+        models: [
+          { v:'llama-4-scout-17b-16e-instruct', label:'Llama 4 Scout (免费)' },
+          { v:'llama-4-maverick-17b-128e-instruct', label:'Llama 4 Maverick (免费)' },
+          { v:'qwen-3-32b', label:'Qwen 3 32B (免费)' },
+          { v:'deepseek-r1-distill-llama-70b', label:'DeepSeek R1 70B (免费)' },
+        ],
+        hint: 'console.groq.com 注册即用，速度快'
+      },
+      deepseek: {
+        models: [
+          { v:'deepseek-chat', label:'DeepSeek V3' },
+          { v:'deepseek-reasoner', label:'DeepSeek R1 (推理)' },
+        ],
+        hint: 'platform.deepseek.com 注册送 500 万 tokens'
+      },
+      gemini: {
+        models: [
+          { v:'gemini-2.5-flash', label:'Gemini 2.5 Flash (免费)' },
+          { v:'gemini-2.5-pro', label:'Gemini 2.5 Pro (免费)' },
+        ],
+        hint: 'aistudio.google.com 谷歌账号直接领'
+      },
+      anthropic: {
+        models: [
+          { v:'claude-sonnet-4-6', label:'Claude Sonnet 4.6' },
+          { v:'claude-opus-4-7', label:'Claude Opus 4.7' },
+          { v:'claude-haiku-4-5', label:'Claude Haiku 4.5' },
+        ],
+        hint: '需境外信用卡，console.anthropic.com'
+      },
+      openai: {
+        models: [
+          { v:'gpt-4o', label:'GPT-4o' },
+          { v:'gpt-4o-mini', label:'GPT-4o Mini' },
+          { v:'o3-mini', label:'o3 Mini' },
+        ],
+        hint: '需境外信用卡，platform.openai.com'
+      }
+    };
+
+    var savedKey = localStorage.getItem('ai_key');
+    var savedProvider = localStorage.getItem('ai_provider') || 'groq';
     if (savedKey) document.getElementById('apiKey').value = savedKey;
     document.getElementById('provider').value = savedProvider;
-    onProviderChange();
+    onProvider();
 
-    function onProviderChange() {
+    function onProvider() {
       var p = document.getElementById('provider').value;
-      var m = document.getElementById('model');
       localStorage.setItem('ai_provider', p);
-      m.innerHTML = p === 'openai'
-        ? '<option value="gpt-4o">GPT-4o</option><option value="gpt-4o-mini">GPT-4o Mini</option><option value="o3-mini">o3 Mini</option>'
-        : '<option value="claude-sonnet-4-6">Claude Sonnet 4.6</option><option value="claude-opus-4-7">Claude Opus 4.7</option><option value="claude-haiku-4-5">Claude Haiku 4.5</option>';
+      var m = document.getElementById('model');
+      var list = providers[p].models;
+      m.innerHTML = list.map(function(x){ return '<option value="'+x.v+'">'+x.label+'</option>'; }).join('');
+      document.getElementById('key-hint').textContent = providers[p].hint;
     }
 
-    async function sendMsg() {
-      var input = document.getElementById('chat-input');
+    async function send() {
+      var input = document.getElementById('input');
       var text = input.value.trim();
-      if (!text || chatting) return;
+      if (!text || busy) return;
 
       var apiKey = document.getElementById('apiKey').value.trim();
       if (!apiKey) { showErr('请先输入 API Key'); return; }
-      localStorage.setItem('ai_api_key', apiKey);
+      localStorage.setItem('ai_key', apiKey);
 
       hideErr();
-      input.value = '';
-      input.style.height = 'auto';
-      chatting = true;
+      input.value = ''; input.style.height = 'auto';
+      busy = true;
       document.getElementById('send-btn').disabled = true;
 
       addMsg('user', text);
-      var typingId = addTyping();
+      messages.push({ role: 'user', content: text });
+      var tid = addTyping();
 
       try {
         var resp = await fetch('/tools/api-proxy/chat', {
@@ -121,77 +171,70 @@
             provider: document.getElementById('provider').value,
             model: document.getElementById('model').value,
             apiKey: apiKey,
-            messages: messages,
+            messages: messages.slice(0, -1),
           })
         });
         var data = await resp.json();
-
-        removeTyping(typingId);
+        removeTyping(tid);
 
         if (data.ok) {
-          addMsg('assistant', data.content, data.elapsed);
+          addMsg('bot', data.content, data.elapsed + ' · ' + data.model);
+          messages.push({ role: 'assistant', content: data.content });
         } else {
-          addMsg('assistant', '❌ ' + data.error, data.elapsed);
-          messages.pop(); // remove failed user msg
+          addMsg('bot', '❌ ' + data.error, data.elapsed);
+          messages.pop();
         }
       } catch (e) {
-        removeTyping(typingId);
-        addMsg('assistant', '❌ 网络错误: ' + e.message);
+        removeTyping(tid);
+        addMsg('bot', '❌ 网络错误: ' + e.message);
         messages.pop();
       } finally {
-        chatting = false;
+        busy = false;
         document.getElementById('send-btn').disabled = false;
-        input.focus();
       }
     }
 
-    function addMsg(role, content, elapsed) {
-      messages.push({ role: role, content: content });
-      var el = document.getElementById('chat-messages');
+    function addMsg(role, content, meta) {
+      var el = document.getElementById('chat-log');
       var div = document.createElement('div');
-      div.className = 'msg ' + role;
+      div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
       div.innerHTML =
         '<div class="msg-avatar">' + (role === 'user' ? '你' : 'AI') + '</div>' +
         '<div><div class="msg-bubble">' + esc(content) + '</div>' +
-        (elapsed ? '<div class="msg-meta">' + elapsed + '</div>' : '') + '</div>';
+        (meta ? '<div class="msg-meta">' + meta + '</div>' : '') + '</div>';
       el.appendChild(div);
       el.scrollTop = el.scrollHeight;
     }
 
     function addTyping() {
-      var el = document.getElementById('chat-messages');
+      var el = document.getElementById('chat-log');
       var div = document.createElement('div');
-      div.className = 'msg assistant';
-      div.id = 'typing-msg';
-      div.innerHTML =
-        '<div class="msg-avatar">AI</div>' +
-        '<div class="msg-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+      div.className = 'msg bot';
+      div.id = 'typing';
+      div.innerHTML = '<div class="msg-avatar">AI</div><div class="msg-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
       el.appendChild(div);
       el.scrollTop = el.scrollHeight;
-      return 'typing-msg';
+      return 'typing';
     }
 
     function removeTyping(id) {
-      var el = document.getElementById(id);
-      if (el) el.remove();
+      var e = document.getElementById(id); if (e) e.remove();
     }
 
-    function showErr(msg) {
-      var el = document.getElementById('err-msg');
-      el.textContent = msg;
-      el.style.display = 'block';
+    function showErr(m) {
+      var e = document.getElementById('err-bar'); e.textContent = m; e.style.display = 'block';
+    }
+    function hideErr() { document.getElementById('err-bar').style.display = 'none'; }
+
+    function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function toggleGuide() {
+      var g = document.getElementById('guide');
+      g.style.display = g.style.display === 'none' ? 'block' : 'none';
+      return false;
     }
 
-    function hideErr() {
-      document.getElementById('err-msg').style.display = 'none';
-    }
-
-    function esc(s) {
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    // Auto-resize textarea
-    document.getElementById('chat-input').addEventListener('input', function() {
+    document.getElementById('input').addEventListener('input', function() {
       this.style.height = 'auto';
       this.style.height = Math.min(this.scrollHeight, 120) + 'px';
     });
