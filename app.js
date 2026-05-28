@@ -15,7 +15,14 @@ process.on('unhandledRejection', (reason) => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+    },
+  },
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
@@ -53,6 +60,9 @@ try {
 
 app.use('/tools/doc-formatter', require('./routes/tools/doc-formatter'));
 app.use('/tools/ppt-generator', require('./routes/tools/ppt-generator'));
+const hotTopics = require('./routes/tools/hot-topics');
+app.use('/tools/hot-topics', hotTopics.pageRouter);
+app.use('/api/hot-topics', hotTopics.apiRouter);
 app.use('/', require('./routes/sitemap'));
 app.use('/', require('./routes/robots'));
 

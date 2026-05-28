@@ -726,3 +726,152 @@ input[type="file"]::file-selector-button {
     font-size: 1.5rem;
   }
 }
+
+/* 热点分析 */
+.hot-topics .source-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.hot-topics .source-tab {
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.hot-topics .source-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.hot-topics .source-tab.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.hot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hot-source {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--header-color);
+  padding: 16px 0 8px 0;
+  margin-top: 8px;
+}
+
+.hot-source:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.hot-source-icon {
+  margin-right: 4px;
+}
+
+.hot-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.1s;
+}
+
+.hot-item:hover {
+  background: var(--code-bg);
+}
+
+.hot-rank {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: var(--btn-secondary-bg);
+  color: var(--text-secondary);
+}
+
+.hot-rank.rank-gold {
+  background: #ffd43b;
+  color: #5c3d00;
+}
+
+.hot-rank.rank-silver {
+  background: #ced4da;
+  color: #343a40;
+}
+
+.hot-rank.rank-bronze {
+  background: #ffa94d;
+  color: #7a3d00;
+}
+
+.hot-title {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--header-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hot-heat {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: right;
+  min-width: 56px;
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-item {
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--code-bg) 25%, var(--border) 50%, var(--code-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.hot-error {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .hot-heat {
+    display: none;
+  }
+}
