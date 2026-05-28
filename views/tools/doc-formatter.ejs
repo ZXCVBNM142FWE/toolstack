@@ -22,8 +22,10 @@
   </script>
 </head>
 <body>
-  <div class="tool-page">
+  <main class="tool-page">
     <h1>文档格式整理</h1>
+
+<div class="usage-card"><h2>使用说明</h2><ol><li>上传文档（支持 .docx / .doc / .wps / .txt，最大 100MB）</li><li>在「排版要求」框中输入自然语言描述（如「宋体小四 1.5倍行距 首行缩进」），系统自动识别</li><li>或手动设置字体、字号、行距、页边距、缩进等参数</li><li>也可直接点击快速预设（课程论文 / 毕业论文 / 实验报告 / WPS 通用）</li><li>点击「生成排版文档」下载排版后的 DOCX 文件</li></ol></div>
 
     <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
       <div class="form-group">

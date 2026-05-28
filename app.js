@@ -43,8 +43,6 @@ try {
 
 app.use('/tools/doc-formatter', require('./routes/tools/doc-formatter'));
 app.use('/tools/ppt-generator', require('./routes/tools/ppt-generator'));
-app.use('/tools/api-proxy', require('./routes/tools/api-proxy'));
-
 app.use('/', require('./routes/sitemap'));
 app.use('/', require('./routes/robots'));
 
