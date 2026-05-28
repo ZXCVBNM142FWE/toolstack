@@ -32,6 +32,11 @@
       </div>
 
       <div class="form-group">
+        <label for="requirements">排版要求 <span style="font-weight:normal;color:#888;font-size:0.85rem;">（输入文字自动识别，如"宋体小四 1.5倍行距 首行缩进 标准页边距 标题居中"）</span></label>
+        <input type="text" id="requirements" name="requirements" placeholder="例如：宋体小四 1.5倍行距 首行缩进" maxlength="200" oninput="syncRequirements()">
+      </div>
+
+      <div class="form-group">
         <label for="title">文档标题（可选）</label>
         <input type="text" id="title" name="title" placeholder="留空则自动识别" maxlength="200">
       </div>
@@ -151,6 +156,63 @@
       for (var i = 0; i < keys.length; i++) {
         var el = document.getElementById(keys[i]);
         if (el) el.value = p[keys[i]];
+      }
+    }
+
+    function parseRequirements(s) {
+      var r = {};
+      if (!s) return r;
+
+      // Body font
+      if (/仿宋/.test(s)) r.bodyFont = 'fangsong';
+      else if (/楷体/.test(s)) r.bodyFont = 'kaiti';
+      else if (/宋体/.test(s)) r.bodyFont = 'simsun';
+
+      // Title font
+      if (/标题.*黑体|黑体.*标题/.test(s)) r.titleFont = 'simhei';
+      else if (/标题.*宋体|宋体.*标题/.test(s)) r.titleFont = 'simsun';
+
+      // Body size
+      if (/五号|5号/.test(s) && !/小五|小5/.test(s)) r.bodySize = '21';
+      else if (/小四|小4/.test(s)) r.bodySize = '24';
+      else if (/四号|4号/.test(s)) r.bodySize = '28';
+
+      // Title size
+      if (/三号|3号/.test(s) && !/小三|小3/.test(s)) r.titleSize = '32';
+      else if (/小二|小2/.test(s)) r.titleSize = '36';
+      else if (/二号|2号/.test(s)) r.titleSize = '44';
+
+      // Line spacing
+      if (/双倍|2倍|2\.0/.test(s)) r.lineSpacing = '2.0';
+      else if (/1\.25/.test(s)) r.lineSpacing = '1.25';
+      else if (/1\.5/.test(s)) r.lineSpacing = '1.5';
+      else if (/单倍|1倍|1\.0/.test(s)) r.lineSpacing = '1.0';
+
+      // Indent
+      if (/不缩进|无缩进|顶格/.test(s)) r.indent = 'none';
+      else if (/缩进|空两格|空2格/.test(s)) r.indent = 'on';
+
+      // Margin
+      if (/加宽/.test(s)) r.margin = 'wide';
+      else if (/较窄|窄/.test(s)) r.margin = 'narrow';
+      else if (/标准/.test(s)) r.margin = 'standard';
+
+      // Title align
+      if (/左对齐|靠左/.test(s)) r.titleAlign = 'left';
+      else if (/居中/.test(s)) r.titleAlign = 'center';
+
+      return r;
+    }
+
+    function syncRequirements() {
+      var input = document.getElementById('requirements').value;
+      var r = parseRequirements(input);
+      var keys = ['bodyFont','titleFont','bodySize','titleSize','lineSpacing','indent','margin','titleAlign'];
+      for (var i = 0; i < keys.length; i++) {
+        if (r[keys[i]]) {
+          var el = document.getElementById(keys[i]);
+          if (el) el.value = r[keys[i]];
+        }
       }
     }
   </script>
