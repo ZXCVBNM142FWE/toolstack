@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const tools = [
-  { name: 'JSON 格式化', desc: '在线 JSON 格式化、压缩、验证工具', url: '/tools/json-formatter', icon: '🔧' },
+  { name: 'JSON 格式化', desc: '在线 JSON 格式化、压缩、验证工具', url: '/tools/json-formatter', icon: '🔧', badge: '热门' },
   { name: 'Base64 编解码', desc: '在线 Base64 编码解码工具', url: '/tools/base64', icon: '🔐' },
   { name: '二维码生成', desc: '在线生成二维码图片', url: '/tools/qrcode', icon: '📱' },
   { name: 'PDF 合并', desc: '在线免费 PDF 合并工具', url: '/tools/pdf-merge', icon: '📄' },
@@ -11,7 +11,7 @@ const tools = [
   { name: 'Markdown 编辑', desc: '在线 Markdown 实时预览编辑器', url: '/tools/markdown', icon: '✍️' },
   { name: '图片压缩', desc: '在线图片压缩，支持 PNG/JPEG', url: '/tools/image-compress', icon: '🖼️' },
   { name: '文档格式整理', desc: '自动排版为标准学术格式，支持课程论文/毕业论文/实验报告', url: '/tools/doc-formatter', icon: '📝' },
-  { name: 'PPT 生成器', desc: '28套模板可选，大纲一键生成 PPTX 文件', url: '/tools/ppt-generator', icon: '📊' },
+  { name: 'PPT 生成器', desc: '28套模板可选，大纲一键生成 PPTX 文件', url: '/tools/ppt-generator', icon: '📊', badge: '新品' },
 ];
 
 router.get('/', (req, res) => {

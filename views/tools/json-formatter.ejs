@@ -19,7 +19,13 @@
 </head>
 <body>
   <main class="tool-page">
-    <h1>JSON 格式化</h1>
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">🔧</span>
+        <h1>JSON 格式化</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
 
 <div class="usage-card"><h2>使用说明</h2><ol><li>在左侧输入框中粘贴 JSON 字符串</li><li>点击「格式化」按钮美化 JSON，或点击「压缩」去除多余空格</li><li>右侧面板显示处理结果，如有语法错误会标红提示</li><li>点击「清空」按钮重置输入和输出</li></ol></div>
 
@@ -41,8 +47,18 @@
       </div>
     </div>
 
-    <a href="/" class="back-link">← 返回首页</a>
   </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
 
   <script>
     const input = document.getElementById('input');

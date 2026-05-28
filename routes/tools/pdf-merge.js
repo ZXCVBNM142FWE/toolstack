@@ -6,7 +6,10 @@ const path = require('path');
 const router = express.Router();
 
 const tmpDir = (process.env.VERCEL || process.env.RAILWAY_ENVIRONMENT) ? '/tmp' : path.join(__dirname, '../../tmp');
-const upload = multer({ dest: tmpDir });
+const upload = multer({
+  dest: tmpDir,
+  limits: { fileSize: 50 * 1024 * 1024 },
+});
 
 router.get('/', (req, res) => {
   res.render('tools/pdf-merge', { title: '在线 PDF 合并 - 免费 PDF 合并工具' });

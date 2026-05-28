@@ -34,12 +34,14 @@
         <input id="search" class="search-input" type="text" placeholder="搜索工具..." autocomplete="off">
       </div>
     </div>
+    <p class="tool-count">共 <%= tools.length %> 个工具，全部免费使用</p>
     <div class="tool-grid" id="toolGrid">
       <% tools.forEach(tool => { %>
         <a href="<%= tool.url %>" class="tool-card" data-name="<%= tool.name %>" data-desc="<%= tool.desc %>">
           <div class="tool-icon"><%= tool.icon %></div>
           <h2 class="tool-name"><%= tool.name %></h2>
           <p class="tool-desc"><%= tool.desc %></p>
+          <% if (tool.badge) { %><span class="badge"><%= tool.badge %></span><% } %>
         </a>
       <% }) %>
     </div>
@@ -47,8 +49,28 @@
   </main>
 
   <footer class="footer">
-    <p>&copy; 2026 ToolStack. 所有工具免费使用。</p>
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
   </footer>
+
+  <button class="back-to-top" id="backToTop" title="回到顶部">↑</button>
+
+  <script>
+    const btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      btn.classList.toggle('visible', window.scrollY > 300);
+    });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+
   <script>
     const search = document.getElementById('search');
     const cards = document.querySelectorAll('.tool-card');

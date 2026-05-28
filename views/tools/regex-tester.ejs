@@ -19,7 +19,13 @@
 </head>
 <body>
   <main class="tool-page">
-    <h1>正则表达式测试</h1>
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">🔍</span>
+        <h1>正则表达式测试</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
 
 <div class="usage-card"><h2>使用说明</h2><ol><li>在「正则表达式」输入框中输入正则模式（如 <code>d{4}-d{2}-d{2}</code>）</li><li>勾选需要的标志位：g（全局）、i（忽略大小写）、m（多行）</li><li>在「测试文本」框中粘贴待匹配的内容</li><li>点击「测试」查看匹配结果，匹配项会高亮显示</li></ol></div>
 
@@ -49,8 +55,18 @@
       </div>
     </div>
 
-    <a href="/" class="back-link">← 返回首页</a>
   </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
 
   <script>
     const pattern = document.getElementById('pattern');

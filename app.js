@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,8 +15,16 @@ process.on('unhandledRejection', (reason) => {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(helmet());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: '请求太频繁，请稍后再试',
+});
+app.use(limiter);
 
 app.get('/health', (req, res) => {
   res.status(200).send('OK');

@@ -23,7 +23,13 @@
 </head>
 <body>
   <main class="tool-page">
-    <h1>文档格式整理</h1>
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">📝</span>
+        <h1>文档格式整理</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
 
 <div class="usage-card"><h2>使用说明</h2><ol><li>上传文档（支持 .docx / .doc / .wps / .txt，最大 100MB）</li><li>在「排版要求」框中输入自然语言描述（如「宋体小四 1.5倍行距 首行缩进」），系统自动识别</li><li>或手动设置字体、字号、行距、页边距、缩进等参数</li><li>也可直接点击快速预设（课程论文 / 毕业论文 / 实验报告 / WPS 通用）</li><li>点击「生成排版文档」下载排版后的 DOCX 文件</li></ol></div>
 
@@ -134,8 +140,18 @@
       <button type="submit" class="btn btn-primary">生成排版文档</button>
     </form>
 
-    <a href="/" class="back-link">← 返回首页</a>
-  </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
 
   <script>
     function checkFile() {
