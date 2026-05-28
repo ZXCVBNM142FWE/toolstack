@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线 API 中转代理工具，绕过跨域限制，支持自定义请求头和方法，在线调试 API 接口">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/api-proxy">
+  <meta property="og:title" content="API 中转站 - 在线 API 代理工具">
+  <meta property="og:description" content="绕过跨域限制，在线调试 API 接口">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .url-row { display: flex; gap: 8px; }
+    .url-row select { width: 120px; }
+    .url-row input { flex: 1; }
+    .proxy-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+    .proxy-left { flex: 1 1 380px; min-width: 300px; }
+    .proxy-right { flex: 1 1 380px; min-width: 300px; }
+    .proxy-right h3 { margin-top: 0; }
+    .resp-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .resp-tag { padding: 2px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+    .resp-tag.green { background: #dcfce7; color: #166534; }
+    .resp-tag.red { background: #fee2e2; color: #991b1b; }
+    .resp-tag.blue { background: #e0f2fe; color: #075985; }
+    .resp-body {
+      background: #1e1e2e; color: #cdd6f4; padding: 14px; border-radius: 6px;
+      font-size: 0.82rem; white-space: pre-wrap; word-break: break-all;
+      max-height: 500px; overflow: auto; font-family: Consolas, monospace;
+    }
+    .resp-headers { font-size: 0.78rem; max-height: 180px; overflow: auto; margin-bottom: 10px; }
+    .resp-headers table { width: 100%; border-collapse: collapse; }
+    .resp-headers td { padding: 2px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+    .resp-headers td:first-child { font-weight: 600; white-space: nowrap; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="tool-page">
+    <h1>API 中转站</h1>
+
+    <form id="proxy-form" onsubmit="return sendRequest(event)">
+      <div class="form-group">
+        <label>请求地址 & 方法</label>
+        <div class="url-row">
+          <select id="method">
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+            <option>HEAD</option>
+            <option>OPTIONS</option>
+          </select>
+          <input type="url" id="url" placeholder="https://api.example.com/endpoint" required>
+          <button type="submit" class="btn btn-primary" id="send-btn">发送</button>
+        </div>
+      </div>
+
+      <div class="proxy-grid">
+        <div class="proxy-left">
+          <div class="form-group">
+            <label for="headers">请求头 <span style="font-weight:normal;color:#888;font-size:0.8rem;">（每行 key: value）</span></label>
+            <textarea id="headers" rows="4" placeholder="Authorization: Bearer xxx&#10;Content-Type: application/json"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="body">请求体</label>
+            <textarea id="body" rows="6" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </div>
+
+        <div class="proxy-right">
+          <h3>响应 <span id="resp-status"></span></h3>
+          <div class="resp-tags" id="resp-tags"></div>
+          <div class="resp-headers" id="resp-headers" style="display:none"></div>
+          <div class="resp-body" id="resp-body">等待请求...</div>
+        </div>
+      </div>
+    </form>
+
+    <a href="/" class="back-link">← 返回首页</a>
+  </div>
+
+  <script>
+    async function sendRequest(e) {
+      e.preventDefault();
+      var btn = document.getElementById('send-btn');
+      btn.disabled = true; btn.textContent = '发送中...';
+      document.getElementById('resp-body').textContent = '请求中...';
+      document.getElementById('resp-status').innerHTML = '';
+      document.getElementById('resp-tags').innerHTML = '';
+      document.getElementById('resp-headers').style.display = 'none';
+
+      try {
+        var r = await fetch('/tools/api-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: document.getElementById('url').value.trim(),
+            method: document.getElementById('method').value,
+            headers: document.getElementById('headers').value,
+            body: document.getElementById('body').value,
+          })
+        });
+        var d = await r.json();
+
+        if (d.ok) {
+          var cls = d.status < 400 ? 'green' : 'red';
+          document.getElementById('resp-status').innerHTML = '<span class="resp-tag ' + cls + '">' + d.status + ' ' + d.statusText + '</span>';
+
+          var size = d.size > 1024 ? (d.size/1024).toFixed(1) + ' KB' : d.size + ' B';
+          document.getElementById('resp-tags').innerHTML =
+            '<span class="resp-tag blue">' + d.elapsed + '</span>' +
+            '<span class="resp-tag blue">' + size + '</span>';
+
+          if (d.headers && Object.keys(d.headers).length) {
+            var h = '<details><summary>响应头</summary><table>';
+            Object.keys(d.headers).forEach(function(k) {
+              h += '<tr><td>' + esc(k) + '</td><td>' + esc(String(d.headers[k])) + '</td></tr>';
+            });
+            h += '</table></details>';
+            document.getElementById('resp-headers').innerHTML = h;
+            document.getElementById('resp-headers').style.display = 'block';
+          }
+
+          document.getElementById('resp-body').textContent = typeof d.body === 'string' ? d.body : JSON.stringify(d.body, null, 2);
+        } else {
+          document.getElementById('resp-status').innerHTML = '<span class="resp-tag red">出错</span>';
+          document.getElementById('resp-tags').innerHTML = '<span class="resp-tag blue">' + d.elapsed + '</span>';
+          document.getElementById('resp-body').textContent = d.error;
+        }
+      } catch (err) {
+        document.getElementById('resp-body').textContent = '请求失败: ' + err.message;
+      } finally {
+        btn.disabled = false; btn.textContent = '发送';
+      }
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ const tools = [
   { name: '图片压缩', desc: '在线图片压缩，支持 PNG/JPEG', url: '/tools/image-compress', icon: '🖼️' },
   { name: '文档格式整理', desc: '自动排版为标准学术格式，支持课程论文/毕业论文/实验报告', url: '/tools/doc-formatter', icon: '📝' },
   { name: 'PPT 生成器', desc: '28套模板可选，大纲一键生成 PPTX 文件', url: '/tools/ppt-generator', icon: '📊' },
+  { name: 'API 中转站', desc: '绕过跨域限制，在线调试 API 接口', url: '/tools/api-proxy', icon: '🔌' },
 ];
 
 router.get('/', (req, res) => {

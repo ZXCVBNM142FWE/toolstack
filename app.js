@@ -14,6 +14,7 @@ process.on('unhandledRejection', (reason) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
@@ -42,6 +43,7 @@ try {
 
 app.use('/tools/doc-formatter', require('./routes/tools/doc-formatter'));
 app.use('/tools/ppt-generator', require('./routes/tools/ppt-generator'));
+app.use('/tools/api-proxy', require('./routes/tools/api-proxy'));
 
 app.use('/', require('./routes/sitemap'));
 app.use('/', require('./routes/robots'));
