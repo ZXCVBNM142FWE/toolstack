@@ -17,10 +17,10 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext === '.docx' || ext === '.txt') {
+    if (ext === '.docx' || ext === '.doc' || ext === '.wps' || ext === '.txt') {
       cb(null, true);
     } else {
-      cb(new Error('仅支持 .docx 和 .txt 文件'));
+      cb(new Error('仅支持 .docx / .doc / .wps / .txt 文件'));
     }
   }
 });
@@ -44,6 +44,27 @@ const LINE_SPACING = {
   '1.5': 360,
   '2.0': 480,
 };
+
+function extractText(filePath, ext) {
+  if (ext === '.txt') {
+    return fs.readFileSync(filePath, 'utf-8');
+  }
+
+  if (ext === '.docx') {
+    return mammoth.extractRawText({ path: filePath }).then(r => r.value);
+  }
+
+  // .wps / .doc — try mammoth first (new WPS uses ZIP+XML), then raw text
+  try {
+    return mammoth.extractRawText({ path: filePath }).then(r => r.value);
+  } catch (_) {
+    // mammoth failed, try reading as raw text (fallback)
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const cleaned = raw.replace(/[^\x20-\x7E一-鿿　-〿＀-￯\n\r]/g, '');
+    if (cleaned.trim().length > 100) return Promise.resolve(cleaned);
+    return Promise.resolve('');
+  }
+}
 
 function buildDoc(text, options) {
   const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
@@ -122,18 +143,12 @@ router.post('/', upload.single('doc'), async (req, res) => {
     const filePath = req.file.path;
     const ext = path.extname(req.file.originalname).toLowerCase();
 
-    let text;
-    if (ext === '.txt') {
-      text = fs.readFileSync(filePath, 'utf-8');
-    } else {
-      const result = await mammoth.extractRawText({ path: filePath });
-      text = result.value;
-    }
+    let text = await extractText(filePath, ext);
 
     fs.unlinkSync(filePath);
 
     if (!text.trim()) {
-      return res.render('tools/doc-formatter', { title: '文档格式整理 - 在线学术排版工具', error: '文件中没有检测到文字内容' });
+      return res.render('tools/doc-formatter', { title: '文档格式整理 - 在线学术排版工具', error: '文件中没有检测到文字内容。WPS 文件请尝试在 WPS 中另存为 .docx 格式后重新上传。' });
     }
 
     const options = {

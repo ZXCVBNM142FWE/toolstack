@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式，支持自定义字体、字号、行距、缩进、页边距">
+  <meta name="description" content="在线文档格式整理工具，支持 DOCX/DOC/WPS/TXT 文档自动排版为标准学术格式，支持自定义字体、字号、行距、缩进、页边距">
   <title><%= title %></title>
   <link rel="canonical" href="https://ijuhe.top/tools/doc-formatter">
   <meta property="og:title" content="文档格式整理 - 在线学术排版工具">
@@ -15,7 +15,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "文档格式整理",
-    "description": "在线文档格式整理工具，将格式混乱的 DOCX/TXT 文档自动排版为标准学术格式",
+    "description": "在线文档格式整理工具，支持 DOCX/DOC/WPS/TXT 文档自动排版为标准学术格式",
     "url": "https://ijuhe.top/tools/doc-formatter",
     "applicationCategory": "UtilityApplication"
   }
@@ -27,8 +27,8 @@
 
     <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
       <div class="form-group">
-        <label for="doc">上传文档（.docx / .txt，最大 10MB）</label>
-        <input type="file" id="doc" name="doc" accept=".docx,.txt">
+        <label for="doc">上传文档（.docx / .doc / .wps / .txt，最大 10MB）</label>
+        <input type="file" id="doc" name="doc" accept=".docx,.doc,.wps,.txt">
       </div>
 
       <div class="form-group">
@@ -42,6 +42,7 @@
           <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('course')">课程论文</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('thesis')">毕业论文</button>
           <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('lab')">实验报告</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('wps')">WPS 通用</button>
         </div>
       </div>
 
@@ -139,7 +140,8 @@
     var presets = {
       course:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
       thesis:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
-      lab:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'36', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' }
+      lab:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'36', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      wps:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' }
     };
 
     function applyPreset(name) {
