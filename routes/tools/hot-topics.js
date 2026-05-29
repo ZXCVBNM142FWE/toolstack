@@ -40,17 +40,20 @@ function getStale(key) {
 }
 
 async function fetchWeibo() {
-  const res = await fetchWithTimeout('https://weibo.com/ajax/side/hotSearch');
+  const res = await fetchWithTimeout('https://weibo.com/ajax/statuses/hot_band', {
+    headers: { 'Referer': 'https://weibo.com/' }
+  });
   const json = await res.json();
+  const list = (json && json.data && json.data.band_list) || [];
   return {
     source: 'weibo',
     sourceName: '微博热搜',
     icon: '🔥',
     updatedAt: Date.now(),
-    items: (json && json.data && json.data.realtime || []).slice(0, 30).map((item, i) => ({
+    items: list.filter(item => !item.is_ad).slice(0, 30).map((item, i) => ({
       rank: i + 1,
-      title: item.word || '',
-      url: item.url || `https://s.weibo.com/weibo?q=${encodeURIComponent(item.word || '')}`,
+      title: item.word || item.note || '',
+      url: item.word_scheme || `https://s.weibo.com/weibo?q=${encodeURIComponent(item.word || '')}`,
       heat: item.raw_hot || 0,
       heatDisplay: formatHeat(item.raw_hot || 0)
     }))
@@ -58,20 +61,24 @@ async function fetchWeibo() {
 }
 
 async function fetchZhihu() {
-  const res = await fetchWithTimeout('https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total');
+  const res = await fetchWithTimeout('https://www.zhihu.com/api/v3/feed/topstory/hot-list-web');
   const json = await res.json();
+  const list = (json && json.data) || [];
   return {
     source: 'zhihu',
     sourceName: '知乎热榜',
     icon: '💡',
     updatedAt: Date.now(),
-    items: (json && json.data || []).slice(0, 30).map((item, i) => ({
-      rank: i + 1,
-      title: (item.target && item.target.title) || '',
-      url: (item.target && item.target.url) || '',
-      heat: parseInt(item.detail_text || '0', 10) || 0,
-      heatDisplay: item.detail_text || '0'
-    }))
+    items: list.slice(0, 30).map((item, i) => {
+      const target = item.target || {};
+      return {
+        rank: i + 1,
+        title: (target.title_area && target.title_area.text) || '',
+        url: (target.link && target.link.url) || '',
+        heat: 0,
+        heatDisplay: (target.metrics_area && target.metrics_area.text) || ''
+      };
+    })
   };
 }
 
