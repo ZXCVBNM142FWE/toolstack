@@ -1,21 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="免费在线 PPT 生成器，28套模板（商务/党政/学术/科技/国潮/校园/杂志/黑金/答辩6款/赛博朋克/日系/路演/深空/渐变），大纲一键生成 PPTX 文件">
+  <meta name="description" content="鍏嶈垂鍦ㄧ嚎 PPT 鐢熸垚鍣紝28濂楁ā鏉匡紙鍟嗗姟/鍏氭斂/瀛︽湳/绉戞妧/鍥芥疆/鏍″洯/鏉傚織/榛戦噾/绛旇京6娆?璧涘崥鏈嬪厠/鏃ョ郴/璺紨/娣辩┖/娓愬彉锛夛紝澶х翰涓€閿敓鎴?PPTX 鏂囦欢">
   <title><%= title %></title>
   <link rel="canonical" href="https://ijuhe.top/tools/ppt-generator">
-  <meta property="og:title" content="PPT 生成器 - 免费在线 PPT 制作工具">
-  <meta property="og:description" content="28套模板可选，大纲一键生成 PPTX">
+  <meta property="og:title" content="PPT 鐢熸垚鍣?- 鍏嶈垂鍦ㄧ嚎 PPT 鍒朵綔宸ュ叿">
+  <meta property="og:description" content="28濂楁ā鏉垮彲閫夛紝澶х翰涓€閿敓鎴?PPTX">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "PPT 生成器",
-    "description": "免费在线 PPT 生成器，多套模板可选，大纲一键生成 PPTX 文件",
+    "name": "PPT 鐢熸垚鍣?,
+    "description": "鍏嶈垂鍦ㄧ嚎 PPT 鐢熸垚鍣紝澶氬妯℃澘鍙€夛紝澶х翰涓€閿敓鎴?PPTX 鏂囦欢",
     "url": "https://ijuhe.top/tools/ppt-generator",
     "applicationCategory": "UtilityApplication"
   }
@@ -25,21 +26,21 @@
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
-        <span class="tool-header-icon">📊</span>
-        <h1>PPT 生成器</h1>
+        <span class="tool-header-icon">馃搳</span>
+        <h1>PPT 鐢熸垚鍣?/h1>
       </div>
-      <a href="/" class="tool-header-back">← 返回首页</a>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
     </div>
 
-<div class="usage-card"><h2>使用说明</h2><ol><li>从 28 套模板中选择一个喜欢的样式（可按「国内风格」/「国际风格」筛选）</li><li>在大纲文本框中输入 PPT 内容：每行 = 一页标题，行首加两个空格 = 该页要点</li><li>点击「生成 PPTX」按钮，等待服务端生成</li><li>生成完成后自动下载 PPTX 文件</li></ol></div>
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>浠?28 濂楁ā鏉夸腑閫夋嫨涓€涓枩娆㈢殑鏍峰紡锛堝彲鎸夈€屽浗鍐呴鏍笺€?銆屽浗闄呴鏍笺€嶇瓫閫夛級</li><li>鍦ㄥぇ绾叉枃鏈涓緭鍏?PPT 鍐呭锛氭瘡琛?= 涓€椤垫爣棰橈紝琛岄鍔犱袱涓┖鏍?= 璇ラ〉瑕佺偣</li><li>鐐瑰嚮銆岀敓鎴?PPTX銆嶆寜閽紝绛夊緟鏈嶅姟绔敓鎴?/li><li>鐢熸垚瀹屾垚鍚庤嚜鍔ㄤ笅杞?PPTX 鏂囦欢</li></ol></div>
 
     <form class="doc-formatter-form" method="POST" action="/tools/ppt-generator">
       <div class="form-group">
-        <label>选择模板</label>
+        <label>閫夋嫨妯℃澘</label>
         <div class="template-tabs">
-          <button type="button" class="tab-btn active" onclick="filterTemplates('all')">全部</button>
-          <button type="button" class="tab-btn" onclick="filterTemplates('domestic')">国内风格</button>
-          <button type="button" class="tab-btn" onclick="filterTemplates('international')">国际风格</button>
+          <button type="button" class="tab-btn active" onclick="filterTemplates('all')">鍏ㄩ儴</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('domestic')">鍥藉唴椋庢牸</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('international')">鍥介檯椋庢牸</button>
         </div>
         <div class="template-grid" id="templateGrid">
           <% templates.forEach(function(tpl) { %>
@@ -60,39 +61,37 @@
       </div>
 
       <div class="form-group">
-        <label for="outline">PPT 大纲（每行=一页标题，前面加两个空格=内容要点）</label>
-        <textarea id="outline" name="outline" rows="10" placeholder="项目介绍
-  背景与目标
-  核心功能
-技术架构
-  前端选型
-  后端服务
-市场分析
-  目标用户
-  竞争格局
-未来规划
-  一季度目标
-  下半年路线图"></textarea>
+        <label for="outline">PPT 澶х翰锛堟瘡琛?涓€椤垫爣棰橈紝鍓嶉潰鍔犱袱涓┖鏍?鍐呭瑕佺偣锛?/label>
+        <textarea id="outline" name="outline" rows="10" placeholder="椤圭洰浠嬬粛
+  鑳屾櫙涓庣洰鏍?  鏍稿績鍔熻兘
+鎶€鏈灦鏋?  鍓嶇閫夊瀷
+  鍚庣鏈嶅姟
+甯傚満鍒嗘瀽
+  鐩爣鐢ㄦ埛
+  绔炰簤鏍煎眬
+鏈潵瑙勫垝
+  涓€瀛ｅ害鐩爣
+  涓嬪崐骞磋矾绾垮浘"></textarea>
       </div>
 
       <% if (typeof error !== 'undefined' && error !== null) { %>
         <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
       <% } %>
 
-      <button type="submit" class="btn btn-primary">生成 PPTX</button>
+      <button type="submit" class="btn btn-primary">鐢熸垚 PPTX</button>
     </form>
 
   </main>
 
   <footer class="footer">
     <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
     </p>
-    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
   </footer>
 
   <script>

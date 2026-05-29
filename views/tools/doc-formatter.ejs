@@ -1,21 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线文档格式整理工具，支持 DOCX/DOC/WPS/TXT 文档自动排版为标准学术格式，支持自定义字体、字号、行距、缩进、页边距">
+  <meta name="description" content="鍦ㄧ嚎鏂囨。鏍煎紡鏁寸悊宸ュ叿锛屾敮鎸?DOCX/DOC/WPS/TXT 鏂囨。鑷姩鎺掔増涓烘爣鍑嗗鏈牸寮忥紝鏀寔鑷畾涔夊瓧浣撱€佸瓧鍙枫€佽璺濄€佺缉杩涖€侀〉杈硅窛">
   <title><%= title %></title>
   <link rel="canonical" href="https://ijuhe.top/tools/doc-formatter">
-  <meta property="og:title" content="文档格式整理 - 在线学术排版工具">
-  <meta property="og:description" content="上传文档自定义排版为标准学术格式">
+  <meta property="og:title" content="鏂囨。鏍煎紡鏁寸悊 - 鍦ㄧ嚎瀛︽湳鎺掔増宸ュ叿">
+  <meta property="og:description" content="涓婁紶鏂囨。鑷畾涔夋帓鐗堜负鏍囧噯瀛︽湳鏍煎紡">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "文档格式整理",
-    "description": "在线文档格式整理工具，支持 DOCX/DOC/WPS/TXT 文档自动排版为标准学术格式",
+    "name": "鏂囨。鏍煎紡鏁寸悊",
+    "description": "鍦ㄧ嚎鏂囨。鏍煎紡鏁寸悊宸ュ叿锛屾敮鎸?DOCX/DOC/WPS/TXT 鏂囨。鑷姩鎺掔増涓烘爣鍑嗗鏈牸寮?,
     "url": "https://ijuhe.top/tools/doc-formatter",
     "applicationCategory": "UtilityApplication"
   }
@@ -25,110 +26,110 @@
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
-        <span class="tool-header-icon">📝</span>
-        <h1>文档格式整理</h1>
+        <span class="tool-header-icon">馃摑</span>
+        <h1>鏂囨。鏍煎紡鏁寸悊</h1>
       </div>
-      <a href="/" class="tool-header-back">← 返回首页</a>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
     </div>
 
-<div class="usage-card"><h2>使用说明</h2><ol><li>上传文档（支持 .docx / .doc / .wps / .txt，最大 100MB）</li><li>在「排版要求」框中输入自然语言描述（如「宋体小四 1.5倍行距 首行缩进」），系统自动识别</li><li>或手动设置字体、字号、行距、页边距、缩进等参数</li><li>也可直接点击快速预设（课程论文 / 毕业论文 / 实验报告 / WPS 通用）</li><li>点击「生成排版文档」下载排版后的 DOCX 文件</li></ol></div>
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>涓婁紶鏂囨。锛堟敮鎸?.docx / .doc / .wps / .txt锛屾渶澶?100MB锛?/li><li>鍦ㄣ€屾帓鐗堣姹傘€嶆涓緭鍏ヨ嚜鐒惰瑷€鎻忚堪锛堝銆屽畫浣撳皬鍥?1.5鍊嶈璺?棣栬缂╄繘銆嶏級锛岀郴缁熻嚜鍔ㄨ瘑鍒?/li><li>鎴栨墜鍔ㄨ缃瓧浣撱€佸瓧鍙枫€佽璺濄€侀〉杈硅窛銆佺缉杩涚瓑鍙傛暟</li><li>涔熷彲鐩存帴鐐瑰嚮蹇€熼璁撅紙璇剧▼璁烘枃 / 姣曚笟璁烘枃 / 瀹為獙鎶ュ憡 / WPS 閫氱敤锛?/li><li>鐐瑰嚮銆岀敓鎴愭帓鐗堟枃妗ｃ€嶄笅杞芥帓鐗堝悗鐨?DOCX 鏂囦欢</li></ol></div>
 
     <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
       <div class="form-group">
-        <label for="doc">上传文档（.docx / .doc / .wps / .txt，最大 100MB）</label>
+        <label for="doc">涓婁紶鏂囨。锛?docx / .doc / .wps / .txt锛屾渶澶?100MB锛?/label>
         <input type="file" id="doc" name="doc" accept=".docx,.doc,.wps,.txt">
       </div>
 
       <div class="form-group">
-        <label for="requirements">排版要求 <span style="font-weight:normal;color:#888;font-size:0.85rem;">（输入文字自动识别，如"宋体小四 1.5倍行距 首行缩进 标准页边距 标题居中"）</span></label>
-        <input type="text" id="requirements" name="requirements" placeholder="例如：宋体小四 1.5倍行距 首行缩进" maxlength="200" oninput="syncRequirements()">
+        <label for="requirements">鎺掔増瑕佹眰 <span style="font-weight:normal;color:#888;font-size:0.85rem;">锛堣緭鍏ユ枃瀛楄嚜鍔ㄨ瘑鍒紝濡?瀹嬩綋灏忓洓 1.5鍊嶈璺?棣栬缂╄繘 鏍囧噯椤佃竟璺?鏍囬灞呬腑"锛?/span></label>
+        <input type="text" id="requirements" name="requirements" placeholder="渚嬪锛氬畫浣撳皬鍥?1.5鍊嶈璺?棣栬缂╄繘" maxlength="200" oninput="syncRequirements()">
       </div>
 
       <div class="form-group">
-        <label for="title">文档标题（可选）</label>
-        <input type="text" id="title" name="title" placeholder="留空则自动识别" maxlength="200">
+        <label for="title">鏂囨。鏍囬锛堝彲閫夛級</label>
+        <input type="text" id="title" name="title" placeholder="鐣欑┖鍒欒嚜鍔ㄨ瘑鍒? maxlength="200">
       </div>
 
       <div class="form-group">
-        <label>快速预设</label>
+        <label>蹇€熼璁?/label>
         <div class="preset-btns">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('course')">课程论文</button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('thesis')">毕业论文</button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('lab')">实验报告</button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('wps')">WPS 通用</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('course')">璇剧▼璁烘枃</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('thesis')">姣曚笟璁烘枃</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('lab')">瀹為獙鎶ュ憡</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('wps')">WPS 閫氱敤</button>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group form-group-half">
-          <label for="bodyFont">正文字体</label>
+          <label for="bodyFont">姝ｆ枃瀛椾綋</label>
           <select id="bodyFont" name="bodyFont">
-            <option value="simsun">宋体</option>
-            <option value="fangsong">仿宋</option>
-            <option value="kaiti">楷体</option>
+            <option value="simsun">瀹嬩綋</option>
+            <option value="fangsong">浠垮畫</option>
+            <option value="kaiti">妤蜂綋</option>
           </select>
         </div>
         <div class="form-group form-group-half">
-          <label for="titleFont">标题字体</label>
+          <label for="titleFont">鏍囬瀛椾綋</label>
           <select id="titleFont" name="titleFont">
-            <option value="simhei" selected>黑体</option>
-            <option value="simsun">宋体</option>
+            <option value="simhei" selected>榛戜綋</option>
+            <option value="simsun">瀹嬩綋</option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group form-group-half">
-          <label for="bodySize">正文字号</label>
+          <label for="bodySize">姝ｆ枃瀛楀彿</label>
           <select id="bodySize" name="bodySize">
-            <option value="21">五号（10.5pt）</option>
-            <option value="24" selected>小四（12pt）</option>
-            <option value="28">四号（14pt）</option>
+            <option value="21">浜斿彿锛?0.5pt锛?/option>
+            <option value="24" selected>灏忓洓锛?2pt锛?/option>
+            <option value="28">鍥涘彿锛?4pt锛?/option>
           </select>
         </div>
         <div class="form-group form-group-half">
-          <label for="titleSize">标题字号</label>
+          <label for="titleSize">鏍囬瀛楀彿</label>
           <select id="titleSize" name="titleSize">
-            <option value="32">三号（16pt）</option>
-            <option value="36">小二（18pt）</option>
-            <option value="44" selected>二号（22pt）</option>
+            <option value="32">涓夊彿锛?6pt锛?/option>
+            <option value="36">灏忎簩锛?8pt锛?/option>
+            <option value="44" selected>浜屽彿锛?2pt锛?/option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group form-group-half">
-          <label for="lineSpacing">行距</label>
+          <label for="lineSpacing">琛岃窛</label>
           <select id="lineSpacing" name="lineSpacing">
-            <option value="1.0">单倍行距</option>
-            <option value="1.25">1.25 倍</option>
-            <option value="1.5" selected>1.5 倍</option>
-            <option value="2.0">双倍行距</option>
+            <option value="1.0">鍗曞€嶈璺?/option>
+            <option value="1.25">1.25 鍊?/option>
+            <option value="1.5" selected>1.5 鍊?/option>
+            <option value="2.0">鍙屽€嶈璺?/option>
           </select>
         </div>
         <div class="form-group form-group-half">
-          <label for="margin">页边距</label>
+          <label for="margin">椤佃竟璺?/label>
           <select id="margin" name="margin">
-            <option value="standard" selected>标准（上下 2.54 左右 3.18 cm）</option>
-            <option value="wide">加宽（上下 2.54 左右 4.28 cm）</option>
-            <option value="narrow">较窄（上下 1.27 左右 1.27 cm）</option>
+            <option value="standard" selected>鏍囧噯锛堜笂涓?2.54 宸﹀彸 3.18 cm锛?/option>
+            <option value="wide">鍔犲锛堜笂涓?2.54 宸﹀彸 4.28 cm锛?/option>
+            <option value="narrow">杈冪獎锛堜笂涓?1.27 宸﹀彸 1.27 cm锛?/option>
           </select>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group form-group-half">
-          <label for="indent">首行缩进</label>
+          <label for="indent">棣栬缂╄繘</label>
           <select id="indent" name="indent">
-            <option value="on" selected>2 字符</option>
-            <option value="none">无缩进</option>
+            <option value="on" selected>2 瀛楃</option>
+            <option value="none">鏃犵缉杩?/option>
           </select>
         </div>
         <div class="form-group form-group-half">
-          <label for="titleAlign">标题对齐</label>
+          <label for="titleAlign">鏍囬瀵归綈</label>
           <select id="titleAlign" name="titleAlign">
-            <option value="center" selected>居中</option>
-            <option value="left">左对齐</option>
+            <option value="center" selected>灞呬腑</option>
+            <option value="left">宸﹀榻?/option>
           </select>
         </div>
       </div>
@@ -137,26 +138,26 @@
         <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
       <% } %>
 
-      <button type="submit" class="btn btn-primary">生成排版文档</button>
+      <button type="submit" class="btn btn-primary">鐢熸垚鎺掔増鏂囨。</button>
     </form>
 
   </main>
 
   <footer class="footer">
     <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
     </p>
-    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
   </footer>
 
   <script>
     function checkFile() {
       var f = document.getElementById('doc');
-      if (!f.files.length) { alert('请先选择要上传的文件'); return false; }
+      if (!f.files.length) { alert('璇峰厛閫夋嫨瑕佷笂浼犵殑鏂囦欢'); return false; }
       return true;
     }
 
@@ -182,42 +183,42 @@
       if (!s) return r;
 
       // Body font
-      if (/仿宋/.test(s)) r.bodyFont = 'fangsong';
-      else if (/楷体/.test(s)) r.bodyFont = 'kaiti';
-      else if (/宋体/.test(s)) r.bodyFont = 'simsun';
+      if (/浠垮畫/.test(s)) r.bodyFont = 'fangsong';
+      else if (/妤蜂綋/.test(s)) r.bodyFont = 'kaiti';
+      else if (/瀹嬩綋/.test(s)) r.bodyFont = 'simsun';
 
       // Title font
-      if (/标题.*黑体|黑体.*标题/.test(s)) r.titleFont = 'simhei';
-      else if (/标题.*宋体|宋体.*标题/.test(s)) r.titleFont = 'simsun';
+      if (/鏍囬.*榛戜綋|榛戜綋.*鏍囬/.test(s)) r.titleFont = 'simhei';
+      else if (/鏍囬.*瀹嬩綋|瀹嬩綋.*鏍囬/.test(s)) r.titleFont = 'simsun';
 
       // Body size
-      if (/五号|5号/.test(s) && !/小五|小5/.test(s)) r.bodySize = '21';
-      else if (/小四|小4/.test(s)) r.bodySize = '24';
-      else if (/四号|4号/.test(s)) r.bodySize = '28';
+      if (/浜斿彿|5鍙?.test(s) && !/灏忎簲|灏?/.test(s)) r.bodySize = '21';
+      else if (/灏忓洓|灏?/.test(s)) r.bodySize = '24';
+      else if (/鍥涘彿|4鍙?.test(s)) r.bodySize = '28';
 
       // Title size
-      if (/三号|3号/.test(s) && !/小三|小3/.test(s)) r.titleSize = '32';
-      else if (/小二|小2/.test(s)) r.titleSize = '36';
-      else if (/二号|2号/.test(s)) r.titleSize = '44';
+      if (/涓夊彿|3鍙?.test(s) && !/灏忎笁|灏?/.test(s)) r.titleSize = '32';
+      else if (/灏忎簩|灏?/.test(s)) r.titleSize = '36';
+      else if (/浜屽彿|2鍙?.test(s)) r.titleSize = '44';
 
       // Line spacing
-      if (/双倍|2倍|2\.0/.test(s)) r.lineSpacing = '2.0';
+      if (/鍙屽€峾2鍊峾2\.0/.test(s)) r.lineSpacing = '2.0';
       else if (/1\.25/.test(s)) r.lineSpacing = '1.25';
       else if (/1\.5/.test(s)) r.lineSpacing = '1.5';
-      else if (/单倍|1倍|1\.0/.test(s)) r.lineSpacing = '1.0';
+      else if (/鍗曞€峾1鍊峾1\.0/.test(s)) r.lineSpacing = '1.0';
 
       // Indent
-      if (/不缩进|无缩进|顶格/.test(s)) r.indent = 'none';
-      else if (/缩进|空两格|空2格/.test(s)) r.indent = 'on';
+      if (/涓嶇缉杩泑鏃犵缉杩泑椤舵牸/.test(s)) r.indent = 'none';
+      else if (/缂╄繘|绌轰袱鏍紎绌?鏍?.test(s)) r.indent = 'on';
 
       // Margin
-      if (/加宽/.test(s)) r.margin = 'wide';
-      else if (/较窄|窄/.test(s)) r.margin = 'narrow';
-      else if (/标准/.test(s)) r.margin = 'standard';
+      if (/鍔犲/.test(s)) r.margin = 'wide';
+      else if (/杈冪獎|绐?.test(s)) r.margin = 'narrow';
+      else if (/鏍囧噯/.test(s)) r.margin = 'standard';
 
       // Title align
-      if (/左对齐|靠左/.test(s)) r.titleAlign = 'left';
-      else if (/居中/.test(s)) r.titleAlign = 'center';
+      if (/宸﹀榻恷闈犲乏/.test(s)) r.titleAlign = 'left';
+      else if (/灞呬腑/.test(s)) r.titleAlign = 'center';
 
       return r;
     }

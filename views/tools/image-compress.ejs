@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线图片压缩工具，免费压缩 PNG/JPEG 图片，完全免费无需注册">
+  <meta name="description" content="鍦ㄧ嚎鍥剧墖鍘嬬缉宸ュ叿锛屽厤璐瑰帇缂?PNG/JPEG 鍥剧墖锛屽畬鍏ㄥ厤璐规棤闇€娉ㄥ唽">
   <title><%= title %></title>
   <link rel="stylesheet" href="/style.css">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "图片压缩",
-    "description": "在线图片压缩工具，支持 PNG/JPEG",
+    "name": "鍥剧墖鍘嬬缉",
+    "description": "鍦ㄧ嚎鍥剧墖鍘嬬缉宸ュ叿锛屾敮鎸?PNG/JPEG",
     "url": "https://ijuhe.top/tools/image-compress",
     "applicationCategory": "UtilityApplication"
   }
@@ -21,44 +22,44 @@
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
-        <span class="tool-header-icon">🖼️</span>
-        <h1>图片压缩</h1>
+        <span class="tool-header-icon">馃柤锔?/span>
+        <h1>鍥剧墖鍘嬬缉</h1>
       </div>
-      <a href="/" class="tool-header-back">← 返回首页</a>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
     </div>
 
-<div class="usage-card"><h2>使用说明</h2><ol><li>点击选择需要压缩的图片（支持 PNG/JPEG 等常见格式）</li><li>拖动质量滑块调节压缩比例（默认 80%，越低文件越小但画质越差）</li><li>点击「压缩并下载」按钮，等待服务端处理</li><li>压缩完成后自动下载，页面同时显示原图和压缩后的对比</li></ol></div>
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鐐瑰嚮閫夋嫨闇€瑕佸帇缂╃殑鍥剧墖锛堟敮鎸?PNG/JPEG 绛夊父瑙佹牸寮忥級</li><li>鎷栧姩璐ㄩ噺婊戝潡璋冭妭鍘嬬缉姣斾緥锛堥粯璁?80%锛岃秺浣庢枃浠惰秺灏忎絾鐢昏川瓒婂樊锛?/li><li>鐐瑰嚮銆屽帇缂╁苟涓嬭浇銆嶆寜閽紝绛夊緟鏈嶅姟绔鐞?/li><li>鍘嬬缉瀹屾垚鍚庤嚜鍔ㄤ笅杞斤紝椤甸潰鍚屾椂鏄剧ず鍘熷浘鍜屽帇缂╁悗鐨勫姣?/li></ol></div>
 
     <div class="tool-workspace">
       <div class="tool-panel" style="grid-column:1/-1;">
-        <label for="fileInput">选择图片</label>
+        <label for="fileInput">閫夋嫨鍥剧墖</label>
         <input type="file" id="fileInput" accept="image/*" style="margin-top:8px;">
       </div>
       <div class="tool-panel">
-        <label>原图</label>
+        <label>鍘熷浘</label>
         <div style="flex:1;min-height:200px;display:flex;align-items:center;justify-content:center;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;overflow:hidden;">
           <img id="originalPreview" style="max-width:100%;max-height:200px;display:none;">
-          <span id="noPreview" style="color:#adb5bd;">预览</span>
+          <span id="noPreview" style="color:#adb5bd;">棰勮</span>
         </div>
         <div id="originalSize" style="font-size:0.85rem;color:#6c757d;margin-top:4px;"></div>
       </div>
       <div class="tool-panel">
-        <label>压缩后</label>
+        <label>鍘嬬缉鍚?/label>
         <div style="flex:1;min-height:200px;display:flex;align-items:center;justify-content:center;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;overflow:hidden;">
           <img id="compressedPreview" style="max-width:100%;max-height:200px;display:none;">
-          <span id="noCompressed" style="color:#adb5bd;">点击压缩</span>
+          <span id="noCompressed" style="color:#adb5bd;">鐐瑰嚮鍘嬬缉</span>
         </div>
         <div id="compressedSize" style="font-size:0.85rem;color:#6c757d;margin-top:4px;"></div>
       </div>
 
       <div class="tool-panel" style="grid-column:1/-1;">
-        <label for="quality">质量: <span id="qualityVal">80</span></label>
+        <label for="quality">璐ㄩ噺: <span id="qualityVal">80</span></label>
         <input type="range" id="quality" min="1" max="100" value="80" style="width:100%;">
       </div>
 
       <div class="tool-actions">
-        <button id="compressBtn" class="btn btn-primary">压缩下载</button>
-        <button id="clearBtn" class="btn btn-secondary">清空</button>
+        <button id="compressBtn" class="btn btn-primary">鍘嬬缉涓嬭浇</button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
       </div>
 
       <div id="error" class="error-msg" style="grid-column:1/-1;"></div>
@@ -68,13 +69,13 @@
 
   <footer class="footer">
     <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
     </p>
-    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
   </footer>
 
   <script>
@@ -100,7 +101,7 @@
       originalPreview.src = url;
       originalPreview.style.display = '';
       document.getElementById('noPreview').style.display = 'none';
-      document.getElementById('originalSize').textContent = '原图: ' + (fileInput.files[0].size / 1024).toFixed(1) + ' KB';
+      document.getElementById('originalSize').textContent = '鍘熷浘: ' + (fileInput.files[0].size / 1024).toFixed(1) + ' KB';
       compressedPreview.style.display = 'none';
       document.getElementById('noCompressed').style.display = '';
       document.getElementById('compressedSize').textContent = '';
@@ -109,7 +110,7 @@
 
     document.getElementById('compressBtn').addEventListener('click', async () => {
       if (!fileInput.files[0]) {
-        showError('请选择一张图片');
+        showError('璇烽€夋嫨涓€寮犲浘鐗?);
         return;
       }
 
@@ -121,13 +122,13 @@
         const resp = await fetch('/tools/image-compress', { method: 'POST', body: formData });
         if (!resp.ok) {
           const data = await resp.json();
-          showError(data.error || '压缩失败');
+          showError(data.error || '鍘嬬缉澶辫触');
           return;
         }
         const result = await resp.json();
         document.getElementById('compressedSize').textContent =
-          '压缩后: ' + (result.compressed / 1024).toFixed(1) + ' KB (' +
-          (100 - result.compressed / result.original * 100).toFixed(1) + '% 减小)';
+          '鍘嬬缉鍚? ' + (result.compressed / 1024).toFixed(1) + ' KB (' +
+          (100 - result.compressed / result.original * 100).toFixed(1) + '% 鍑忓皬)';
 
         const byteString = atob(result.data);
         const bytes = new Uint8Array(byteString.length);
@@ -146,7 +147,7 @@
 
         hideError();
       } catch (e) {
-        showError('请求失败: ' + e.message);
+        showError('璇锋眰澶辫触: ' + e.message);
       }
     });
 

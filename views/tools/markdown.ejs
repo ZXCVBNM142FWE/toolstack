@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线 Markdown 编辑器，支持实时预览，完全免费无需注册">
+  <meta name="description" content="鍦ㄧ嚎 Markdown 缂栬緫鍣紝鏀寔瀹炴椂棰勮锛屽畬鍏ㄥ厤璐规棤闇€娉ㄥ唽">
   <title><%= title %></title>
   <link rel="stylesheet" href="/style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -11,8 +12,8 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Markdown 编辑器",
-    "description": "在线 Markdown 实时预览编辑器",
+    "name": "Markdown 缂栬緫鍣?,
+    "description": "鍦ㄧ嚎 Markdown 瀹炴椂棰勮缂栬緫鍣?,
     "url": "https://ijuhe.top/tools/markdown",
     "applicationCategory": "UtilityApplication"
   }
@@ -30,26 +31,26 @@
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
-        <span class="tool-header-icon">✍️</span>
-        <h1>Markdown 编辑器</h1>
+        <span class="tool-header-icon">鉁嶏笍</span>
+        <h1>Markdown 缂栬緫鍣?/h1>
       </div>
-      <a href="/" class="tool-header-back">← 返回首页</a>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
     </div>
 
-<div class="usage-card"><h2>使用说明</h2><ol><li>在左侧编辑区输入 Markdown 格式文本</li><li>右侧预览区实时显示渲染后的效果</li><li>支持标题、列表、代码块、引用、链接、图片等标准语法</li><li>初始已填入示例内容供参考，可清空后自行编辑</li></ol></div>
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鍦ㄥ乏渚х紪杈戝尯杈撳叆 Markdown 鏍煎紡鏂囨湰</li><li>鍙充晶棰勮鍖哄疄鏃舵樉绀烘覆鏌撳悗鐨勬晥鏋?/li><li>鏀寔鏍囬銆佸垪琛ㄣ€佷唬鐮佸潡銆佸紩鐢ㄣ€侀摼鎺ャ€佸浘鐗囩瓑鏍囧噯璇硶</li><li>鍒濆宸插～鍏ョず渚嬪唴瀹逛緵鍙傝€冿紝鍙竻绌哄悗鑷缂栬緫</li></ol></div>
 
     <div class="tool-workspace">
       <div class="tool-panel">
-        <label for="input">编辑</label>
-        <textarea id="input" placeholder="在这里写 Markdown..."></textarea>
+        <label for="input">缂栬緫</label>
+        <textarea id="input" placeholder="鍦ㄨ繖閲屽啓 Markdown..."></textarea>
       </div>
       <div class="tool-panel">
-        <label>预览</label>
+        <label>棰勮</label>
         <div id="preview" class="markdown-preview"></div>
       </div>
 
       <div class="tool-actions">
-        <button id="clearBtn" class="btn btn-secondary">清空</button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
       </div>
     </div>
 
@@ -57,30 +58,30 @@
 
   <footer class="footer">
     <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
     </p>
-    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
   </footer>
 
   <script>
     const input = document.getElementById('input');
     const preview = document.getElementById('preview');
 
-    const defaultMd = '# 欢迎使用 Markdown\n\n' +
-      '## 标题\n' +
-      '**粗体** 和 *斜体* 文本\n\n' +
-      '### 代码块\n' +
+    const defaultMd = '# 娆㈣繋浣跨敤 Markdown\n\n' +
+      '## 鏍囬\n' +
+      '**绮椾綋** 鍜?*鏂滀綋* 鏂囨湰\n\n' +
+      '### 浠ｇ爜鍧梊n' +
       '```javascript\nconsole.log("Hello World");\n```\n\n' +
-      '### 列表\n' +
-      '- 项目 1\n' +
-      '- 项目 2\n' +
-      '- 项目 3\n\n' +
-      '### 引用\n> 这是一段引用文字\n\n' +
-      '### 链接\n[访问 Google](https://www.google.com)';
+      '### 鍒楄〃\n' +
+      '- 椤圭洰 1\n' +
+      '- 椤圭洰 2\n' +
+      '- 椤圭洰 3\n\n' +
+      '### 寮曠敤\n> 杩欐槸涓€娈靛紩鐢ㄦ枃瀛梊n\n' +
+      '### 閾炬帴\n[璁块棶 Google](https://www.google.com)';
 
     input.value = defaultMd;
     preview.innerHTML = marked.parse(defaultMd);
