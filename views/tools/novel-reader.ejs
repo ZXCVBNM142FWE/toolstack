@@ -22,7 +22,7 @@
       border-right: 1px solid var(--border);
       background: var(--code-bg);
       overflow-y: auto;
-      max-height: 70vh;
+      max-height: 80vh;
     }
     .novel-sidebar-header {
       position: sticky;
@@ -61,7 +61,7 @@
     .novel-content-area {
       display: flex;
       flex-direction: column;
-      max-height: 70vh;
+      max-height: 80vh;
     }
     .novel-toolbar {
       display: flex;
@@ -102,27 +102,29 @@
     .novel-text-wrap {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 32px 24px;
     }
     .novel-text {
       margin: 0 auto;
       line-height: 1.8;
-      font-size: 18px;
+      font-size: 17px;
+      font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
       color: var(--text);
+      letter-spacing: 0.03em;
     }
     .novel-text p {
-      margin-bottom: 0.8em;
+      margin-bottom: 1.2em;
       text-indent: 2em;
     }
-    .novel-text.size-small { font-size: 16px; }
-    .novel-text.size-medium { font-size: 18px; }
-    .novel-text.size-large { font-size: 20px; }
-    .novel-text.line-compact { line-height: 1.5; }
+    .novel-text.size-small { font-size: 15px; }
+    .novel-text.size-medium { font-size: 17px; }
+    .novel-text.size-large { font-size: 19px; }
+    .novel-text.line-compact { line-height: 1.6; }
     .novel-text.line-normal { line-height: 1.8; }
-    .novel-text.line-loose { line-height: 2.2; }
-    .novel-text.width-narrow { max-width: 720px; }
-    .novel-text.width-medium { max-width: 900px; }
-    .novel-text.width-wide { max-width: 1100px; }
+    .novel-text.line-loose { line-height: 2.1; }
+    .novel-text.width-narrow { max-width: 480px; }
+    .novel-text.width-medium { max-width: 560px; }
+    .novel-text.width-wide { max-width: 640px; }
     .novel-nav {
       display: flex;
       align-items: center;
@@ -153,9 +155,9 @@
     }
     .novel-chapter-title {
       text-align: center;
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       font-weight: 700;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       color: var(--header-color);
     }
     .novel-placeholder {
@@ -265,14 +267,14 @@
             <label>宽度</label>
             <select id="widthSel">
               <option value="width-narrow">窄</option>
-              <option value="width-medium">中</option>
-              <option value="width-wide" selected>宽</option>
+              <option value="width-medium" selected>中</option>
+              <option value="width-wide">宽</option>
             </select>
             <div class="sep"></div>
             <button id="themeToggle" title="切换深色/浅色模式">🌓 深浅</button>
           </div>
           <div class="novel-text-wrap" id="textWrap">
-            <div class="novel-text size-medium line-normal width-wide" id="novelText">
+            <div class="novel-text size-medium line-normal width-medium" id="novelText">
               <div class="novel-placeholder"><span class="spinner"></span> 加载中...</div>
             </div>
           </div>
@@ -421,18 +423,43 @@
     textWrap.addEventListener('scroll', () => { saveState(); });
 
     // Theme toggle
-    let darkMode = false;
-    themeToggle.addEventListener('click', () => {
-      darkMode = !darkMode;
+    let darkMode = localStorage.getItem('novel-dark-mode') === '1';
+    function applyTheme() {
       if (darkMode) {
-        document.body.style.background = '#1a1a2e';
-        document.body.style.color = '#e0e0e0';
+        document.documentElement.style.setProperty('--text', '#d0d0d0');
+        document.documentElement.style.setProperty('--card-bg', '#1a1a1a');
+        document.documentElement.style.setProperty('--code-bg', '#141414');
+        document.documentElement.style.setProperty('--border', '#333');
+        document.documentElement.style.setProperty('--text-secondary', '#999');
+        document.documentElement.style.setProperty('--header-color', '#e0e0e0');
+        document.documentElement.style.setProperty('--btn-secondary-bg', '#2a2a2a');
+        document.documentElement.style.setProperty('--btn-secondary-text', '#d0d0d0');
+        document.documentElement.style.setProperty('--btn-secondary-hover', '#3a3a3a');
+        document.documentElement.style.setProperty('--shadow', 'rgba(0,0,0,0.4)');
+        document.body.style.background = '#111';
+        document.body.style.color = '#d0d0d0';
         themeToggle.textContent = '☀️ 浅色';
       } else {
+        document.documentElement.style.setProperty('--text', '');
+        document.documentElement.style.setProperty('--card-bg', '');
+        document.documentElement.style.setProperty('--code-bg', '');
+        document.documentElement.style.setProperty('--border', '');
+        document.documentElement.style.setProperty('--text-secondary', '');
+        document.documentElement.style.setProperty('--header-color', '');
+        document.documentElement.style.setProperty('--btn-secondary-bg', '');
+        document.documentElement.style.setProperty('--btn-secondary-text', '');
+        document.documentElement.style.setProperty('--btn-secondary-hover', '');
+        document.documentElement.style.setProperty('--shadow', '');
         document.body.style.background = '';
         document.body.style.color = '';
         themeToggle.textContent = '🌓 深浅';
       }
+    }
+    applyTheme();
+    themeToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+      localStorage.setItem('novel-dark-mode', darkMode ? '1' : '0');
+      applyTheme();
     });
 
     // Preferences
