@@ -501,31 +501,37 @@
       currentIndex = Math.max(0, Math.min(index, chapters.length - 1));
       const ch = chapters[currentIndex];
 
-      if (isRemote && !ch.content) {
-        // need to fetch
+      if (!ch.content) {
         novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
         updateNav();
         updateChapterList();
 
-        if (contentCache[ch.url]) {
-          ch.content = contentCache[ch.url];
-        } else {
-          try {
-            const resp = await fetch('/api/novel/get-chapter', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url: ch.url })
-            });
+        try {
+          if (isRemote) {
+            if (contentCache[ch.url]) {
+              ch.content = contentCache[ch.url];
+            } else {
+              const resp = await fetch('/api/novel/get-chapter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: ch.url })
+              });
+              const data = await resp.json();
+              if (data.error) throw new Error(data.error);
+              ch.title = data.title || ch.title;
+              ch.content = data.content;
+              contentCache[ch.url] = data.content;
+            }
+          } else {
+            const resp = await fetch(ch.url);
             const data = await resp.json();
-            if (data.error) throw new Error(data.error);
-            ch.title = data.title || ch.title;
             ch.content = data.content;
-            contentCache[ch.url] = data.content;
-          } catch (e) {
-            novelText.innerHTML = '<div class="novel-placeholder">加载失败: ' + escapeHTML(e.message) + '</div>';
-            updateChapterList();
-            return;
+            if (data.title) ch.title = data.title;
           }
+        } catch (e) {
+          novelText.innerHTML = '<div class="novel-placeholder">加载失败: ' + escapeHTML(e.message) + '</div>';
+          updateChapterList();
+          return;
         }
       }
 
@@ -737,15 +743,6 @@
         contentCache = {};
         showReader();
         bookTitle.textContent = slug;
-        // pre-fetch all chapters from local storage (fast, no delay needed)
-        for (const ch of chapters) {
-          try {
-            const cr = await fetch(ch.url);
-            const cd = await cr.json();
-            ch.content = cd.content;
-            if (cd.title) ch.title = cd.title;
-          } catch (e) { /* skip failed chapter */ }
-        }
         renderChapter(0);
       } catch (e) {
         alert('加载失败: ' + e.message);
