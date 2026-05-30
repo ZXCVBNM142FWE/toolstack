@@ -472,18 +472,23 @@
           return;
         }
         shelfList.innerHTML = data.books.map(b =>
-          '<div class="tool-card" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '" onclick="loadBook(\'' + escapeHTML(b.slug) + '\')">' +
+          '<div class="tool-card shelf-book" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '">' +
           '<div style="font-size:1.5rem;margin-bottom:8px;">📖</div>' +
           '<div style="font-weight:600;font-size:1rem;margin-bottom:4px;">' + escapeHTML(b.title || b.slug) + '</div>' +
           '<div style="font-size:0.8rem;color:var(--text-secondary);">' + (b.chapterCount || 0) + ' 章</div>' +
           '</div>'
         ).join('');
+        // Event delegation (CSP-safe, no inline onclick)
+        shelfList.onclick = (e) => {
+          const card = e.target.closest('.shelf-book');
+          if (card) loadBook(card.dataset.slug);
+        };
       } catch (e) {
         shelfList.innerHTML = '<div style="color:#e03131;font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">加载书架失败: ' + escapeHTML(e.message) + '</div>';
       }
     }
 
-    window.loadBook = async function(slug) {
+    async function loadBook(slug) {
       try {
         const resp = await fetch('/api/novel/local/' + encodeURIComponent(slug) + '/meta');
         const meta = await resp.json();
