@@ -78,7 +78,8 @@ node scripts/crawl-novel.js http://www.leshugu.info/html/0/626/ 蛊真人
 
 | # | 完成时间 | 任务 | 结果 |
 |---|---------|------|------|
-| 5 | 2026-05-30 | 小说预爬取存储 + 本地书架 | crawl-novel.js 10 路并发+断点续爬+重试，API shelf/local 路由，前端书架 tab，蛊真人已缓存 360 章（源站暂时不可达） |
+| 6 | 2026-05-30 | 修复 Render 503 | 加 `app.set('trust proxy', 1)` 在 rate-limit 之前，信任 Render 代理的 X-Forwarded-For |
+| 5 | 2026-05-30 | 小说预爬取存储 + 本地书架 | crawl-novel.js 断点续爬完成，2360 章全部缓存，API+前端就绪 |
 | 4 | 2026-05-30 | 修复 Cloudflare 403 | fetchHTML 改用 curl 子进程 |
 | 3 | 2026-05-30 | 小说阅读器 v2 | URL 爬取 API + 前端 |
 | 2 | 2026-05-30 | 新增小说阅读器 | 基础版本 |
