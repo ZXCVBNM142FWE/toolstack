@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="在线小说阅读器，支持 URL 爬取 / TXT 上传 / 粘贴文本，自动分章，舒适阅读体验">
+  <meta name="description" content="在线小说阅读器，舒适阅读体验">
   <title><%= title %></title>
   <link rel="stylesheet" href="/style.css">
   <style>
@@ -57,14 +57,6 @@
     .chapter-list li.active {
       background: var(--primary);
       color: #fff;
-    }
-    .chapter-list li.loading-ch {
-      background: var(--btn-secondary-bg);
-      color: var(--text-secondary);
-      pointer-events: none;
-    }
-    .chapter-list li.loading-ch::after {
-      content: ' ⏳';
     }
     .novel-content-area {
       display: flex;
@@ -183,54 +175,6 @@
       color: var(--text);
       padding: 4px;
     }
-    .mode-tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 16px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .mode-tab {
-      flex: 1;
-      padding: 10px 16px;
-      text-align: center;
-      cursor: pointer;
-      font-size: 0.88rem;
-      font-weight: 500;
-      background: var(--card-bg);
-      color: var(--text-secondary);
-      border: none;
-      font-family: inherit;
-      transition: all 0.15s;
-    }
-    .mode-tab + .mode-tab { border-left: 1px solid var(--border); }
-    .mode-tab:hover { color: var(--primary); }
-    .mode-tab.active {
-      background: var(--primary);
-      color: #fff;
-    }
-    .crawl-input-row {
-      display: flex;
-      gap: 10px;
-    }
-    .crawl-input-row input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      background: var(--card-bg);
-      color: var(--text);
-      outline: none;
-      font-family: inherit;
-    }
-    .crawl-input-row input:focus { border-color: var(--primary); }
-    .crawl-status {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
     .spinner {
       display: inline-block;
       width: 16px;
@@ -280,58 +224,18 @@
       <a href="/" class="tool-header-back">← 返回首页</a>
     </div>
 
-    <div class="usage-card"><h2>使用说明</h2><ol><li>书架：查看已爬取到本地的整本小说，点击即读</li><li>在线爬取：输入小说目录页 URL，自动抓取章节列表</li><li>上传/粘贴：上传 TXT 或粘贴文本，自动识别章节分章</li><li>可调节字体大小、行间距和阅读宽度</li></ol></div>
-
-    <!-- 导入区 -->
-    <div id="importArea" style="margin-bottom:18px;">
-
-      <!-- 模式切换 tab -->
-      <div class="mode-tabs" id="modeTabs">
-        <button class="mode-tab active" data-mode="shelf">📚 书架</button>
-        <button class="mode-tab" data-mode="crawl">🌐 在线爬取</button>
-        <button class="mode-tab" data-mode="upload">📂 上传文件</button>
-        <button class="mode-tab" data-mode="paste">📋 粘贴文本</button>
-      </div>
-
-      <!-- 书架模式 -->
-      <div id="modeShelf">
-        <div id="shelfList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
-          <div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">
-            <span class="spinner"></span> 加载书架...
-          </div>
+    <!-- 书架 -->
+    <div id="shelfArea">
+      <div id="shelfList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+        <div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">
+          <span class="spinner"></span> 加载书架...
         </div>
-      </div>
-
-      <!-- 上传模式 -->
-      <div id="modeUpload" style="display:none;">
-        <label class="btn btn-secondary" style="cursor:pointer;margin:0;">
-          上传 TXT 文件
-          <input type="file" id="fileInput" accept=".txt" style="display:none;">
-        </label>
-      </div>
-
-      <!-- 粘贴模式 -->
-      <div id="modePaste" style="display:none;">
-        <textarea id="pasteInput" placeholder="在此粘贴小说内容..." style="width:100%;min-height:200px;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;outline:none;background:var(--card-bg);color:var(--text);"></textarea>
-        <div style="margin-top:8px;display:flex;gap:8px;">
-          <button id="loadPasteBtn" class="btn btn-primary btn-sm">加载文本</button>
-        </div>
-      </div>
-
-      <!-- 爬取模式 -->
-      <div id="modeCrawl" style="display:none;">
-        <div class="crawl-input-row">
-          <input id="crawlUrl" type="text" placeholder="输入小说目录页 URL，如 http://www.leshugu.info/html/0/626/">
-          <button id="crawlBtn" class="btn btn-primary">开始爬取</button>
-        </div>
-        <div id="crawlStatus" class="crawl-status"></div>
       </div>
     </div>
 
-    <!-- 清除按钮（加载后有内容时显示） -->
-    <div id="clearArea" style="display:none;margin-bottom:12px;">
-      <button id="clearNovelBtn" class="btn btn-secondary btn-sm">清除内容</button>
-      <span style="font-size:0.85rem;color:var(--text-secondary);margin-left:8px;" id="modeLabel"></span>
+    <!-- 返回书架 -->
+    <div id="backArea" style="display:none;margin-bottom:12px;">
+      <button id="backToShelfBtn" class="btn btn-secondary btn-sm">← 返回书架</button>
     </div>
 
     <!-- 阅读区 -->
@@ -369,7 +273,7 @@
           </div>
           <div class="novel-text-wrap" id="textWrap">
             <div class="novel-text size-medium line-normal width-medium" id="novelText">
-              <div class="novel-placeholder">请导入小说文本</div>
+              <div class="novel-placeholder"><span class="spinner"></span> 加载中...</div>
             </div>
           </div>
           <div class="novel-nav">
@@ -395,23 +299,16 @@
 
   <script>
     const STORAGE_KEY = 'novel-reader-state';
-    const CHAPTER_RE = /^(第[零一二三四五六七八九十百千\d]+[章节回]|Chapter\s*\d+|第?\d+[章节])[^\n]{0,50}$/gim;
 
-    // state
-    let chapters = [];          // local: { title, content }; remote: { title, url }
-    let contentCache = {};      // url -> content for remote chapters
+    let chapters = [];
     let currentIndex = 0;
-    let isRemote = false;       // true = crawled chapters, need API fetch
+    let currentSlug = '';
 
     // DOM refs
-    const importArea = document.getElementById('importArea');
+    const shelfArea = document.getElementById('shelfArea');
     const readerArea = document.getElementById('readerArea');
-    const clearArea = document.getElementById('clearArea');
-    const modeLabel = document.getElementById('modeLabel');
-    const fileInput = document.getElementById('fileInput');
-    const pasteInput = document.getElementById('pasteInput');
-    const loadPasteBtn = document.getElementById('loadPasteBtn');
-    const clearNovelBtn = document.getElementById('clearNovelBtn');
+    const backArea = document.getElementById('backArea');
+    const backToShelfBtn = document.getElementById('backToShelfBtn');
     const chapterList = document.getElementById('chapterList');
     const chapterCount = document.getElementById('chapterCount');
     const bookTitle = document.getElementById('bookTitle');
@@ -423,61 +320,6 @@
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburger');
     const themeToggle = document.getElementById('themeToggle');
-    const crawlUrl = document.getElementById('crawlUrl');
-    const crawlBtn = document.getElementById('crawlBtn');
-    const crawlStatus = document.getElementById('crawlStatus');
-
-    // Mode switching
-    const modeTabs = document.querySelectorAll('.mode-tab');
-    const modeShelf = document.getElementById('modeShelf');
-    const modeUpload = document.getElementById('modeUpload');
-    const modePaste = document.getElementById('modePaste');
-    const modeCrawl = document.getElementById('modeCrawl');
-
-    modeTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        modeTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const mode = tab.dataset.mode;
-        modeShelf.style.display = mode === 'shelf' ? '' : 'none';
-        modeUpload.style.display = mode === 'upload' ? '' : 'none';
-        modePaste.style.display = mode === 'paste' ? '' : 'none';
-        modeCrawl.style.display = mode === 'crawl' ? '' : 'none';
-        if (mode === 'shelf') loadShelf();
-      });
-    });
-
-    // Parsing for local text
-    function parseChapters(text) {
-      text = text.replace(/\r\n/g, '\n');
-      const lines = text.split('\n');
-      const result = [];
-      let currentTitle = '未命名章节';
-      let currentLines = [];
-      let matched = false;
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        CHAPTER_RE.lastIndex = 0;
-        if (trimmed && CHAPTER_RE.test(trimmed)) {
-          if (currentLines.length > 0 || matched) {
-            result.push({ title: currentTitle, content: currentLines.join('\n').trim() });
-          }
-          currentTitle = trimmed;
-          currentLines = [];
-          matched = true;
-        } else {
-          currentLines.push(line);
-        }
-      }
-      if (currentLines.length > 0 || !matched) {
-        result.push({ title: matched ? currentTitle : '全文', content: currentLines.join('\n').trim() });
-      }
-      if (result.length === 0 && text.trim()) {
-        result.push({ title: '全文', content: text.trim() });
-      }
-      return result;
-    }
 
     function renderContent(text) {
       const paragraphs = text.split(/\n\n+/);
@@ -493,9 +335,6 @@
       return div.innerHTML;
     }
 
-    // Render a chapter
-    // For local: chapters[index].content exists
-    // For remote: check cache, else fetch
     async function renderChapter(index) {
       if (!chapters.length) return;
       currentIndex = Math.max(0, Math.min(index, chapters.length - 1));
@@ -507,27 +346,10 @@
         updateChapterList();
 
         try {
-          if (isRemote) {
-            if (contentCache[ch.url]) {
-              ch.content = contentCache[ch.url];
-            } else {
-              const resp = await fetch('/api/novel/get-chapter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: ch.url })
-              });
-              const data = await resp.json();
-              if (data.error) throw new Error(data.error);
-              ch.title = data.title || ch.title;
-              ch.content = data.content;
-              contentCache[ch.url] = data.content;
-            }
-          } else {
-            const resp = await fetch(ch.url);
-            const data = await resp.json();
-            ch.content = data.content;
-            if (data.title) ch.title = data.title;
-          }
+          const resp = await fetch(ch.url);
+          const data = await resp.json();
+          ch.content = data.content;
+          if (data.title) ch.title = data.title;
         } catch (e) {
           novelText.innerHTML = '<div class="novel-placeholder">加载失败: ' + escapeHTML(e.message) + '</div>';
           updateChapterList();
@@ -536,7 +358,6 @@
       }
 
       novelText.innerHTML = '<div class="novel-chapter-title">' + escapeHTML(ch.title) + '</div>' + renderContent(ch.content);
-      if (isRemote) novelText.classList.add('width-wide'); // wider default for web novels
       textWrap.scrollTop = 0;
       updateNav();
       updateChapterList();
@@ -551,73 +372,34 @@
 
     function updateChapterList() {
       chapterList.innerHTML = chapters.map((ch, i) => {
-        let cls = '';
-        if (i === currentIndex) cls = 'active';
-        else if (isRemote && !ch.content && !contentCache[ch.url]) cls = '';
+        let cls = i === currentIndex ? 'active' : '';
         return '<li class="' + cls + '" data-index="' + i + '">' + escapeHTML(ch.title || '章节 ' + (i + 1)) + '</li>';
       }).join('');
       chapterCount.textContent = chapters.length;
     }
 
     function saveState() {
-      const state = { currentIndex, scrollTop: textWrap.scrollTop, isRemote };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, scrollTop: textWrap.scrollTop, slug: currentSlug }));
     }
 
     function showReader() {
-      importArea.style.display = 'none';
+      shelfArea.style.display = 'none';
       readerArea.style.display = 'block';
-      clearArea.style.display = '';
-      if (isRemote) {
-        modeLabel.textContent = '在线爬取模式';
-        bookTitle.textContent = '目录';
-      } else {
-        modeLabel.textContent = '本地文件模式';
-        bookTitle.textContent = '目录';
-      }
+      backArea.style.display = '';
     }
 
-    // Load local text
-    function loadLocalText(text) {
-      if (!text.trim()) return;
-      chapters = parseChapters(text);
-      isRemote = false;
-      contentCache = {};
-      showReader();
-      const saved = localStorage.getItem(STORAGE_KEY);
-      const idx = saved ? Math.min(JSON.parse(saved).currentIndex, chapters.length - 1) : 0;
-      renderChapter(idx);
-    }
-
-    function clearAll() {
+    function backToShelf() {
       chapters = [];
       currentIndex = 0;
-      isRemote = false;
-      contentCache = {};
-      importArea.style.display = '';
+      currentSlug = '';
+      shelfArea.style.display = '';
       readerArea.style.display = 'none';
-      clearArea.style.display = 'none';
-      pasteInput.value = '';
-      fileInput.value = '';
-      crawlUrl.value = '';
-      crawlStatus.textContent = '';
+      backArea.style.display = 'none';
       localStorage.removeItem(STORAGE_KEY);
+      loadShelf();
     }
 
-    // File upload
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => { loadLocalText(reader.result); pasteInput.value = reader.result; };
-      reader.readAsText(file, 'UTF-8');
-    });
-
-    // Paste
-    loadPasteBtn.addEventListener('click', () => { loadLocalText(pasteInput.value); });
-
-    // Clear
-    clearNovelBtn.addEventListener('click', clearAll);
+    backToShelfBtn.addEventListener('click', backToShelf);
 
     // Chapter list click
     chapterList.addEventListener('click', (e) => {
@@ -679,50 +461,18 @@
       if (w) { document.getElementById('widthSel').value = w; novelText.classList.remove('width-narrow','width-medium','width-wide'); novelText.classList.add(w); }
     })();
 
-    // CRAWL MODE
-    crawlBtn.addEventListener('click', async () => {
-      const url = crawlUrl.value.trim();
-      if (!url) return;
-      crawlBtn.disabled = true;
-      crawlStatus.innerHTML = '<span class="spinner"></span>正在爬取目录...';
-      try {
-        const resp = await fetch('/api/novel/parse-index', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        });
-        const data = await resp.json();
-        if (data.error) throw new Error(data.error);
-        if (!data.chapters || data.chapters.length === 0) {
-          crawlStatus.textContent = '未找到章节列表，请确认 URL 是否正确';
-          crawlBtn.disabled = false;
-          return;
-        }
-        chapters = data.chapters;
-        isRemote = true;
-        contentCache = {};
-        bookTitle.textContent = data.title || '目录';
-        crawlStatus.textContent = '已找到 ' + chapters.length + ' 个章节（来自: ' + escapeHTML(data.title || url) + '）';
-        showReader();
-        renderChapter(0);
-      } catch (e) {
-        crawlStatus.innerHTML = '<span style="color:#e03131;">爬取失败: ' + escapeHTML(e.message) + '</span>';
-      }
-      crawlBtn.disabled = false;
-    });
-
-    // SHELF MODE
+    // SHELF
     async function loadShelf() {
       const shelfList = document.getElementById('shelfList');
       try {
         const resp = await fetch('/api/novel/shelf');
         const data = await resp.json();
         if (!data.books || data.books.length === 0) {
-          shelfList.innerHTML = '<div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">书架为空，请先爬取小说</div>';
+          shelfList.innerHTML = '<div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">书架为空</div>';
           return;
         }
         shelfList.innerHTML = data.books.map(b =>
-          '<div class="tool-card" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '" onclick="loadLocalBook(\'' + escapeHTML(b.slug) + '\')">' +
+          '<div class="tool-card" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '" onclick="loadBook(\'' + escapeHTML(b.slug) + '\')">' +
           '<div style="font-size:1.5rem;margin-bottom:8px;">📖</div>' +
           '<div style="font-weight:600;font-size:1rem;margin-bottom:4px;">' + escapeHTML(b.title || b.slug) + '</div>' +
           '<div style="font-size:0.8rem;color:var(--text-secondary);">' + (b.chapterCount || 0) + ' 章</div>' +
@@ -733,14 +483,13 @@
       }
     }
 
-    window.loadLocalBook = async function(slug) {
+    window.loadBook = async function(slug) {
       try {
         const resp = await fetch('/api/novel/local/' + encodeURIComponent(slug) + '/meta');
         const meta = await resp.json();
         if (resp.status !== 200) throw new Error(meta.error || '加载失败');
-        chapters = meta.map((m, i) => ({ title: m.title, url: '/api/novel/local/' + encodeURIComponent(slug) + '/' + m.filename, content: null }));
-        isRemote = false;
-        contentCache = {};
+        chapters = meta.map(m => ({ title: m.title, url: '/api/novel/local/' + encodeURIComponent(slug) + '/' + m.filename, content: null }));
+        currentSlug = slug;
         showReader();
         bookTitle.textContent = slug;
         renderChapter(0);
@@ -755,7 +504,7 @@
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
       if (!chapters.length) return;
-      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
       if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         if (currentIndex > 0) renderChapter(currentIndex - 1);
