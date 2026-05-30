@@ -8,7 +8,24 @@
 
 | # | 状态 | 优先级 | 任务 | 详情 |
 |---|------|--------|------|------|
+| 6 | [ ] | P0 | 修复 Render 503 — express-rate-limit trust proxy | 见下方 |
 | 4 | [x] | P0 | 小说预爬取存储 + 本地书架 | 见下方 |
+
+### 需求：修复 Render 503 — express-rate-limit trust proxy
+
+**问题**：Render 代理设置了 `X-Forwarded-For` header，但 express-rate-limit 默认不信任代理，所有请求抛 `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR` 返回 503。
+
+**修法**：在 `app.js` 中加一行：
+
+```js
+app.set('trust proxy', 1);
+```
+
+加在 `app.set('view engine', 'ejs')` 下面（约第 17 行）。
+
+一行搞定，改完推上去等 Render 重新部署就行。
+
+---
 
 ### 需求：把整本小说爬到工具本地存储
 
