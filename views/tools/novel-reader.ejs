@@ -101,8 +101,10 @@
     }
     .novel-text-wrap {
       flex: 1;
-      overflow-y: auto;
+      overflow: hidden;
       padding: 32px 24px;
+      cursor: pointer;
+      position: relative;
     }
     .novel-text {
       margin: 0 auto;
@@ -279,9 +281,9 @@
             </div>
           </div>
           <div class="novel-nav">
-            <button id="prevChapter">← 上一章</button>
+            <button id="prevChapter">← 上一页</button>
             <span id="navInfo" style="font-size:0.85rem;color:var(--text-secondary);"></span>
-            <button id="nextChapter">下一章 →</button>
+            <button id="nextChapter">下一页 →</button>
           </div>
         </div>
       </div>
@@ -305,6 +307,9 @@
     let chapters = [];
     let currentIndex = 0;
     let currentSlug = '';
+    let pages = [];
+    let currentPage = 0;
+    let chapterHTML = '';
 
     // DOM refs
     const shelfArea = document.getElementById('shelfArea');
@@ -322,14 +327,9 @@
     const sidebar = document.getElementById('sidebar');
     const hamburger = document.getElementById('hamburger');
     const themeToggle = document.getElementById('themeToggle');
-
-    function renderContent(text) {
-      const paragraphs = text.split(/\n\n+/);
-      return paragraphs.map(p => {
-        const lines = p.trim().split('\n');
-        return '<p>' + lines.map(l => escapeHTML(l)).join('<br>') + '</p>';
-      }).join('');
-    }
+    const fontSizeSel = document.getElementById('fontSizeSel');
+    const lineHeightSel = document.getElementById('lineHeightSel');
+    const widthSel = document.getElementById('widthSel');
 
     function escapeHTML(str) {
       const div = document.createElement('div');
@@ -337,16 +337,80 @@
       return div.innerHTML;
     }
 
-    async function renderChapter(index) {
+    function buildHTML(text) {
+      const paragraphs = text.split(/\n\n+/);
+      return paragraphs.map(p => {
+        const lines = p.trim().split('\n');
+        return '<p>' + lines.map(l => escapeHTML(l)).join('<br>') + '</p>';
+      }).join('');
+    }
+
+    function splitPages(html) {
+      // Render into measuring container
+      novelText.innerHTML = html;
+      const pageH = textWrap.clientHeight;
+      if (!pageH) return [html];
+
+      const paras = [...novelText.querySelectorAll('p')];
+      if (!paras.length) return [html];
+
+      const result = [];
+      let chunk = [];
+      let chunkTop = paras[0].offsetTop;
+
+      for (const p of paras) {
+        const bottom = p.offsetTop + p.offsetHeight;
+        if (bottom - chunkTop > pageH && chunk.length > 0) {
+          result.push(chunk.map(el => el.outerHTML).join(''));
+          chunk = [];
+          chunkTop = p.offsetTop;
+        }
+        chunk.push(p);
+      }
+      if (chunk.length > 0) {
+        result.push(chunk.map(el => el.outerHTML).join(''));
+      }
+      return result.length ? result : [html];
+    }
+
+    function showPage() {
+      if (!pages.length) return;
+      const titleHTML = currentPage === 0 && chapterHTML
+        ? '<div class="novel-chapter-title">' + chapterHTML + '</div>'
+        : '';
+      novelText.innerHTML = titleHTML + (pages[currentPage] || '');
+      updateNav();
+    }
+
+    function turnPage(dir) {
+      const newPage = currentPage + dir;
+      if (newPage >= 0 && newPage < pages.length) {
+        currentPage = newPage;
+        showPage();
+        saveState();
+        return;
+      }
+      // Cross chapter boundary
+      if (dir > 0 && currentIndex < chapters.length - 1) {
+        renderChapter(currentIndex + 1, 0);
+      } else if (dir < 0 && currentIndex > 0) {
+        renderChapter(currentIndex - 1, -1); // -1 = last page
+      }
+    }
+
+    async function renderChapter(index, targetPage) {
       if (!chapters.length) return;
       currentIndex = Math.max(0, Math.min(index, chapters.length - 1));
       const ch = chapters[currentIndex];
+      pages = [];
+      currentPage = 0;
+      chapterHTML = '';
+
+      novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
+      updateNav();
+      updateChapterList();
 
       if (!ch.content) {
-        novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
-        updateNav();
-        updateChapterList();
-
         try {
           const resp = await fetch(ch.url);
           const data = await resp.json();
@@ -359,17 +423,26 @@
         }
       }
 
-      novelText.innerHTML = '<div class="novel-chapter-title">' + escapeHTML(ch.title) + '</div>' + renderContent(ch.content);
-      textWrap.scrollTop = 0;
-      updateNav();
+      chapterHTML = escapeHTML(ch.title);
+      pages = splitPages(buildHTML(ch.content));
+
+      if (targetPage === -1) {
+        currentPage = pages.length - 1;
+      } else if (typeof targetPage === 'number' && targetPage >= 0 && targetPage < pages.length) {
+        currentPage = targetPage;
+      } else {
+        currentPage = 0;
+      }
+      showPage();
       updateChapterList();
       saveState();
     }
 
     function updateNav() {
-      prevChapter.disabled = currentIndex === 0;
-      nextChapter.disabled = currentIndex === chapters.length - 1;
-      navInfo.textContent = (currentIndex + 1) + ' / ' + chapters.length;
+      prevChapter.disabled = currentIndex === 0 && currentPage === 0;
+      nextChapter.disabled = currentIndex === chapters.length - 1 && currentPage === pages.length - 1;
+      const pageInfo = pages.length ? (currentPage + 1) + '/' + pages.length + ' 页' : '';
+      navInfo.textContent = '第 ' + (currentIndex + 1) + '/' + chapters.length + ' 章 ' + pageInfo;
     }
 
     function updateChapterList() {
@@ -381,7 +454,9 @@
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, scrollTop: textWrap.scrollTop, slug: currentSlug }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        currentIndex, currentPage, slug: currentSlug
+      }));
     }
 
     function showReader() {
@@ -394,6 +469,8 @@
       chapters = [];
       currentIndex = 0;
       currentSlug = '';
+      pages = [];
+      currentPage = 0;
       shelfArea.style.display = '';
       readerArea.style.display = 'none';
       backArea.style.display = 'none';
@@ -411,16 +488,24 @@
       if (window.innerWidth <= 768) sidebar.classList.remove('open');
     });
 
-    // Navigation
-    prevChapter.addEventListener('click', () => { if (currentIndex > 0) renderChapter(currentIndex - 1); });
-    nextChapter.addEventListener('click', () => { if (currentIndex < chapters.length - 1) renderChapter(currentIndex + 1); });
+    // Navigation buttons — now page-level
+    prevChapter.addEventListener('click', () => turnPage(-1));
+    nextChapter.addEventListener('click', () => turnPage(1));
+
+    // Click zones on text area to turn pages
+    textWrap.addEventListener('click', (e) => {
+      if (!pages.length) return;
+      const rect = textWrap.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const mid = rect.width / 2;
+      if (x < mid) turnPage(-1);
+      else turnPage(1);
+    });
 
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); });
     sidebar.addEventListener('click', (e) => {
       if (e.target === sidebar && window.innerWidth <= 768) sidebar.classList.remove('open');
     });
-
-    textWrap.addEventListener('scroll', () => { saveState(); });
 
     // Theme toggle
     let darkMode = localStorage.getItem('novel-dark-mode') === '1';
@@ -462,30 +547,47 @@
       applyTheme();
     });
 
-    // Preferences
-    document.getElementById('fontSizeSel').addEventListener('change', function() {
+    // Preferences — re-split pages when font/width/line-height changes
+    let prefChanging = false;
+    async function onPrefChange() {
+      if (prefChanging || !pages.length) return;
+      prefChanging = true;
+      await new Promise(r => setTimeout(r, 100)); // debounce
       novelText.classList.remove('size-small', 'size-medium', 'size-large');
-      novelText.classList.add(this.value);
-      localStorage.setItem('novel-font-size', this.value);
-    });
-    document.getElementById('lineHeightSel').addEventListener('change', function() {
+      novelText.classList.add(fontSizeSel.value);
       novelText.classList.remove('line-compact', 'line-normal', 'line-loose');
-      novelText.classList.add(this.value);
-      localStorage.setItem('novel-line-height', this.value);
-    });
-    document.getElementById('widthSel').addEventListener('change', function() {
+      novelText.classList.add(lineHeightSel.value);
       novelText.classList.remove('width-narrow', 'width-medium', 'width-wide');
-      novelText.classList.add(this.value);
-      localStorage.setItem('novel-width', this.value);
+      novelText.classList.add(widthSel.value);
+      const ch = chapters[currentIndex];
+      if (ch && ch.content) {
+        const savedPage = currentPage;
+        pages = splitPages(buildHTML(ch.content));
+        currentPage = Math.min(savedPage, pages.length - 1);
+        showPage();
+      }
+      prefChanging = false;
+    }
+    fontSizeSel.addEventListener('change', () => {
+      localStorage.setItem('novel-font-size', fontSizeSel.value);
+      onPrefChange();
+    });
+    lineHeightSel.addEventListener('change', () => {
+      localStorage.setItem('novel-line-height', lineHeightSel.value);
+      onPrefChange();
+    });
+    widthSel.addEventListener('change', () => {
+      localStorage.setItem('novel-width', widthSel.value);
+      onPrefChange();
     });
 
     (function restorePrefs() {
       const fs = localStorage.getItem('novel-font-size');
-      if (fs) { document.getElementById('fontSizeSel').value = fs; novelText.classList.remove('size-small','size-medium','size-large'); novelText.classList.add(fs); }
+      if (fs) { fontSizeSel.value = fs; novelText.classList.add(fs); }
       const lh = localStorage.getItem('novel-line-height');
-      if (lh) { document.getElementById('lineHeightSel').value = lh; novelText.classList.remove('line-compact','line-normal','line-loose'); novelText.classList.add(lh); }
+      if (lh) { lineHeightSel.value = lh; novelText.classList.add(lh); }
       const w = localStorage.getItem('novel-width');
-      if (w) { document.getElementById('widthSel').value = w; novelText.classList.remove('width-narrow','width-medium','width-wide'); novelText.classList.add(w); }
+      if (w) { widthSel.value = w; novelText.classList.add(w); }
     })();
 
     // SHELF
@@ -505,7 +607,6 @@
           '<div style="font-size:0.8rem;color:var(--text-secondary);">' + (b.chapterCount || 0) + ' 章</div>' +
           '</div>'
         ).join('');
-        // Event delegation (CSP-safe, no inline onclick)
         shelfList.onclick = (e) => {
           const card = e.target.closest('.shelf-book');
           if (card) loadBook(card.dataset.slug);
@@ -528,7 +629,7 @@
       } catch (e) {
         alert('加载失败: ' + e.message);
       }
-    };
+    }
 
     // Initial shelf load
     loadShelf();
@@ -539,11 +640,11 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
       if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        if (currentIndex > 0) renderChapter(currentIndex - 1);
+        turnPage(-1);
       }
       if (e.key === 'ArrowRight' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        if (currentIndex < chapters.length - 1) renderChapter(currentIndex + 1);
+        turnPage(1);
       }
     });
   </script>
