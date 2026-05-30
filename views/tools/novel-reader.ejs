@@ -10,7 +10,7 @@
   <style>
     .novel-layout {
       display: grid;
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 200px 1fr;
       gap: 0;
       min-height: 60vh;
       border: 1px solid var(--border);
@@ -120,9 +120,9 @@
     .novel-text.line-compact { line-height: 1.5; }
     .novel-text.line-normal { line-height: 1.8; }
     .novel-text.line-loose { line-height: 2.2; }
-    .novel-text.width-narrow { max-width: 600px; }
-    .novel-text.width-medium { max-width: 720px; }
-    .novel-text.width-wide { max-width: 860px; }
+    .novel-text.width-narrow { max-width: 720px; }
+    .novel-text.width-medium { max-width: 900px; }
+    .novel-text.width-wide { max-width: 1100px; }
     .novel-nav {
       display: flex;
       align-items: center;
@@ -265,14 +265,14 @@
             <label>宽度</label>
             <select id="widthSel">
               <option value="width-narrow">窄</option>
-              <option value="width-medium" selected>中</option>
-              <option value="width-wide">宽</option>
+              <option value="width-medium">中</option>
+              <option value="width-wide" selected>宽</option>
             </select>
             <div class="sep"></div>
             <button id="themeToggle" title="切换深色/浅色模式">🌓 深浅</button>
           </div>
           <div class="novel-text-wrap" id="textWrap">
-            <div class="novel-text size-medium line-normal width-medium" id="novelText">
+            <div class="novel-text size-medium line-normal width-wide" id="novelText">
               <div class="novel-placeholder"><span class="spinner"></span> 加载中...</div>
             </div>
           </div>
