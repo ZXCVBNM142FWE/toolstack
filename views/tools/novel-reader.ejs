@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线小说阅读器，支持 URL 爬取 / TXT 上传 / 粘贴文本，自动分章，舒适阅读体验">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .novel-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 0;
+      min-height: 60vh;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--card-bg);
+    }
+    .novel-sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--code-bg);
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+    .novel-sidebar-header {
+      position: sticky;
+      top: 0;
+      background: var(--code-bg);
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
+    }
+    .chapter-list {
+      list-style: none;
+      padding: 4px 0;
+      margin: 0;
+    }
+    .chapter-list li {
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      transition: all 0.1s;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chapter-list li:hover {
+      background: var(--btn-secondary-bg);
+    }
+    .chapter-list li.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .chapter-list li.loading-ch {
+      background: var(--btn-secondary-bg);
+      color: var(--text-secondary);
+      pointer-events: none;
+    }
+    .chapter-list li.loading-ch::after {
+      content: ' ⏳';
+    }
+    .novel-content-area {
+      display: flex;
+      flex-direction: column;
+      max-height: 70vh;
+    }
+    .novel-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: var(--card-bg);
+    }
+    .novel-toolbar label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+    .novel-toolbar select, .novel-toolbar button {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .novel-toolbar button {
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+    }
+    .novel-toolbar button:hover {
+      background: var(--btn-secondary-hover);
+    }
+    .novel-toolbar .sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    .novel-text-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+    .novel-text {
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .novel-text p {
+      margin-bottom: 0.8em;
+      text-indent: 2em;
+    }
+    .novel-text.size-small { font-size: 16px; }
+    .novel-text.size-medium { font-size: 18px; }
+    .novel-text.size-large { font-size: 20px; }
+    .novel-text.line-compact { line-height: 1.5; }
+    .novel-text.line-normal { line-height: 1.8; }
+    .novel-text.line-loose { line-height: 2.2; }
+    .novel-text.width-narrow { max-width: 600px; }
+    .novel-text.width-medium { max-width: 720px; }
+    .novel-text.width-wide { max-width: 860px; }
+    .novel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .novel-nav button {
+      padding: 6px 18px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.1s;
+    }
+    .novel-nav button:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .novel-nav button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .novel-chapter-title {
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--header-color);
+    }
+    .novel-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text);
+      padding: 4px;
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .mode-tab {
+      flex: 1;
+      padding: 10px 16px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      border: none;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .mode-tab + .mode-tab { border-left: 1px solid var(--border); }
+    .mode-tab:hover { color: var(--primary); }
+    .mode-tab.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .crawl-input-row {
+      display: flex;
+      gap: 10px;
+    }
+    .crawl-input-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+    }
+    .crawl-input-row input:focus { border-color: var(--primary); }
+    .crawl-status {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 768px) {
+      .novel-layout {
+        grid-template-columns: 1fr;
+      }
+      .novel-sidebar {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        z-index: 1000;
+        max-height: 100vh;
+        box-shadow: 4px 0 20px var(--shadow);
+      }
+      .novel-sidebar.open {
+        display: block;
+      }
+      .hamburger {
+        display: block;
+      }
+      .novel-text {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">📖</span>
+        <h1>小说阅读器</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
+
+    <div class="usage-card"><h2>使用说明</h2><ol><li>书架：查看已爬取到本地的整本小说，点击即读</li><li>在线爬取：输入小说目录页 URL，自动抓取章节列表</li><li>上传/粘贴：上传 TXT 或粘贴文本，自动识别章节分章</li><li>可调节字体大小、行间距和阅读宽度</li></ol></div>
+
+    <!-- 导入区 -->
+    <div id="importArea" style="margin-bottom:18px;">
+
+      <!-- 模式切换 tab -->
+      <div class="mode-tabs" id="modeTabs">
+        <button class="mode-tab active" data-mode="shelf">📚 书架</button>
+        <button class="mode-tab" data-mode="crawl">🌐 在线爬取</button>
+        <button class="mode-tab" data-mode="upload">📂 上传文件</button>
+        <button class="mode-tab" data-mode="paste">📋 粘贴文本</button>
+      </div>
+
+      <!-- 书架模式 -->
+      <div id="modeShelf">
+        <div id="shelfList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+          <div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">
+            <span class="spinner"></span> 加载书架...
+          </div>
+        </div>
+      </div>
+
+      <!-- 上传模式 -->
+      <div id="modeUpload" style="display:none;">
+        <label class="btn btn-secondary" style="cursor:pointer;margin:0;">
+          上传 TXT 文件
+          <input type="file" id="fileInput" accept=".txt" style="display:none;">
+        </label>
+      </div>
+
+      <!-- 粘贴模式 -->
+      <div id="modePaste" style="display:none;">
+        <textarea id="pasteInput" placeholder="在此粘贴小说内容..." style="width:100%;min-height:200px;padding:12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.9rem;resize:vertical;outline:none;background:var(--card-bg);color:var(--text);"></textarea>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button id="loadPasteBtn" class="btn btn-primary btn-sm">加载文本</button>
+        </div>
+      </div>
+
+      <!-- 爬取模式 -->
+      <div id="modeCrawl" style="display:none;">
+        <div class="crawl-input-row">
+          <input id="crawlUrl" type="text" placeholder="输入小说目录页 URL，如 http://www.leshugu.info/html/0/626/">
+          <button id="crawlBtn" class="btn btn-primary">开始爬取</button>
+        </div>
+        <div id="crawlStatus" class="crawl-status"></div>
+      </div>
+    </div>
+
+    <!-- 清除按钮（加载后有内容时显示） -->
+    <div id="clearArea" style="display:none;margin-bottom:12px;">
+      <button id="clearNovelBtn" class="btn btn-secondary btn-sm">清除内容</button>
+      <span style="font-size:0.85rem;color:var(--text-secondary);margin-left:8px;" id="modeLabel"></span>
+    </div>
+
+    <!-- 阅读区 -->
+    <div id="readerArea" style="display:none;">
+      <div class="novel-layout">
+        <aside class="novel-sidebar" id="sidebar">
+          <div class="novel-sidebar-header">📑 <span id="bookTitle">目录</span> (<span id="chapterCount">0</span> 章)</div>
+          <ul class="chapter-list" id="chapterList"></ul>
+        </aside>
+        <div class="novel-content-area">
+          <div class="novel-toolbar">
+            <button class="hamburger" id="hamburger" title="目录">☰</button>
+            <label>字号</label>
+            <select id="fontSizeSel">
+              <option value="size-small">小</option>
+              <option value="size-medium" selected>中</option>
+              <option value="size-large">大</option>
+            </select>
+            <div class="sep"></div>
+            <label>行距</label>
+            <select id="lineHeightSel">
+              <option value="line-compact">紧凑</option>
+              <option value="line-normal" selected>正常</option>
+              <option value="line-loose">宽松</option>
+            </select>
+            <div class="sep"></div>
+            <label>宽度</label>
+            <select id="widthSel">
+              <option value="width-narrow">窄</option>
+              <option value="width-medium" selected>中</option>
+              <option value="width-wide">宽</option>
+            </select>
+            <div class="sep"></div>
+            <button id="themeToggle" title="切换深色/浅色模式">🌓 深浅</button>
+          </div>
+          <div class="novel-text-wrap" id="textWrap">
+            <div class="novel-text size-medium line-normal width-medium" id="novelText">
+              <div class="novel-placeholder">请导入小说文本</div>
+            </div>
+          </div>
+          <div class="novel-nav">
+            <button id="prevChapter">← 上一章</button>
+            <span id="navInfo" style="font-size:0.85rem;color:var(--text-secondary);"></span>
+            <button id="nextChapter">下一章 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = 'novel-reader-state';
+    const CHAPTER_RE = /^(第[零一二三四五六七八九十百千\d]+[章节回]|Chapter\s*\d+|第?\d+[章节])[^\n]{0,50}$/gim;
+
+    // state
+    let chapters = [];          // local: { title, content }; remote: { title, url }
+    let contentCache = {};      // url -> content for remote chapters
+    let currentIndex = 0;
+    let isRemote = false;       // true = crawled chapters, need API fetch
+
+    // DOM refs
+    const importArea = document.getElementById('importArea');
+    const readerArea = document.getElementById('readerArea');
+    const clearArea = document.getElementById('clearArea');
+    const modeLabel = document.getElementById('modeLabel');
+    const fileInput = document.getElementById('fileInput');
+    const pasteInput = document.getElementById('pasteInput');
+    const loadPasteBtn = document.getElementById('loadPasteBtn');
+    const clearNovelBtn = document.getElementById('clearNovelBtn');
+    const chapterList = document.getElementById('chapterList');
+    const chapterCount = document.getElementById('chapterCount');
+    const bookTitle = document.getElementById('bookTitle');
+    const novelText = document.getElementById('novelText');
+    const textWrap = document.getElementById('textWrap');
+    const prevChapter = document.getElementById('prevChapter');
+    const nextChapter = document.getElementById('nextChapter');
+    const navInfo = document.getElementById('navInfo');
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const themeToggle = document.getElementById('themeToggle');
+    const crawlUrl = document.getElementById('crawlUrl');
+    const crawlBtn = document.getElementById('crawlBtn');
+    const crawlStatus = document.getElementById('crawlStatus');
+
+    // Mode switching
+    const modeTabs = document.querySelectorAll('.mode-tab');
+    const modeShelf = document.getElementById('modeShelf');
+    const modeUpload = document.getElementById('modeUpload');
+    const modePaste = document.getElementById('modePaste');
+    const modeCrawl = document.getElementById('modeCrawl');
+
+    modeTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        modeTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const mode = tab.dataset.mode;
+        modeShelf.style.display = mode === 'shelf' ? '' : 'none';
+        modeUpload.style.display = mode === 'upload' ? '' : 'none';
+        modePaste.style.display = mode === 'paste' ? '' : 'none';
+        modeCrawl.style.display = mode === 'crawl' ? '' : 'none';
+        if (mode === 'shelf') loadShelf();
+      });
+    });
+
+    // Parsing for local text
+    function parseChapters(text) {
+      text = text.replace(/\r\n/g, '\n');
+      const lines = text.split('\n');
+      const result = [];
+      let currentTitle = '未命名章节';
+      let currentLines = [];
+      let matched = false;
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        CHAPTER_RE.lastIndex = 0;
+        if (trimmed && CHAPTER_RE.test(trimmed)) {
+          if (currentLines.length > 0 || matched) {
+            result.push({ title: currentTitle, content: currentLines.join('\n').trim() });
+          }
+          currentTitle = trimmed;
+          currentLines = [];
+          matched = true;
+        } else {
+          currentLines.push(line);
+        }
+      }
+      if (currentLines.length > 0 || !matched) {
+        result.push({ title: matched ? currentTitle : '全文', content: currentLines.join('\n').trim() });
+      }
+      if (result.length === 0 && text.trim()) {
+        result.push({ title: '全文', content: text.trim() });
+      }
+      return result;
+    }
+
+    function renderContent(text) {
+      const paragraphs = text.split(/\n\n+/);
+      return paragraphs.map(p => {
+        const lines = p.trim().split('\n');
+        return '<p>' + lines.map(l => escapeHTML(l)).join('<br>') + '</p>';
+      }).join('');
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Render a chapter
+    // For local: chapters[index].content exists
+    // For remote: check cache, else fetch
+    async function renderChapter(index) {
+      if (!chapters.length) return;
+      currentIndex = Math.max(0, Math.min(index, chapters.length - 1));
+      const ch = chapters[currentIndex];
+
+      if (isRemote && !ch.content) {
+        // need to fetch
+        novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
+        updateNav();
+        updateChapterList();
+
+        if (contentCache[ch.url]) {
+          ch.content = contentCache[ch.url];
+        } else {
+          try {
+            const resp = await fetch('/api/novel/get-chapter', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url: ch.url })
+            });
+            const data = await resp.json();
+            if (data.error) throw new Error(data.error);
+            ch.title = data.title || ch.title;
+            ch.content = data.content;
+            contentCache[ch.url] = data.content;
+          } catch (e) {
+            novelText.innerHTML = '<div class="novel-placeholder">加载失败: ' + escapeHTML(e.message) + '</div>';
+            updateChapterList();
+            return;
+          }
+        }
+      }
+
+      novelText.innerHTML = '<div class="novel-chapter-title">' + escapeHTML(ch.title) + '</div>' + renderContent(ch.content);
+      if (isRemote) novelText.classList.add('width-wide'); // wider default for web novels
+      textWrap.scrollTop = 0;
+      updateNav();
+      updateChapterList();
+      saveState();
+    }
+
+    function updateNav() {
+      prevChapter.disabled = currentIndex === 0;
+      nextChapter.disabled = currentIndex === chapters.length - 1;
+      navInfo.textContent = (currentIndex + 1) + ' / ' + chapters.length;
+    }
+
+    function updateChapterList() {
+      chapterList.innerHTML = chapters.map((ch, i) => {
+        let cls = '';
+        if (i === currentIndex) cls = 'active';
+        else if (isRemote && !ch.content && !contentCache[ch.url]) cls = '';
+        return '<li class="' + cls + '" data-index="' + i + '">' + escapeHTML(ch.title || '章节 ' + (i + 1)) + '</li>';
+      }).join('');
+      chapterCount.textContent = chapters.length;
+    }
+
+    function saveState() {
+      const state = { currentIndex, scrollTop: textWrap.scrollTop, isRemote };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showReader() {
+      importArea.style.display = 'none';
+      readerArea.style.display = 'block';
+      clearArea.style.display = '';
+      if (isRemote) {
+        modeLabel.textContent = '在线爬取模式';
+        bookTitle.textContent = '目录';
+      } else {
+        modeLabel.textContent = '本地文件模式';
+        bookTitle.textContent = '目录';
+      }
+    }
+
+    // Load local text
+    function loadLocalText(text) {
+      if (!text.trim()) return;
+      chapters = parseChapters(text);
+      isRemote = false;
+      contentCache = {};
+      showReader();
+      const saved = localStorage.getItem(STORAGE_KEY);
+      const idx = saved ? Math.min(JSON.parse(saved).currentIndex, chapters.length - 1) : 0;
+      renderChapter(idx);
+    }
+
+    function clearAll() {
+      chapters = [];
+      currentIndex = 0;
+      isRemote = false;
+      contentCache = {};
+      importArea.style.display = '';
+      readerArea.style.display = 'none';
+      clearArea.style.display = 'none';
+      pasteInput.value = '';
+      fileInput.value = '';
+      crawlUrl.value = '';
+      crawlStatus.textContent = '';
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    // File upload
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => { loadLocalText(reader.result); pasteInput.value = reader.result; };
+      reader.readAsText(file, 'UTF-8');
+    });
+
+    // Paste
+    loadPasteBtn.addEventListener('click', () => { loadLocalText(pasteInput.value); });
+
+    // Clear
+    clearNovelBtn.addEventListener('click', clearAll);
+
+    // Chapter list click
+    chapterList.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      renderChapter(parseInt(li.dataset.index));
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
+    });
+
+    // Navigation
+    prevChapter.addEventListener('click', () => { if (currentIndex > 0) renderChapter(currentIndex - 1); });
+    nextChapter.addEventListener('click', () => { if (currentIndex < chapters.length - 1) renderChapter(currentIndex + 1); });
+
+    hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); });
+    sidebar.addEventListener('click', (e) => {
+      if (e.target === sidebar && window.innerWidth <= 768) sidebar.classList.remove('open');
+    });
+
+    textWrap.addEventListener('scroll', () => { saveState(); });
+
+    // Theme toggle
+    let darkMode = false;
+    themeToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+      if (darkMode) {
+        document.body.style.background = '#1a1a2e';
+        document.body.style.color = '#e0e0e0';
+        themeToggle.textContent = '☀️ 浅色';
+      } else {
+        document.body.style.background = '';
+        document.body.style.color = '';
+        themeToggle.textContent = '🌓 深浅';
+      }
+    });
+
+    // Preferences
+    document.getElementById('fontSizeSel').addEventListener('change', function() {
+      novelText.classList.remove('size-small', 'size-medium', 'size-large');
+      novelText.classList.add(this.value);
+      localStorage.setItem('novel-font-size', this.value);
+    });
+    document.getElementById('lineHeightSel').addEventListener('change', function() {
+      novelText.classList.remove('line-compact', 'line-normal', 'line-loose');
+      novelText.classList.add(this.value);
+      localStorage.setItem('novel-line-height', this.value);
+    });
+    document.getElementById('widthSel').addEventListener('change', function() {
+      novelText.classList.remove('width-narrow', 'width-medium', 'width-wide');
+      novelText.classList.add(this.value);
+      localStorage.setItem('novel-width', this.value);
+    });
+
+    (function restorePrefs() {
+      const fs = localStorage.getItem('novel-font-size');
+      if (fs) { document.getElementById('fontSizeSel').value = fs; novelText.classList.remove('size-small','size-medium','size-large'); novelText.classList.add(fs); }
+      const lh = localStorage.getItem('novel-line-height');
+      if (lh) { document.getElementById('lineHeightSel').value = lh; novelText.classList.remove('line-compact','line-normal','line-loose'); novelText.classList.add(lh); }
+      const w = localStorage.getItem('novel-width');
+      if (w) { document.getElementById('widthSel').value = w; novelText.classList.remove('width-narrow','width-medium','width-wide'); novelText.classList.add(w); }
+    })();
+
+    // CRAWL MODE
+    crawlBtn.addEventListener('click', async () => {
+      const url = crawlUrl.value.trim();
+      if (!url) return;
+      crawlBtn.disabled = true;
+      crawlStatus.innerHTML = '<span class="spinner"></span>正在爬取目录...';
+      try {
+        const resp = await fetch('/api/novel/parse-index', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        if (!data.chapters || data.chapters.length === 0) {
+          crawlStatus.textContent = '未找到章节列表，请确认 URL 是否正确';
+          crawlBtn.disabled = false;
+          return;
+        }
+        chapters = data.chapters;
+        isRemote = true;
+        contentCache = {};
+        bookTitle.textContent = data.title || '目录';
+        crawlStatus.textContent = '已找到 ' + chapters.length + ' 个章节（来自: ' + escapeHTML(data.title || url) + '）';
+        showReader();
+        renderChapter(0);
+      } catch (e) {
+        crawlStatus.innerHTML = '<span style="color:#e03131;">爬取失败: ' + escapeHTML(e.message) + '</span>';
+      }
+      crawlBtn.disabled = false;
+    });
+
+    // SHELF MODE
+    async function loadShelf() {
+      const shelfList = document.getElementById('shelfList');
+      try {
+        const resp = await fetch('/api/novel/shelf');
+        const data = await resp.json();
+        if (!data.books || data.books.length === 0) {
+          shelfList.innerHTML = '<div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">书架为空，请先爬取小说</div>';
+          return;
+        }
+        shelfList.innerHTML = data.books.map(b =>
+          '<div class="tool-card" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '" onclick="loadLocalBook(\'' + escapeHTML(b.slug) + '\')">' +
+          '<div style="font-size:1.5rem;margin-bottom:8px;">📖</div>' +
+          '<div style="font-weight:600;font-size:1rem;margin-bottom:4px;">' + escapeHTML(b.title || b.slug) + '</div>' +
+          '<div style="font-size:0.8rem;color:var(--text-secondary);">' + (b.chapterCount || 0) + ' 章</div>' +
+          '</div>'
+        ).join('');
+      } catch (e) {
+        shelfList.innerHTML = '<div style="color:#e03131;font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">加载书架失败: ' + escapeHTML(e.message) + '</div>';
+      }
+    }
+
+    window.loadLocalBook = async function(slug) {
+      try {
+        const resp = await fetch('/api/novel/local/' + encodeURIComponent(slug) + '/meta');
+        const meta = await resp.json();
+        if (resp.status !== 200) throw new Error(meta.error || '加载失败');
+        chapters = meta.map((m, i) => ({ title: m.title, url: '/api/novel/local/' + encodeURIComponent(slug) + '/' + m.filename, content: null }));
+        isRemote = false;
+        contentCache = {};
+        showReader();
+        bookTitle.textContent = slug;
+        // pre-fetch all chapters from local storage (fast, no delay needed)
+        for (const ch of chapters) {
+          try {
+            const cr = await fetch(ch.url);
+            const cd = await cr.json();
+            ch.content = cd.content;
+            if (cd.title) ch.title = cd.title;
+          } catch (e) { /* skip failed chapter */ }
+        }
+        renderChapter(0);
+      } catch (e) {
+        alert('加载失败: ' + e.message);
+      }
+    };
+
+    // Initial shelf load
+    loadShelf();
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!chapters.length) return;
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (currentIndex > 0) renderChapter(currentIndex - 1);
+      }
+      if (e.key === 'ArrowRight' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (currentIndex < chapters.length - 1) renderChapter(currentIndex + 1);
+      }
+    });
+  </script>
+</body>
+</html>

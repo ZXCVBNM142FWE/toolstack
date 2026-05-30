@@ -8,7 +8,52 @@
 
 | # | 状态 | 优先级 | 任务 | 详情 |
 |---|------|--------|------|------|
-| — | — | — | 暂无 | — |
+| 4 | [x] | P0 | 小说预爬取存储 + 本地书架 | 见下方 |
+
+### 需求：把整本小说爬到工具本地存储
+
+**爬取速度：10 路并发 ~8章/秒，2360 章约 5 分钟**
+
+#### 存储结构
+`data/novels/<slug>/`
+```
+data/novels/
+  index.json              ← 书架索引
+  蛊真人/
+    meta.json             ← [{index, title, file}]
+    0001.json ~ 2600.json  ← 每章 {title, content}
+```
+
+#### 1. 新建 `scripts/crawl-novel.js`
+
+```bash
+node scripts/crawl-novel.js <index-url> <slug> [concurrency]
+```
+
+- **并发控制**：默认 10 路并发，Promise.all 批量处理
+- **断点续爬**：跳过已存在的章节文件
+- **进度条**：每 50 章打印一次 `[150/2360] 6.3% 速度: 8.2章/秒 剩余: 4.5分钟`
+- **重试**：失败章节自动重试 2 次
+- **用 curl 子进程**（同 `routes/api/novel.js` 的 fetchHTML 方式）
+
+#### 2. 后端 API（`routes/api/novel.js` 新增）
+
+- `GET /api/novel/shelf` → 读 `data/novels/index.json`
+- `GET /api/novel/local/:slug/meta` → 读 `章节索引`
+- `GET /api/novel/local/:slug/:file` → 读 `章节内容`
+
+#### 3. 前端：加「书架」tab
+
+- 书架 tab 列出现有小说
+- 点击进入阅读，侧栏章节列表，复用现有阅读区
+
+#### 4. 执行爬取
+
+```bash
+node scripts/crawl-novel.js http://www.leshugu.info/html/0/626/ 蛊真人
+```
+
+#### 5. 修改 `app.js` 注册新路由
 
 ---
 
@@ -16,4 +61,8 @@
 
 | # | 完成时间 | 任务 | 结果 |
 |---|---------|------|------|
-| 1 | 2026-05-29 | 修复 hot-topics 微博知乎加载失败 | 微博换 `statuses/hot_band`，知乎换 `hot-list-web`，两个 API 均已验证通过 |
+| 5 | 2026-05-30 | 小说预爬取存储 + 本地书架 | crawl-novel.js 10 路并发+断点续爬+重试，API shelf/local 路由，前端书架 tab，蛊真人已缓存 360 章（源站暂时不可达） |
+| 4 | 2026-05-30 | 修复 Cloudflare 403 | fetchHTML 改用 curl 子进程 |
+| 3 | 2026-05-30 | 小说阅读器 v2 | URL 爬取 API + 前端 |
+| 2 | 2026-05-30 | 新增小说阅读器 | 基础版本 |
+| 1 | 2026-05-29 | 修复 hot-topics | 验证通过 |

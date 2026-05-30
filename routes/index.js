@@ -12,6 +12,7 @@ const tools = [
   { name: '图片压缩', desc: '在线图片压缩，支持 PNG/JPEG', url: '/tools/image-compress', icon: '🖼️' },
   { name: '文档格式整理', desc: '自动排版为标准学术格式，支持课程论文/毕业论文/实验报告', url: '/tools/doc-formatter', icon: '📝' },
   { name: 'PPT 生成器', desc: '28套模板可选，大纲一键生成 PPTX 文件', url: '/tools/ppt-generator', icon: '📊', badge: '新品' },
+  { name: '小说阅读器', desc: '在线阅读小说，支持 URL 爬取 / TXT 上传 / 粘贴文本，自动分章', url: '/tools/novel-reader', icon: '📖', badge: '新品' },
   { name: '热点分析', desc: '聚合微博/知乎/B站/百度实时热搜，一站式追热点', url: '/tools/hot-topics', icon: '🔥', badge: '新品' },
 ];
 

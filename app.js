@@ -61,6 +61,8 @@ try {
 app.use('/tools/doc-formatter', require('./routes/tools/doc-formatter'));
 app.use('/tools/ppt-generator', require('./routes/tools/ppt-generator'));
 const hotTopics = require('./routes/tools/hot-topics');
+app.use('/tools/novel-reader', require('./routes/tools/novel-reader'));
+app.use('/api/novel', require('./routes/api/novel'));
 app.use('/tools/hot-topics', hotTopics.pageRouter);
 app.use('/api/hot-topics', hotTopics.apiRouter);
 app.use('/', require('./routes/sitemap'));
