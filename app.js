@@ -8,10 +8,41 @@ const session = require('cookie-session');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ensure data directory exists
+// ensure data directory exists + seed defaults
 const fs = require('fs');
 const DATA_DIR = path.join(__dirname, 'data');
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+const SEEDS = {
+  'providers.json': [
+    { id: 'deepseek', name: 'DeepSeek', endpoint: 'https://api.deepseek.com/v1', api_key: '', models: ['deepseek-chat','deepseek-reasoner','deepseek-v3-0324','deepseek-r1-0528'], pricing: { prompt: 1, completion: 2 }, weight: 10, priority: 1, timeout: 60000, enabled: true, features: { web_search: true, thinking: true } },
+    { id: 'qwen', name: '通义千问', endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1', api_key: '', models: ['qwen-max','qwen-plus','qwen-turbo','qwen3-235b-a22b','qwen-coder-plus'], pricing: { prompt: 2, completion: 6 }, weight: 10, priority: 2, timeout: 60000, enabled: true, features: { web_search: false, thinking: true } },
+    { id: 'glm', name: '智谱 GLM', endpoint: 'https://open.bigmodel.cn/api/paas/v4', api_key: '', models: ['glm-4-flash','glm-4-plus','glm-4-air','glm-4-long'], pricing: { prompt: 0.5, completion: 1 }, weight: 8, priority: 3, timeout: 60000, enabled: true, features: { web_search: true, thinking: false } },
+    { id: 'moonshot', name: '月之暗面 Kimi', endpoint: 'https://api.moonshot.cn/v1', api_key: '', models: ['moonshot-v1-8k','moonshot-v1-32k','moonshot-v1-128k'], pricing: { prompt: 3, completion: 12 }, weight: 8, priority: 4, timeout: 60000, enabled: true, features: { web_search: true, thinking: false } },
+    { id: 'qianfan', name: '百度文心', endpoint: 'https://qianfan.baidubce.com/v2', api_key: '', models: ['ernie-4.0-turbo-8k','ernie-3.5-8k'], pricing: { prompt: 3, completion: 9 }, weight: 5, priority: 5, timeout: 60000, enabled: false, features: { web_search: false, thinking: false } },
+    { id: 'grok', name: 'xAI Grok', endpoint: 'https://api.x.ai/v1', api_key: '', models: ['grok-3','grok-2'], pricing: { prompt: 15, completion: 50 }, weight: 5, priority: 6, timeout: 90000, enabled: false, features: { web_search: true, thinking: true } },
+    { id: 'openrouter', name: 'OpenRouter', endpoint: 'https://openrouter.ai/api/v1', api_key: '', models: ['openai/gpt-5','anthropic/claude-sonnet-4-6','google/gemini-2.5-pro'], pricing: { prompt: 10, completion: 30 }, weight: 5, priority: 7, timeout: 90000, enabled: false, features: { web_search: false, thinking: false } },
+    { id: 'doubao', name: '字节豆包', endpoint: 'https://ark.cn-beijing.volces.com/api/v3', api_key: '', models: ['doubao-1.5-pro-256k','doubao-1.5-thinking-pro','doubao-1.5-lite-32k','doubao-1.5-vision-pro'], pricing: { prompt: 0.8, completion: 2 }, weight: 8, priority: 8, timeout: 60000, enabled: false, features: { web_search: true, thinking: true } },
+    { id: 'minimax', name: 'MiniMax', endpoint: 'https://api.minimax.chat/v1', api_key: '', models: ['MiniMax-M2','MiniMax-M1','abab7-chat'], pricing: { prompt: 1, completion: 5 }, weight: 7, priority: 9, timeout: 60000, enabled: false, features: { web_search: false, thinking: false } },
+    { id: 'yi', name: '零一万物 Yi', endpoint: 'https://api.lingyiwanwu.com/v1', api_key: '', models: ['yi-lightning','yi-large','yi-medium','yi-vision'], pricing: { prompt: 1, completion: 3 }, weight: 7, priority: 10, timeout: 60000, enabled: false, features: { web_search: false, thinking: false } },
+    { id: 'spark', name: '讯飞星火', endpoint: 'https://spark-api-open.xf-yun.com/v1', api_key: '', models: ['spark-4.0-ultra','spark-lite','spark-pro'], pricing: { prompt: 2, completion: 8 }, weight: 6, priority: 11, timeout: 60000, enabled: false, features: { web_search: false, thinking: false } },
+    { id: 'anthropic', name: 'Anthropic Claude', endpoint: 'https://api.anthropic.com/v1', api_key: '', models: ['claude-sonnet-4-6','claude-opus-4-7','claude-haiku-4-5'], pricing: { prompt: 15, completion: 75 }, weight: 5, priority: 12, timeout: 120000, enabled: false, features: { web_search: false, thinking: true } },
+    { id: 'gemini', name: 'Google Gemini', endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai', api_key: '', models: ['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], pricing: { prompt: 2.5, completion: 10 }, weight: 7, priority: 13, timeout: 90000, enabled: false, features: { web_search: true, thinking: true } },
+  ],
+  'tokens.json': [],
+  'usage.json': [],
+  'users.json': [
+    { id: 'admin-001', username: 'admin', password: '$2b$10$PLACEHOLDER', role: 'admin', balance: 0, daily_limit: 0, created_at: '2025-01-01T00:00:00.000Z' },
+  ],
+};
+
+for (const [file, data] of Object.entries(SEEDS)) {
+  const p = path.join(DATA_DIR, file);
+  if (!fs.existsSync(p)) {
+    fs.writeFileSync(p, JSON.stringify(data, null, 2), 'utf8');
+    console.log(`  📦 seeded ${file}`);
+  }
+}
 
 process.on('uncaughtException', (err) => {
   console.error('uncaughtException:', err.message, err.stack);
