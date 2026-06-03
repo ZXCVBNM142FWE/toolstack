@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}</style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+<%- include('../partials/nav', { currentPage: 'tools', user: typeof user !== 'undefined' ? user : null }) %>
+
+<main class="flex-1 max-w-6xl mx-auto px-6 py-12 w-full">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold mb-2">工具箱</h1>
+    <p class="text-sm text-slate-400"><%= tools.length %> 个实用工具，全部免费使用</p>
+  </div>
+
+  <!-- search -->
+  <div class="max-w-md mb-8">
+    <div class="relative bg-slate-900 rounded-xl border border-slate-700 focus-within:border-cyan-600 transition">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input id="search" class="w-full pl-10 pr-10 py-3 text-sm text-slate-200 placeholder-slate-500 bg-transparent outline-none" type="text" placeholder="搜索工具..." autocomplete="off">
+      <button id="searchClear" class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 hover:text-slate-400 transition-colors hidden cursor-pointer">✕</button>
+    </div>
+  </div>
+
+  <!-- category tabs -->
+  <div class="flex gap-2 mb-6 flex-wrap" id="categoryTabs">
+    <% categories.forEach((cat, i) => { %>
+      <button class="category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border <%= i === 0 ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400 border-slate-700/50 hover:text-slate-200 bg-transparent' %>" data-category="<%= cat %>"><%= cat %></button>
+    <% }) %>
+  </div>
+
+  <p class="text-xs text-slate-500 mb-6">共 <span id="countNum"><%= tools.length %></span> 个工具</p>
+
+  <!-- grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="toolGrid">
+    <% tools.forEach((tool, i) => { %>
+      <a href="<%= tool.url %>" class="tool-card group block bg-slate-800/80 rounded-xl border border-slate-700/50 p-5 hover:border-cyan-700 hover:-translate-y-1 transition-all duration-200 cursor-pointer no-underline" data-category="<%= tool.category %>" data-name="<%= tool.name %>" data-desc="<%= tool.desc %>">
+        <div class="mb-3"><%- tool.icon %></div>
+        <h3 class="text-sm font-semibold text-white mb-1.5 group-hover:text-cyan-400 transition-colors"><%= tool.name %></h3>
+        <p class="text-xs text-slate-400 leading-relaxed"><%= tool.desc %></p>
+        <% if (tool.badge) { %>
+          <span class="inline-block mt-3 px-2 py-0.5 bg-cyan-950 text-cyan-400 text-xs rounded-full border border-cyan-800"><%= tool.badge %></span>
+        <% } %>
+      </a>
+    <% }) %>
+  </div>
+
+  <div id="noResults" class="text-center text-slate-500 py-20 hidden">
+    <div class="text-4xl mb-4">🔍</div>
+    <p>没有匹配的工具</p>
+  </div>
+</main>
+
+<footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-600">API 中转站 · 完全免费</footer>
+
+<script>
+const search = document.getElementById('search');
+const clearBtn = document.getElementById('searchClear');
+const cards = document.querySelectorAll('.tool-card');
+const noResults = document.getElementById('noResults');
+const countNum = document.getElementById('countNum');
+const categoryTabs = document.querySelectorAll('.category-tab');
+let activeCat = '全部';
+
+function updateClear() { clearBtn.style.display = search.value ? 'flex' : 'none'; }
+function filter() {
+  const q = search.value.toLowerCase();
+  let visible = 0;
+  cards.forEach(c => {
+    const matchCat = activeCat === '全部' || c.dataset.category === activeCat;
+    const matchSearch = !q || c.dataset.name.toLowerCase().includes(q) || c.dataset.desc.toLowerCase().includes(q);
+    c.style.display = (matchCat && matchSearch) ? '' : 'none';
+    if (matchCat && matchSearch) visible++;
+  });
+  countNum.textContent = visible;
+  noResults.style.display = visible === 0 ? '' : 'none';
+}
+search.addEventListener('input', () => { updateClear(); filter(); });
+clearBtn.addEventListener('click', () => { search.value = ''; updateClear(); filter(); search.focus(); });
+categoryTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    activeCat = tab.dataset.category;
+    categoryTabs.forEach(t => {
+      t.className = t.dataset.category === activeCat ? 'category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border text-slate-400 border-slate-700/50 hover:text-slate-200 bg-transparent';
+    });
+    filter();
+  });
+});
+</script>
+</body>
+</html>

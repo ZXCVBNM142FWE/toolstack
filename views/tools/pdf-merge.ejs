@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎 PDF 鍚堝苟宸ュ叿锛屽厤璐瑰皢澶氫釜 PDF 鏂囦欢鍚堝苟涓轰竴涓紝瀹屽叏鍏嶈垂鏃犻渶娉ㄥ唽">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PDF 鍚堝苟",
+    "description": "鍦ㄧ嚎鍏嶈垂 PDF 鍚堝苟宸ュ叿",
+    "url": "https://ijuhe.top/tools/pdf-merge",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃搫</span>
+        <h1>PDF 鍚堝苟</h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鐐瑰嚮閫夋嫨 PDF 鏂囦欢锛堝彲澶氶€夛紝鏈€澶?20 涓級</li><li>鏂囦欢鎸夋枃浠跺悕鎺掑簭锛屽垪琛ㄤ腑鍙煡鐪嬫枃浠跺ぇ灏?/li><li>鐐瑰嚮銆屽悎骞跺苟涓嬭浇銆嶆寜閽紝绛夊緟鏈嶅姟绔鐞?/li><li>鍚堝苟瀹屾垚鍚庤嚜鍔ㄤ笅杞藉悎骞跺悗鐨?PDF 鏂囦欢</li></ol></div>
+
+    <div class="tool-workspace">
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label for="fileInput">閫夋嫨 PDF 鏂囦欢锛堝彲澶氶€夛紝鎸夋枃浠跺悕鎺掑簭鍚堝苟锛?/label>
+        <input type="file" id="fileInput" multiple accept=".pdf" style="margin-top:8px;">
+      </div>
+      <div class="tool-panel" style="grid-column:1/-1;">
+        <label>宸查€夋枃浠?/label>
+        <ul id="fileList" style="padding:12px;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;min-height:80px;list-style:none;font-size:0.9rem;color:#6c757d;">
+          <li>灏氭湭閫夋嫨鏂囦欢</li>
+        </ul>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="mergeBtn" class="btn btn-primary">鍚堝苟涓嬭浇</button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+    }
+
+    fileInput.addEventListener('change', () => {
+      fileList.innerHTML = '';
+      if (fileInput.files.length === 0) {
+        fileList.innerHTML = '<li>灏氭湭閫夋嫨鏂囦欢</li>';
+        return;
+      }
+      Array.from(fileInput.files).forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+        li.style.cssText = 'color:#e0e0e0;padding:2px 0;';
+        fileList.appendChild(li);
+      });
+      hideError();
+    });
+
+    document.getElementById('mergeBtn').addEventListener('click', async () => {
+      if (fileInput.files.length < 2) {
+        showError('璇烽€夋嫨鑷冲皯 2 涓?PDF 鏂囦欢');
+        return;
+      }
+
+      const formData = new FormData();
+      Array.from(fileInput.files).forEach(f => formData.append('pdfs', f));
+
+      try {
+        const resp = await fetch('/tools/pdf-merge', { method: 'POST', body: formData });
+        if (!resp.ok) {
+          const data = await resp.json();
+          showError(data.error || '鍚堝苟澶辫触');
+          return;
+        }
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'merged.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+        hideError();
+      } catch (e) {
+        showError('璇锋眰澶辫触: ' + e.message);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      fileInput.value = '';
+      fileList.innerHTML = '<li>灏氭湭閫夋嫨鏂囦欢</li>';
+      hideError();
+    });
+  </script>
+</body>
+</html>

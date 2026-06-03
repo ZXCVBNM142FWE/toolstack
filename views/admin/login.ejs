@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0F172A; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-sm mx-4">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-cyan-400">API 中转站</h1>
+      <p class="text-slate-400 text-sm mt-2">管理后台</p>
+    </div>
+    <form method="POST" action="/admin/login" class="bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-700">
+      <% if (error) { %>
+        <div class="bg-red-900/30 border border-red-500/50 text-red-300 px-4 py-2 rounded-lg text-sm mb-4"><%= error %></div>
+      <% } %>
+      <div class="mb-4">
+        <label class="block text-slate-300 text-sm mb-1.5">用户名</label>
+        <input name="username" type="text" required
+          class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-cyan-500 outline-none transition">
+      </div>
+      <div class="mb-6">
+        <label class="block text-slate-300 text-sm mb-1.5">密码</label>
+        <input name="password" type="password" required
+          class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-cyan-500 outline-none transition">
+      </div>
+      <button type="submit" class="w-full py-2.5 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold rounded-lg transition cursor-pointer">
+        登录
+      </button>
+    </form>
+  </div>
+</body>
+</html>

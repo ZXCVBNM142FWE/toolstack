@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍏嶈垂鍦ㄧ嚎 PPT 鐢熸垚鍣紝28濂楁ā鏉匡紙鍟嗗姟/鍏氭斂/瀛︽湳/绉戞妧/鍥芥疆/鏍″洯/鏉傚織/榛戦噾/绛旇京6娆?璧涘崥鏈嬪厠/鏃ョ郴/璺紨/娣辩┖/娓愬彉锛夛紝澶х翰涓€閿敓鎴?PPTX 鏂囦欢">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/ppt-generator">
+  <meta property="og:title" content="PPT 鐢熸垚鍣?- 鍏嶈垂鍦ㄧ嚎 PPT 鍒朵綔宸ュ叿">
+  <meta property="og:description" content="28濂楁ā鏉垮彲閫夛紝澶х翰涓€閿敓鎴?PPTX">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "PPT 鐢熸垚鍣?,
+    "description": "鍏嶈垂鍦ㄧ嚎 PPT 鐢熸垚鍣紝澶氬妯℃澘鍙€夛紝澶х翰涓€閿敓鎴?PPTX 鏂囦欢",
+    "url": "https://ijuhe.top/tools/ppt-generator",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃搳</span>
+        <h1>PPT 鐢熸垚鍣?/h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>浠?28 濂楁ā鏉夸腑閫夋嫨涓€涓枩娆㈢殑鏍峰紡锛堝彲鎸夈€屽浗鍐呴鏍笺€?銆屽浗闄呴鏍笺€嶇瓫閫夛級</li><li>鍦ㄥぇ绾叉枃鏈涓緭鍏?PPT 鍐呭锛氭瘡琛?= 涓€椤垫爣棰橈紝琛岄鍔犱袱涓┖鏍?= 璇ラ〉瑕佺偣</li><li>鐐瑰嚮銆岀敓鎴?PPTX銆嶆寜閽紝绛夊緟鏈嶅姟绔敓鎴?/li><li>鐢熸垚瀹屾垚鍚庤嚜鍔ㄤ笅杞?PPTX 鏂囦欢</li></ol></div>
+
+    <form class="doc-formatter-form" method="POST" action="/tools/ppt-generator">
+      <div class="form-group">
+        <label>閫夋嫨妯℃澘</label>
+        <div class="template-tabs">
+          <button type="button" class="tab-btn active" onclick="filterTemplates('all')">鍏ㄩ儴</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('domestic')">鍥藉唴椋庢牸</button>
+          <button type="button" class="tab-btn" onclick="filterTemplates('international')">鍥介檯椋庢牸</button>
+        </div>
+        <div class="template-grid" id="templateGrid">
+          <% templates.forEach(function(tpl) { %>
+            <label class="tpl-card" data-category="<%= tpl.category %>">
+              <input type="radio" name="templateId" value="<%= tpl.id %>" <%= tpl.id === 'business-blue' ? 'checked' : '' %>>
+              <div class="tpl-preview" style="background:#<%= tpl.bg %>;">
+                <div class="tpl-bar" style="background:#<%= tpl.accent %>;"></div>
+                <div class="tpl-title-sample" style="color:#<%= tpl.titleColor %>;">Title</div>
+                <div class="tpl-body-sample" style="color:#<%= tpl.bodyColor %>;">Body text preview</div>
+              </div>
+              <div class="tpl-info">
+                <span class="tpl-name"><%= tpl.name %></span>
+                <span class="tpl-desc"><%= tpl.desc %></span>
+              </div>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="outline">PPT 澶х翰锛堟瘡琛?涓€椤垫爣棰橈紝鍓嶉潰鍔犱袱涓┖鏍?鍐呭瑕佺偣锛?/label>
+        <textarea id="outline" name="outline" rows="10" placeholder="椤圭洰浠嬬粛
+  鑳屾櫙涓庣洰鏍?  鏍稿績鍔熻兘
+鎶€鏈灦鏋?  鍓嶇閫夊瀷
+  鍚庣鏈嶅姟
+甯傚満鍒嗘瀽
+  鐩爣鐢ㄦ埛
+  绔炰簤鏍煎眬
+鏈潵瑙勫垝
+  涓€瀛ｅ害鐩爣
+  涓嬪崐骞磋矾绾垮浘"></textarea>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error !== null) { %>
+        <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">鐢熸垚 PPTX</button>
+    </form>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    function filterTemplates(cat) {
+      document.querySelectorAll('.tpl-card').forEach(function(c) {
+        c.style.display = (cat === 'all' || c.dataset.category === cat) ? '' : 'none';
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

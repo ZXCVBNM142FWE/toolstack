@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎 Base64 缂栬В鐮佸伐鍏凤紝鏀寔 Base64 缂栫爜鍜岃В鐮侊紝瀹屽叏鍏嶈垂鏃犻渶娉ㄥ唽">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Base64 缂栬В鐮?,
+    "description": "鍦ㄧ嚎 Base64 缂栫爜瑙ｇ爜宸ュ叿",
+    "url": "https://ijuhe.top/tools/base64",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃攼</span>
+        <h1>Base64 缂栬В鐮?/h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鍦ㄤ笂鏂硅緭鍏ユ涓緭鍏ヨ缂栫爜/瑙ｇ爜鐨勬枃鏈?/li><li>鐐瑰嚮銆岀紪鐮併€嶅皢鏂囨湰杞负 Base64 瀛楃涓?/li><li>鐐瑰嚮銆岃В鐮併€嶅皢 Base64 瀛楃涓茶繕鍘熶负鍘熸枃</li><li>缁撴灉鍦ㄤ笅鏂规樉绀猴紝鐐瑰嚮銆屾竻绌恒€嶉噸缃?/li></ol></div>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">鍘熸枃</label>
+        <textarea id="input" placeholder="杈撳叆瑕佺紪鐮佹垨瑙ｇ爜鐨勬枃鏈?.."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label for="output">缁撴灉</label>
+        <textarea id="output" readonly placeholder="缁撴灉灏嗘樉绀哄湪杩欓噷..."></textarea>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="encodeBtn" class="btn btn-primary">缂栫爜</button>
+        <button id="decodeBtn" class="btn btn-primary">瑙ｇ爜</button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      output.value = '';
+    }
+
+    document.getElementById('encodeBtn').addEventListener('click', () => {
+      try {
+        output.value = btoa(unescape(encodeURIComponent(input.value)));
+        hideError();
+      } catch (e) {
+        showError('缂栫爜澶辫触: ' + e.message);
+      }
+    });
+
+    document.getElementById('decodeBtn').addEventListener('click', () => {
+      try {
+        const decoded = decodeURIComponent(escape(atob(input.value)));
+        output.value = decoded;
+        hideError();
+      } catch (e) {
+        showError('瑙ｇ爜澶辫触: 璇疯緭鍏ユ湁鏁堢殑 Base64 瀛楃涓?);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+      hideError();
+    });
+  </script>
+</body>
+</html>

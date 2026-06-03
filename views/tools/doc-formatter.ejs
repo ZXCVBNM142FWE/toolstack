@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎鏂囨。鏍煎紡鏁寸悊宸ュ叿锛屾敮鎸?DOCX/DOC/WPS/TXT 鏂囨。鑷姩鎺掔増涓烘爣鍑嗗鏈牸寮忥紝鏀寔鑷畾涔夊瓧浣撱€佸瓧鍙枫€佽璺濄€佺缉杩涖€侀〉杈硅窛">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/doc-formatter">
+  <meta property="og:title" content="鏂囨。鏍煎紡鏁寸悊 - 鍦ㄧ嚎瀛︽湳鎺掔増宸ュ叿">
+  <meta property="og:description" content="涓婁紶鏂囨。鑷畾涔夋帓鐗堜负鏍囧噯瀛︽湳鏍煎紡">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "鏂囨。鏍煎紡鏁寸悊",
+    "description": "鍦ㄧ嚎鏂囨。鏍煎紡鏁寸悊宸ュ叿锛屾敮鎸?DOCX/DOC/WPS/TXT 鏂囨。鑷姩鎺掔増涓烘爣鍑嗗鏈牸寮?,
+    "url": "https://ijuhe.top/tools/doc-formatter",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃摑</span>
+        <h1>鏂囨。鏍煎紡鏁寸悊</h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>涓婁紶鏂囨。锛堟敮鎸?.docx / .doc / .wps / .txt锛屾渶澶?100MB锛?/li><li>鍦ㄣ€屾帓鐗堣姹傘€嶆涓緭鍏ヨ嚜鐒惰瑷€鎻忚堪锛堝銆屽畫浣撳皬鍥?1.5鍊嶈璺?棣栬缂╄繘銆嶏級锛岀郴缁熻嚜鍔ㄨ瘑鍒?/li><li>鎴栨墜鍔ㄨ缃瓧浣撱€佸瓧鍙枫€佽璺濄€侀〉杈硅窛銆佺缉杩涚瓑鍙傛暟</li><li>涔熷彲鐩存帴鐐瑰嚮蹇€熼璁撅紙璇剧▼璁烘枃 / 姣曚笟璁烘枃 / 瀹為獙鎶ュ憡 / WPS 閫氱敤锛?/li><li>鐐瑰嚮銆岀敓鎴愭帓鐗堟枃妗ｃ€嶄笅杞芥帓鐗堝悗鐨?DOCX 鏂囦欢</li></ol></div>
+
+    <form class="doc-formatter-form" method="POST" action="/tools/doc-formatter" enctype="multipart/form-data" onsubmit="return checkFile()">
+      <div class="form-group">
+        <label for="doc">涓婁紶鏂囨。锛?docx / .doc / .wps / .txt锛屾渶澶?100MB锛?/label>
+        <input type="file" id="doc" name="doc" accept=".docx,.doc,.wps,.txt">
+      </div>
+
+      <div class="form-group">
+        <label for="requirements">鎺掔増瑕佹眰 <span style="font-weight:normal;color:#888;font-size:0.85rem;">锛堣緭鍏ユ枃瀛楄嚜鍔ㄨ瘑鍒紝濡?瀹嬩綋灏忓洓 1.5鍊嶈璺?棣栬缂╄繘 鏍囧噯椤佃竟璺?鏍囬灞呬腑"锛?/span></label>
+        <input type="text" id="requirements" name="requirements" placeholder="渚嬪锛氬畫浣撳皬鍥?1.5鍊嶈璺?棣栬缂╄繘" maxlength="200" oninput="syncRequirements()">
+      </div>
+
+      <div class="form-group">
+        <label for="title">鏂囨。鏍囬锛堝彲閫夛級</label>
+        <input type="text" id="title" name="title" placeholder="鐣欑┖鍒欒嚜鍔ㄨ瘑鍒? maxlength="200">
+      </div>
+
+      <div class="form-group">
+        <label>蹇€熼璁?/label>
+        <div class="preset-btns">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('course')">璇剧▼璁烘枃</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('thesis')">姣曚笟璁烘枃</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('lab')">瀹為獙鎶ュ憡</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="applyPreset('wps')">WPS 閫氱敤</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="bodyFont">姝ｆ枃瀛椾綋</label>
+          <select id="bodyFont" name="bodyFont">
+            <option value="simsun">瀹嬩綋</option>
+            <option value="fangsong">浠垮畫</option>
+            <option value="kaiti">妤蜂綋</option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleFont">鏍囬瀛椾綋</label>
+          <select id="titleFont" name="titleFont">
+            <option value="simhei" selected>榛戜綋</option>
+            <option value="simsun">瀹嬩綋</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="bodySize">姝ｆ枃瀛楀彿</label>
+          <select id="bodySize" name="bodySize">
+            <option value="21">浜斿彿锛?0.5pt锛?/option>
+            <option value="24" selected>灏忓洓锛?2pt锛?/option>
+            <option value="28">鍥涘彿锛?4pt锛?/option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleSize">鏍囬瀛楀彿</label>
+          <select id="titleSize" name="titleSize">
+            <option value="32">涓夊彿锛?6pt锛?/option>
+            <option value="36">灏忎簩锛?8pt锛?/option>
+            <option value="44" selected>浜屽彿锛?2pt锛?/option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="lineSpacing">琛岃窛</label>
+          <select id="lineSpacing" name="lineSpacing">
+            <option value="1.0">鍗曞€嶈璺?/option>
+            <option value="1.25">1.25 鍊?/option>
+            <option value="1.5" selected>1.5 鍊?/option>
+            <option value="2.0">鍙屽€嶈璺?/option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="margin">椤佃竟璺?/label>
+          <select id="margin" name="margin">
+            <option value="standard" selected>鏍囧噯锛堜笂涓?2.54 宸﹀彸 3.18 cm锛?/option>
+            <option value="wide">鍔犲锛堜笂涓?2.54 宸﹀彸 4.28 cm锛?/option>
+            <option value="narrow">杈冪獎锛堜笂涓?1.27 宸﹀彸 1.27 cm锛?/option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-half">
+          <label for="indent">棣栬缂╄繘</label>
+          <select id="indent" name="indent">
+            <option value="on" selected>2 瀛楃</option>
+            <option value="none">鏃犵缉杩?/option>
+          </select>
+        </div>
+        <div class="form-group form-group-half">
+          <label for="titleAlign">鏍囬瀵归綈</label>
+          <select id="titleAlign" name="titleAlign">
+            <option value="center" selected>灞呬腑</option>
+            <option value="left">宸﹀榻?/option>
+          </select>
+        </div>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error !== null) { %>
+        <div class="error-msg" style="display:block;color:#e03131;font-size:0.9rem;margin-bottom:12px;"><%= error %></div>
+      <% } %>
+
+      <button type="submit" class="btn btn-primary">鐢熸垚鎺掔増鏂囨。</button>
+    </form>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    function checkFile() {
+      var f = document.getElementById('doc');
+      if (!f.files.length) { alert('璇峰厛閫夋嫨瑕佷笂浼犵殑鏂囦欢'); return false; }
+      return true;
+    }
+
+    var presets = {
+      course:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      thesis:  { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      lab:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'36', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' },
+      wps:     { bodyFont:'simsun', titleFont:'simhei', bodySize:'24', titleSize:'44', lineSpacing:'1.5', indent:'on', margin:'standard', titleAlign:'center' }
+    };
+
+    function applyPreset(name) {
+      var p = presets[name];
+      if (!p) return;
+      var keys = ['bodyFont','titleFont','bodySize','titleSize','lineSpacing','indent','margin','titleAlign'];
+      for (var i = 0; i < keys.length; i++) {
+        var el = document.getElementById(keys[i]);
+        if (el) el.value = p[keys[i]];
+      }
+    }
+
+    function parseRequirements(s) {
+      var r = {};
+      if (!s) return r;
+
+      // Body font
+      if (/浠垮畫/.test(s)) r.bodyFont = 'fangsong';
+      else if (/妤蜂綋/.test(s)) r.bodyFont = 'kaiti';
+      else if (/瀹嬩綋/.test(s)) r.bodyFont = 'simsun';
+
+      // Title font
+      if (/鏍囬.*榛戜綋|榛戜綋.*鏍囬/.test(s)) r.titleFont = 'simhei';
+      else if (/鏍囬.*瀹嬩綋|瀹嬩綋.*鏍囬/.test(s)) r.titleFont = 'simsun';
+
+      // Body size
+      if (/浜斿彿|5鍙?.test(s) && !/灏忎簲|灏?/.test(s)) r.bodySize = '21';
+      else if (/灏忓洓|灏?/.test(s)) r.bodySize = '24';
+      else if (/鍥涘彿|4鍙?.test(s)) r.bodySize = '28';
+
+      // Title size
+      if (/涓夊彿|3鍙?.test(s) && !/灏忎笁|灏?/.test(s)) r.titleSize = '32';
+      else if (/灏忎簩|灏?/.test(s)) r.titleSize = '36';
+      else if (/浜屽彿|2鍙?.test(s)) r.titleSize = '44';
+
+      // Line spacing
+      if (/鍙屽€峾2鍊峾2\.0/.test(s)) r.lineSpacing = '2.0';
+      else if (/1\.25/.test(s)) r.lineSpacing = '1.25';
+      else if (/1\.5/.test(s)) r.lineSpacing = '1.5';
+      else if (/鍗曞€峾1鍊峾1\.0/.test(s)) r.lineSpacing = '1.0';
+
+      // Indent
+      if (/涓嶇缉杩泑鏃犵缉杩泑椤舵牸/.test(s)) r.indent = 'none';
+      else if (/缂╄繘|绌轰袱鏍紎绌?鏍?.test(s)) r.indent = 'on';
+
+      // Margin
+      if (/鍔犲/.test(s)) r.margin = 'wide';
+      else if (/杈冪獎|绐?.test(s)) r.margin = 'narrow';
+      else if (/鏍囧噯/.test(s)) r.margin = 'standard';
+
+      // Title align
+      if (/宸﹀榻恷闈犲乏/.test(s)) r.titleAlign = 'left';
+      else if (/灞呬腑/.test(s)) r.titleAlign = 'center';
+
+      return r;
+    }
+
+    function syncRequirements() {
+      var input = document.getElementById('requirements').value;
+      var r = parseRequirements(input);
+      var keys = ['bodyFont','titleFont','bodySize','titleSize','lineSpacing','indent','margin','titleAlign'];
+      for (var i = 0; i < keys.length; i++) {
+        if (r[keys[i]]) {
+          var el = document.getElementById(keys[i]);
+          if (el) el.value = r[keys[i]];
+        }
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#0B1120}code{font-family:'Cascadia Code',Consolas,monospace}pre{margin:0;white-space:pre-wrap;word-break:break-word}.code-block{background:#0D1520;border:1px solid #1E293B;border-radius:12px;padding:16px 20px;margin:12px 0;overflow-x:auto;font-size:13px;line-height:1.7}</style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+<%- include('partials/nav', { currentPage: 'docs', user: typeof user !== 'undefined' ? user : null }) %>
+
+<main class="flex-1 max-w-4xl mx-auto px-6 py-12 w-full">
+  <h1 class="text-2xl font-bold mb-2">API 文档</h1>
+  <p class="text-sm text-slate-400 mb-8">兼容 OpenAI / Claude 格式，替换 Endpoint 即可使用，完全免费</p>
+
+  <!-- quick start -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">快速开始</h2>
+    <div class="code-block"><pre># 1. 获取 API Key（注册后在控制台复制）
+# 2. 替换 Base URL 为本站地址
+# 3. 用 OpenAI SDK 或 curl 直接调用
+
+curl https://你的域名/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的APIKey" \
+  -d '{
+    "model": "deepseek-chat",
+    "messages": [{"role": "user", "content": "你好"}]
+  }'</pre></div>
+  </section>
+
+  <!-- OpenAI -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">OpenAI 兼容模式</h2>
+    <div class="space-y-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 bg-green-900/50 text-green-400 text-xs font-mono rounded">POST</span>
+          <code class="text-sm text-slate-200">/v1/chat/completions</code>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">发送聊天请求，支持流式和非流式</p>
+        <div class="code-block"><pre>from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的APIKey",
+    base_url="https://你的域名/v1"
+)
+
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[{"role": "user", "content": "你好"}],
+    stream=True
+)
+
+for chunk in response:
+    print(chunk.choices[0].delta.content or "", end="")</pre></div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 bg-blue-900/50 text-blue-400 text-xs font-mono rounded">GET</span>
+          <code class="text-sm text-slate-200">/v1/models</code>
+        </div>
+        <p class="text-xs text-slate-400">获取所有可用模型列表</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Claude -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">Claude Messages 模式</h2>
+    <div class="space-y-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 bg-green-900/50 text-green-400 text-xs font-mono rounded">POST</span>
+          <code class="text-sm text-slate-200">/v1/messages</code>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">Anthropic Messages API 兼容端点，支持 Claude SDK 直接调用</p>
+        <div class="code-block"><pre>import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-你的APIKey",
+    base_url="https://你的域名/v1"
+)
+
+message = client.messages.create(
+    model="deepseek-chat",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "你好"}]
+)
+
+print(message.content[0].text)</pre></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JS -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">JavaScript / Node.js</h2>
+    <div class="code-block"><pre>// 使用 OpenAI SDK
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "sk-你的APIKey",
+  baseURL: "https://你的域名/v1",
+});
+
+const completion = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages: [{ role: "user", content: "用JS写一个快速排序" }],
+});
+
+console.log(completion.choices[0].message.content);</pre></div>
+  </section>
+
+  <!-- 认证 -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">认证方式</h2>
+    <div class="code-block"><pre># 方式 1：Bearer Token（推荐）
+Authorization: Bearer sk-你的APIKey
+
+# 方式 2：x-api-key（Claude SDK 默认）
+x-api-key: sk-你的APIKey</pre></div>
+  </section>
+
+  <!-- 流式 -->
+  <section class="mb-12">
+    <h2 class="text-lg font-semibold mb-4">流式输出</h2>
+    <p class="text-sm text-slate-400 mb-3">设置 <code>stream: true</code>，响应为 SSE (Server-Sent Events)</p>
+    <div class="code-block"><pre>// 流式请求
+const stream = await client.chat.completions.create({
+  model: "deepseek-chat",
+  messages: [{ role: "user", content: "讲个故事" }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}</pre></div>
+  </section>
+</main>
+
+<footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-600">API 中转站 · 完全免费</footer>
+</body>
+</html>

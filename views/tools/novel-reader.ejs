@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="在线小说阅读器，舒适阅读体验">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .novel-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      min-height: 60vh;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--card-bg);
+    }
+    .novel-sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--code-bg);
+      overflow-y: auto;
+      max-height: 80vh;
+    }
+    .novel-sidebar-header {
+      position: sticky;
+      top: 0;
+      background: var(--code-bg);
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
+    }
+    .chapter-list {
+      list-style: none;
+      padding: 4px 0;
+      margin: 0;
+    }
+    .chapter-list li {
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      transition: all 0.1s;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .chapter-list li:hover {
+      background: var(--btn-secondary-bg);
+    }
+    .chapter-list li.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .novel-content-area {
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+    }
+    .novel-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: var(--card-bg);
+    }
+    .novel-toolbar label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+    .novel-toolbar select, .novel-toolbar button {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .novel-toolbar button {
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+    }
+    .novel-toolbar button:hover {
+      background: var(--btn-secondary-hover);
+    }
+    .novel-toolbar .sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+    .novel-text-wrap {
+      flex: 1;
+      overflow: hidden;
+      padding: 32px 24px;
+      cursor: pointer;
+      position: relative;
+    }
+    .novel-text {
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 17px;
+      font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+      color: var(--text);
+      letter-spacing: 0.03em;
+      transition: transform 0.18s ease, opacity 0.15s ease;
+    }
+    .novel-text p {
+      margin-bottom: 1.2em;
+      text-indent: 2em;
+    }
+    .novel-text.size-small { font-size: 15px; }
+    .novel-text.size-medium { font-size: 17px; }
+    .novel-text.size-large { font-size: 19px; }
+    .novel-text.line-compact { line-height: 1.6; }
+    .novel-text.line-normal { line-height: 1.8; }
+    .novel-text.line-loose { line-height: 2.1; }
+    .novel-text.width-narrow { max-width: 480px; }
+    .novel-text.width-medium { max-width: 560px; }
+    .novel-text.width-wide { max-width: 640px; }
+    .novel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+    .novel-nav button {
+      padding: 6px 18px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.1s;
+    }
+    .novel-nav button:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .novel-nav button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .novel-chapter-title {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 32px;
+      color: var(--header-color);
+    }
+    .novel-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text);
+      padding: 4px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Fullscreen reading */
+    body.novel-fullscreen {
+      overflow: hidden;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+    }
+    body.novel-fullscreen .tool-header,
+    body.novel-fullscreen .footer,
+    body.novel-fullscreen #shelfArea,
+    body.novel-fullscreen #backArea {
+      display: none !important;
+    }
+    body.novel-fullscreen .tool-page {
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+      height: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    body.novel-fullscreen #readerArea {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.novel-fullscreen .novel-layout {
+      flex: 1;
+      border-radius: 0;
+      border: none;
+      grid-template-columns: 1fr;
+    }
+    body.novel-fullscreen .novel-sidebar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 1000;
+      max-height: 100vh;
+      max-height: 100dvh;
+      box-shadow: 4px 0 20px var(--shadow);
+    }
+    body.novel-fullscreen .novel-sidebar.open {
+      display: block;
+    }
+    body.novel-fullscreen .novel-content-area {
+      max-height: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.novel-fullscreen .novel-text-wrap {
+      flex: 1;
+      overflow: hidden;
+      padding: 24px 12px;
+    }
+    body.novel-fullscreen .novel-nav {
+      flex-shrink: 0;
+    }
+    body.novel-fullscreen .novel-toolbar {
+      flex-shrink: 0;
+    }
+    /* Mobile fullscreen: hide toolbar, tap-to-reveal */
+    @media (max-width: 768px) {
+      body.novel-fullscreen .novel-toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1001;
+        background: var(--card-bg);
+        border-bottom: 1px solid var(--border);
+        padding: 8px 12px;
+        gap: 6px;
+        transform: translateY(-100%);
+        transition: transform 0.2s;
+        opacity: 0.95;
+        flex-shrink: 0;
+      }
+      body.novel-fullscreen .novel-toolbar.visible {
+        transform: translateY(0);
+      }
+      body.novel-fullscreen .novel-text-wrap {
+        padding: 44px 12px 24px;
+      }
+      body.novel-fullscreen .hamburger {
+        position: fixed;
+        top: 8px;
+        left: 8px;
+        z-index: 1002;
+        background: rgba(0,0,0,0.15);
+        color: var(--text);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+      body.novel-fullscreen .novel-nav {
+        padding: 6px 8px;
+        gap: 6px;
+      }
+      body.novel-fullscreen .novel-nav button {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+    }
+    body.novel-fullscreen .hamburger {
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .novel-layout {
+        grid-template-columns: 1fr;
+      }
+      .novel-sidebar {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        z-index: 1000;
+        max-height: 100vh;
+        box-shadow: 4px 0 20px var(--shadow);
+      }
+      .novel-sidebar.open {
+        display: block;
+      }
+      .hamburger {
+        display: block;
+      }
+      .novel-text {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">📖</span>
+        <h1>小说阅读器</h1>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a href="/tools/novel-crawl" class="tool-header-back" style="color:var(--primary);border-color:var(--primary);">+ 添加小说</a>
+        <a href="/" class="tool-header-back">← 返回首页</a>
+      </div>
+    </div>
+
+    <!-- 书架 -->
+    <div id="shelfArea">
+      <div id="shelfList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+        <div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">
+          <span class="spinner"></span> 加载书架...
+        </div>
+      </div>
+    </div>
+
+    <!-- 返回书架 -->
+    <div id="backArea" style="display:none;margin-bottom:12px;">
+      <button id="backToShelfBtn" class="btn btn-secondary btn-sm">← 返回书架</button>
+    </div>
+
+    <!-- 阅读区 -->
+    <div id="readerArea" style="display:none;">
+      <div class="novel-layout">
+        <aside class="novel-sidebar" id="sidebar">
+          <div class="novel-sidebar-header">📑 <span id="bookTitle">目录</span> (<span id="chapterCount">0</span> 章)</div>
+          <ul class="chapter-list" id="chapterList"></ul>
+        </aside>
+        <div class="novel-content-area">
+          <div class="novel-toolbar">
+            <button class="hamburger" id="hamburger" title="目录">☰</button>
+            <label>字号</label>
+            <select id="fontSizeSel">
+              <option value="size-small">小</option>
+              <option value="size-medium" selected>中</option>
+              <option value="size-large">大</option>
+            </select>
+            <div class="sep"></div>
+            <label>行距</label>
+            <select id="lineHeightSel">
+              <option value="line-compact">紧凑</option>
+              <option value="line-normal" selected>正常</option>
+              <option value="line-loose">宽松</option>
+            </select>
+            <div class="sep"></div>
+            <label>宽度</label>
+            <select id="widthSel">
+              <option value="width-narrow">窄</option>
+              <option value="width-medium" selected>中</option>
+              <option value="width-wide">宽</option>
+            </select>
+            <div class="sep"></div>
+            <button id="themeToggle" title="切换深色/浅色模式">🌓 深浅</button>
+            <div class="sep"></div>
+            <button id="fullscreenToggle" title="退出全屏">✕ 退出</button>
+          </div>
+          <div class="novel-text-wrap" id="textWrap">
+            <div class="novel-text size-medium line-normal width-medium" id="novelText">
+              <div class="novel-placeholder"><span class="spinner"></span> 加载中...</div>
+            </div>
+          </div>
+          <div class="novel-nav">
+            <button id="prevChapter">← 上一页</button>
+            <span id="navInfo" style="font-size:0.85rem;color:var(--text-secondary);"></span>
+            <button id="nextChapter">下一页 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = 'novel-reader-state';
+
+    let chapters = [];
+    let currentIndex = 0;
+    let currentSlug = '';
+    let pages = [];
+    let currentPage = 0;
+    let chapterHTML = '';
+
+    // DOM refs
+    const shelfArea = document.getElementById('shelfArea');
+    const readerArea = document.getElementById('readerArea');
+    const backArea = document.getElementById('backArea');
+    const backToShelfBtn = document.getElementById('backToShelfBtn');
+    const chapterList = document.getElementById('chapterList');
+    const chapterCount = document.getElementById('chapterCount');
+    const bookTitle = document.getElementById('bookTitle');
+    const novelText = document.getElementById('novelText');
+    const textWrap = document.getElementById('textWrap');
+    const prevChapter = document.getElementById('prevChapter');
+    const nextChapter = document.getElementById('nextChapter');
+    const navInfo = document.getElementById('navInfo');
+    const sidebar = document.getElementById('sidebar');
+    const hamburger = document.getElementById('hamburger');
+    const themeToggle = document.getElementById('themeToggle');
+    const fontSizeSel = document.getElementById('fontSizeSel');
+    const lineHeightSel = document.getElementById('lineHeightSel');
+    const widthSel = document.getElementById('widthSel');
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function buildHTML(text) {
+      const paragraphs = text.split(/\n\n+/);
+      return paragraphs.map(p => {
+        const lines = p.trim().split('\n');
+        return '<p>' + lines.map(l => escapeHTML(l)).join('<br>') + '</p>';
+      }).join('');
+    }
+
+    function splitPages(html) {
+      // Render into measuring container
+      novelText.innerHTML = html;
+      const pageH = textWrap.clientHeight || window.innerHeight - 100;
+      if (pageH < 20) return [html];
+
+      const paras = [...novelText.querySelectorAll('p')];
+      if (!paras.length) return [html];
+
+      const result = [];
+      let chunk = [];
+      let chunkTop = paras[0].offsetTop;
+
+      for (const p of paras) {
+        const bottom = p.offsetTop + p.offsetHeight;
+        if (bottom - chunkTop > pageH && chunk.length > 0) {
+          result.push(chunk.map(el => el.outerHTML).join(''));
+          chunk = [];
+          chunkTop = p.offsetTop;
+        }
+        chunk.push(p);
+      }
+      if (chunk.length > 0) {
+        result.push(chunk.map(el => el.outerHTML).join(''));
+      }
+      return result.length ? result : [html];
+    }
+
+    function showPage() {
+      if (!pages.length) return;
+      const titleHTML = currentPage === 0 && chapterHTML
+        ? '<div class="novel-chapter-title">' + chapterHTML + '</div>'
+        : '';
+      novelText.innerHTML = titleHTML + (pages[currentPage] || '');
+      updateNav();
+    }
+
+    function turnPage(dir) {
+      const newPage = currentPage + dir;
+      if (newPage >= 0 && newPage < pages.length) {
+        animateTurn(dir, () => {
+          currentPage = newPage;
+          showPage();
+        });
+        saveState();
+        return;
+      }
+      // Cross chapter boundary
+      if (dir > 0 && currentIndex < chapters.length - 1) {
+        animateTurn(dir, () => renderChapter(currentIndex + 1, 0));
+      } else if (dir < 0 && currentIndex > 0) {
+        animateTurn(dir, () => renderChapter(currentIndex - 1, -1));
+      }
+    }
+
+    function animateTurn(dir, updateFn) {
+      const dx = dir > 0 ? -24 : 24;
+      novelText.style.transform = `translateX(${dx}px)`;
+      novelText.style.opacity = '0';
+      setTimeout(() => {
+        updateFn();
+        novelText.style.transition = 'none';
+        novelText.style.transform = `translateX(${-dx}px)`;
+        void novelText.offsetWidth;
+        novelText.style.transition = '';
+        novelText.style.transform = '';
+        novelText.style.opacity = '';
+      }, 160);
+    }
+
+    async function renderChapter(index, targetPage) {
+      if (!chapters.length) return;
+      currentIndex = Math.max(0, Math.min(index, chapters.length - 1));
+      const ch = chapters[currentIndex];
+      pages = [];
+      currentPage = 0;
+      chapterHTML = '';
+
+      novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
+      updateNav();
+      updateChapterList();
+
+      if (!ch.content) {
+        try {
+          const resp = await fetch(ch.url);
+          const data = await resp.json();
+          ch.content = data.content;
+          if (data.title) ch.title = data.title;
+        } catch (e) {
+          novelText.innerHTML = '<div class="novel-placeholder">加载失败: ' + escapeHTML(e.message) + '</div>';
+          updateChapterList();
+          return;
+        }
+      }
+
+      chapterHTML = escapeHTML(ch.title);
+      pages = splitPages(buildHTML(ch.content));
+
+      if (targetPage === -1) {
+        currentPage = pages.length - 1;
+      } else if (typeof targetPage === 'number' && targetPage >= 0 && targetPage < pages.length) {
+        currentPage = targetPage;
+      } else {
+        currentPage = 0;
+      }
+      showPage();
+      updateChapterList();
+      saveState();
+    }
+
+    function updateNav() {
+      prevChapter.disabled = currentIndex === 0 && currentPage === 0;
+      nextChapter.disabled = currentIndex === chapters.length - 1 && currentPage === pages.length - 1;
+      const pageInfo = pages.length ? (currentPage + 1) + '/' + pages.length + ' 页' : '';
+      navInfo.textContent = '第 ' + (currentIndex + 1) + '/' + chapters.length + ' 章 ' + pageInfo;
+    }
+
+    function updateChapterList() {
+      chapterList.innerHTML = chapters.map((ch, i) => {
+        let cls = i === currentIndex ? 'active' : '';
+        return '<li class="' + cls + '" data-index="' + i + '">' + escapeHTML(ch.title || '章节 ' + (i + 1)) + '</li>';
+      }).join('');
+      chapterCount.textContent = chapters.length;
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        currentIndex, currentPage, slug: currentSlug
+      }));
+    }
+
+    function showReader() {
+      shelfArea.style.display = 'none';
+      readerArea.style.display = ''; // let CSS control (flex in fullscreen, block otherwise)
+      backArea.style.display = '';
+      enterFullscreen();
+    }
+
+    function backToShelf() {
+      chapters = [];
+      currentIndex = 0;
+      currentSlug = '';
+      pages = [];
+      currentPage = 0;
+      shelfArea.style.display = '';
+      readerArea.style.display = 'none';
+      backArea.style.display = 'none';
+      exitFullscreen();
+      localStorage.removeItem(STORAGE_KEY);
+      loadShelf();
+    }
+
+    backToShelfBtn.addEventListener('click', backToShelf);
+
+    // Chapter list click
+    chapterList.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (!li) return;
+      renderChapter(parseInt(li.dataset.index));
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
+    });
+
+    // Navigation buttons — now page-level
+    prevChapter.addEventListener('click', () => turnPage(-1));
+    nextChapter.addEventListener('click', () => turnPage(1));
+
+    // Click zones on text area to turn pages
+    textWrap.addEventListener('click', (e) => {
+      if (!pages.length) return;
+      // Mobile: tap top zone to reveal toolbar
+      if (window.innerWidth <= 768 && e.clientY < 50) {
+        showToolbar();
+        return;
+      }
+      const rect = textWrap.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const mid = rect.width / 2;
+      if (x < mid) turnPage(-1);
+      else turnPage(1);
+    });
+
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      if (window.innerWidth <= 768) showToolbar();
+    });
+    sidebar.addEventListener('click', (e) => {
+      if (e.target === sidebar && window.innerWidth <= 768) sidebar.classList.remove('open');
+    });
+
+    // Mobile toolbar auto-hide
+    let toolbarTimer = null;
+    const novelToolbar = document.querySelector('.novel-toolbar');
+    function showToolbar() {
+      clearTimeout(toolbarTimer);
+      novelToolbar.classList.add('visible');
+      toolbarTimer = setTimeout(() => novelToolbar.classList.remove('visible'), 4000);
+    }
+
+    // Fullscreen mode
+    const fullscreenToggle = document.getElementById('fullscreenToggle');
+    function enterFullscreen() {
+      document.body.classList.add('novel-fullscreen');
+      fullscreenToggle.textContent = '✕ 退出';
+      try { document.documentElement.requestFullscreen?.().catch?.(() => {}); } catch (_) {}
+      if (window.innerWidth <= 768) showToolbar();
+    }
+    function exitFullscreen() {
+      document.body.classList.remove('novel-fullscreen');
+      fullscreenToggle.textContent = '⛶ 全屏';
+      try { document.exitFullscreen?.().catch?.(() => {}); } catch (_) {}
+    }
+    fullscreenToggle.addEventListener('click', () => {
+      if (document.body.classList.contains('novel-fullscreen')) {
+        exitFullscreen();
+      } else {
+        enterFullscreen();
+      }
+    });
+
+    // Theme toggle
+    let darkMode = localStorage.getItem('novel-dark-mode') === '1';
+    function applyTheme() {
+      if (darkMode) {
+        document.documentElement.style.setProperty('--text', '#d0d0d0');
+        document.documentElement.style.setProperty('--card-bg', '#1a1a1a');
+        document.documentElement.style.setProperty('--code-bg', '#141414');
+        document.documentElement.style.setProperty('--border', '#333');
+        document.documentElement.style.setProperty('--text-secondary', '#999');
+        document.documentElement.style.setProperty('--header-color', '#e0e0e0');
+        document.documentElement.style.setProperty('--btn-secondary-bg', '#2a2a2a');
+        document.documentElement.style.setProperty('--btn-secondary-text', '#d0d0d0');
+        document.documentElement.style.setProperty('--btn-secondary-hover', '#3a3a3a');
+        document.documentElement.style.setProperty('--shadow', 'rgba(0,0,0,0.4)');
+        document.body.style.background = '#111';
+        document.body.style.color = '#d0d0d0';
+        themeToggle.textContent = '☀️ 浅色';
+      } else {
+        document.documentElement.style.setProperty('--text', '');
+        document.documentElement.style.setProperty('--card-bg', '');
+        document.documentElement.style.setProperty('--code-bg', '');
+        document.documentElement.style.setProperty('--border', '');
+        document.documentElement.style.setProperty('--text-secondary', '');
+        document.documentElement.style.setProperty('--header-color', '');
+        document.documentElement.style.setProperty('--btn-secondary-bg', '');
+        document.documentElement.style.setProperty('--btn-secondary-text', '');
+        document.documentElement.style.setProperty('--btn-secondary-hover', '');
+        document.documentElement.style.setProperty('--shadow', '');
+        document.body.style.background = '';
+        document.body.style.color = '';
+        themeToggle.textContent = '🌓 深浅';
+      }
+    }
+    applyTheme();
+    themeToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+      localStorage.setItem('novel-dark-mode', darkMode ? '1' : '0');
+      applyTheme();
+    });
+
+    // Preferences — re-split pages when font/width/line-height changes
+    let prefChanging = false;
+    async function onPrefChange() {
+      if (prefChanging || !pages.length) return;
+      prefChanging = true;
+      await new Promise(r => setTimeout(r, 100)); // debounce
+      novelText.classList.remove('size-small', 'size-medium', 'size-large');
+      novelText.classList.add(fontSizeSel.value);
+      novelText.classList.remove('line-compact', 'line-normal', 'line-loose');
+      novelText.classList.add(lineHeightSel.value);
+      novelText.classList.remove('width-narrow', 'width-medium', 'width-wide');
+      novelText.classList.add(widthSel.value);
+      const ch = chapters[currentIndex];
+      if (ch && ch.content) {
+        const savedPage = currentPage;
+        pages = splitPages(buildHTML(ch.content));
+        currentPage = Math.min(savedPage, pages.length - 1);
+        showPage();
+      }
+      prefChanging = false;
+    }
+    fontSizeSel.addEventListener('change', () => {
+      localStorage.setItem('novel-font-size', fontSizeSel.value);
+      onPrefChange();
+    });
+    lineHeightSel.addEventListener('change', () => {
+      localStorage.setItem('novel-line-height', lineHeightSel.value);
+      onPrefChange();
+    });
+    widthSel.addEventListener('change', () => {
+      localStorage.setItem('novel-width', widthSel.value);
+      onPrefChange();
+    });
+
+    (function restorePrefs() {
+      const fs = localStorage.getItem('novel-font-size');
+      if (fs) { fontSizeSel.value = fs; novelText.classList.add(fs); }
+      const lh = localStorage.getItem('novel-line-height');
+      if (lh) { lineHeightSel.value = lh; novelText.classList.add(lh); }
+      const w = localStorage.getItem('novel-width');
+      if (w) { widthSel.value = w; novelText.classList.add(w); }
+    })();
+
+    // SHELF
+    async function loadShelf() {
+      const shelfList = document.getElementById('shelfList');
+      try {
+        const resp = await fetch('/api/novel/shelf');
+        const data = await resp.json();
+        if (!data.books || data.books.length === 0) {
+          shelfList.innerHTML = '<div style="color:var(--text-secondary);font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">书架为空</div>';
+          return;
+        }
+        shelfList.innerHTML = data.books.map(b =>
+          '<div class="tool-card shelf-book" style="cursor:pointer;padding:20px;" data-slug="' + escapeHTML(b.slug) + '">' +
+          '<div style="font-size:1.5rem;margin-bottom:8px;">📖</div>' +
+          '<div style="font-weight:600;font-size:1rem;margin-bottom:4px;">' + escapeHTML(b.title || b.slug) + '</div>' +
+          '<div style="font-size:0.8rem;color:var(--text-secondary);">' + (b.chapterCount || 0) + ' 章</div>' +
+          '</div>'
+        ).join('');
+        shelfList.onclick = (e) => {
+          const card = e.target.closest('.shelf-book');
+          if (card) loadBook(card.dataset.slug);
+        };
+      } catch (e) {
+        shelfList.innerHTML = '<div style="color:#e03131;font-size:0.9rem;padding:20px;text-align:center;grid-column:1/-1;">加载书架失败: ' + escapeHTML(e.message) + '</div>';
+      }
+    }
+
+    async function loadBook(slug) {
+      showReader();
+      bookTitle.textContent = slug;
+      novelText.innerHTML = '<div class="novel-placeholder"><span class="spinner"></span>加载中...</div>';
+      updateNav();
+      chapterList.innerHTML = '';
+      currentSlug = slug;
+      try {
+        const resp = await fetch('/api/novel/local/' + encodeURIComponent(slug) + '/meta');
+        const meta = await resp.json();
+        if (resp.status !== 200) throw new Error(meta.error || '加载失败');
+        chapters = meta.map(m => ({ title: m.title, url: '/api/novel/local/' + encodeURIComponent(slug) + '/' + m.filename, content: null }));
+        renderChapter(0);
+      } catch (e) {
+        exitFullscreen();
+        alert('加载失败: ' + e.message);
+        backToShelf();
+      }
+    }
+
+    // Initial shelf load
+    loadShelf();
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('novel-fullscreen')) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        e.preventDefault();
+        exitFullscreen();
+        return;
+      }
+      if (!chapters.length) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+      if (e.key === 'ArrowLeft' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        turnPage(-1);
+      }
+      if (e.key === 'ArrowRight' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        turnPage(1);
+      }
+    });
+  </script>
+</body>
+</html>

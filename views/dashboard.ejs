@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+  .progress-bar{transition:width 0.6s ease}
+</style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col">
+
+<%- include('partials/nav', { currentPage: 'dashboard', user }) %>
+
+<main class="flex-1 max-w-5xl mx-auto px-6 py-8 w-full">
+
+  <!-- header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold">控制台</h1>
+      <p class="text-sm text-slate-400">欢迎回来，<%= user.username %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/tools" class="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-200 rounded-lg text-sm font-semibold hover:border-cyan-700 transition cursor-pointer no-underline">🧰 工具箱</a>
+      <a href="/chat" class="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-semibold hover:bg-cyan-500 transition cursor-pointer no-underline">💬 开始对话</a>
+    </div>
+  </div>
+
+  <!-- stat cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="p-5 rounded-xl bg-gradient-to-br from-slate-900 to-slate-900/80 border border-slate-800">
+      <div class="text-xs text-slate-500 mb-1 uppercase tracking-wide">今日调用</div>
+      <div class="text-3xl font-bold text-cyan-400"><%= todayCount %></div>
+      <div class="text-xs text-slate-500 mt-1">次</div>
+    </div>
+    <div class="p-5 rounded-xl bg-gradient-to-br from-slate-900 to-slate-900/80 border border-slate-800">
+      <div class="text-xs text-slate-500 mb-1 uppercase tracking-wide">今日 Token</div>
+      <div class="text-3xl font-bold text-green-400"><%= Number(todayTokensTotal).toLocaleString() %></div>
+      <div class="text-xs text-slate-500 mt-1">tokens</div>
+    </div>
+    <div class="p-5 rounded-xl bg-gradient-to-br from-slate-900 to-slate-900/80 border border-slate-800">
+      <div class="text-xs text-slate-500 mb-1 uppercase tracking-wide">活跃 Key</div>
+      <div class="text-3xl font-bold text-blue-400"><%= tokens.filter(t => !t.paused).length %> / <%= tokens.length %></div>
+      <div class="text-xs text-slate-500 mt-1">个</div>
+    </div>
+    <div class="p-5 rounded-xl bg-gradient-to-br from-slate-900 to-slate-900/80 border border-slate-800">
+      <div class="text-xs text-slate-500 mb-1 uppercase tracking-wide">可用模型</div>
+      <div class="text-3xl font-bold text-purple-400"><%= totalModels %></div>
+      <div class="text-xs text-slate-500 mt-1">个</div>
+    </div>
+  </div>
+
+  <!-- API tokens -->
+  <section class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">API Keys</h2>
+      <form method="POST" action="/dashboard/create-token" class="m-0">
+        <button class="px-4 py-1.5 bg-cyan-600 text-white rounded-lg text-sm font-semibold hover:bg-cyan-500 transition cursor-pointer">+ 生成新 Key</button>
+      </form>
+    </div>
+
+    <% if (tokens.length === 0) { %>
+      <div class="p-12 text-center bg-slate-900/50 border border-slate-800 rounded-xl text-slate-500 text-sm">
+        <div class="text-3xl mb-3">🔑</div>
+        <p>还没有 API Key</p>
+        <p class="text-xs mt-1">点击"生成新 Key"创建你的第一个 API 密钥</p>
+      </div>
+    <% } else { %>
+    <div class="space-y-4">
+      <% tokens.forEach(t => { %>
+      <div class="p-5 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition">
+        <!-- header row -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <span class="font-semibold text-sm"><%= t.name %></span>
+            <span class="text-xs px-2 py-0.5 rounded-full <%= t.paused ? 'bg-red-900/50 text-red-400 border border-red-800' : 'bg-green-900/50 text-green-400 border border-green-800' %>"><%= t.paused ? '已暂停' : '运行中' %></span>
+            <span class="text-xs text-slate-500">创建于 <%= new Date(t.created_at).toLocaleDateString('zh-CN') %></span>
+          </div>
+          <div class="flex gap-2">
+            <form method="POST" action="/dashboard/toggle-token/<%= t.id %>" class="m-0">
+              <button class="text-xs px-3 py-1 border border-slate-600 rounded-lg text-slate-400 hover:text-cyan-400 hover:border-cyan-700 transition cursor-pointer"><%= t.paused ? '▶ 启用' : '⏸ 暂停' %></button>
+            </form>
+            <form method="POST" action="/dashboard/delete-token/<%= t.id %>" onsubmit="return confirm('确认删除此 Key？此操作不可撤销')" class="m-0">
+              <button class="text-xs px-3 py-1 border border-red-800/50 rounded-lg text-red-400 hover:bg-red-900/30 transition cursor-pointer">删除</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- key row -->
+        <div class="flex items-center gap-2 mb-4">
+          <code class="text-xs text-cyan-300 bg-slate-950/80 px-3 py-1.5 rounded-lg select-all flex-1 font-mono break-all"><%= t.token %></code>
+          <button onclick="copyKey('<%= t.token %>', this)" class="text-xs px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition cursor-pointer shrink-0">复制</button>
+        </div>
+
+        <!-- stats bars -->
+        <div class="grid grid-cols-2 gap-4">
+          <!-- daily usage bar -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-400">今日调用</span>
+              <span class="<%= t.dailyUsed >= t.dailyLimit ? 'text-red-400' : 'text-slate-300' %>"><%= t.dailyUsed %> / <%= t.dailyLimit %></span>
+            </div>
+            <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="progress-bar h-full rounded-full <%= t.dailyUsed >= t.dailyLimit ? 'bg-red-500' : t.dailyUsed / t.dailyLimit > 0.7 ? 'bg-yellow-500' : 'bg-cyan-500' %>" style="width:<%= Math.min(t.dailyUsed / t.dailyLimit * 100, 100) %>%"></div>
+            </div>
+            <!-- daily limit adjust -->
+            <form method="POST" action="/dashboard/daily-limit/<%= t.id %>" class="flex items-center gap-1 mt-1.5">
+              <span class="text-xs text-slate-500">日限额:</span>
+              <input type="number" name="daily_limit" value="<%= t.dailyLimit %>" min="1" max="100000" class="w-16 px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-200 text-center outline-none focus:border-cyan-600">
+              <button class="text-xs px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 hover:text-cyan-400 transition cursor-pointer">更新</button>
+            </form>
+          </div>
+
+          <!-- total quota bar -->
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-slate-400">总额度</span>
+              <span class="text-slate-300"><%= t.quota_used %> / <%= t.quota_total %></span>
+            </div>
+            <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="progress-bar h-full rounded-full <%= t.quota_used >= t.quota_total ? 'bg-red-500' : 'bg-blue-500' %>" style="width:<%= Math.min(t.quota_used / t.quota_total * 100, 100) %>%"></div>
+            </div>
+            <div class="text-xs text-slate-500 mt-1.5">
+              今日 Token: <%= Number(t.todayTokens).toLocaleString() %>
+              <% if (t.last_used) { %> · 最近: <%= new Date(t.last_used).toLocaleDateString('zh-CN') %><% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+    <% } %>
+  </section>
+
+  <!-- usage history -->
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold mb-4">调用记录</h2>
+    <% if (recentUsage.length === 0) { %>
+      <div class="p-8 text-center bg-slate-900/50 border border-slate-800 rounded-xl text-slate-500 text-sm">暂无调用记录</div>
+    <% } else { %>
+    <div class="overflow-x-auto rounded-xl border border-slate-800">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-slate-900/80 text-slate-400 text-xs uppercase">
+            <th class="text-left py-3 px-4 font-medium">时间</th>
+            <th class="text-left py-3 px-4 font-medium">Key</th>
+            <th class="text-left py-3 px-4 font-medium">模型</th>
+            <th class="text-left py-3 px-4 font-medium">渠道</th>
+            <th class="text-right py-3 px-4 font-medium">Tokens</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/50">
+          <% recentUsage.forEach(u => { %>
+          <tr class="hover:bg-slate-800/30 transition">
+            <td class="py-2.5 px-4 text-xs text-slate-400 whitespace-nowrap"><%= new Date(u.timestamp).toLocaleString('zh-CN') %></td>
+            <td class="py-2.5 px-4 text-xs text-slate-300"><%= u.tokenName %></td>
+            <td class="py-2.5 px-4 text-xs font-mono text-cyan-400"><%= u.model %></td>
+            <td class="py-2.5 px-4 text-xs text-slate-500"><%= u.provider %></td>
+            <td class="py-2.5 px-4 text-xs text-slate-300 text-right"><%= Number(u.tokens).toLocaleString() %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </section>
+
+  <!-- quick links -->
+  <section class="p-5 rounded-2xl bg-slate-900/50 border border-slate-800">
+    <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">快捷入口</h2>
+    <div class="flex flex-wrap gap-2">
+      <a href="/chat" class="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300 hover:text-cyan-400 hover:bg-slate-700 transition no-underline">💬 AI 对话</a>
+      <a href="/docs" class="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300 hover:text-cyan-400 hover:bg-slate-700 transition no-underline">📖 API 文档</a>
+      <a href="/models" class="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300 hover:text-cyan-400 hover:bg-slate-700 transition no-underline">📋 模型目录</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-600">API 中转站</footer>
+
+<script>
+function copyKey(key, btn) {
+  navigator.clipboard.writeText(key).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '已复制!';
+    btn.classList.add('text-green-400');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('text-green-400'); }, 1500);
+  });
+}
+</script>
+</body>
+</html>

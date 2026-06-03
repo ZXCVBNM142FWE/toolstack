@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠</text></svg>">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['DM Sans', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'DM Sans', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-black min-h-screen flex flex-col text-slate-300">
+  <header class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950 border-b border-slate-800">
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute top-10 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-10 w-96 h-96 bg-cyan-600 rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-14 flex items-center justify-between">
+      <div>
+        <h1 class="font-display text-2xl md:text-3xl font-bold text-white">AI 论文助手</h1>
+        <p class="text-cyan-300/80 text-sm md:text-base mt-1">上传 PDF/Word · 提取要点 · AI 总结 · 出题自测</p>
+      </div>
+      <a href="/" class="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-slate-600 transition text-sm font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        返回
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 w-full">
+    <div id="uploadZone" class="border-2 border-dashed border-slate-700 rounded-2xl p-12 text-center cursor-pointer transition hover:border-cyan-600 hover:bg-slate-900/50 mb-6 bg-slate-900/30">
+      <svg class="w-12 h-12 text-cyan-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+      <p class="text-slate-200 font-medium">拖拽 PDF/Word 到此处，或点击上传</p>
+      <p class="text-slate-500 text-sm mt-1">支持 PDF、Word 格式，最大 100MB</p>
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx" class="hidden">
+    </div>
+
+    <div id="fileInfo" class="hidden px-4 py-3 bg-cyan-950/30 border border-cyan-800/50 rounded-xl text-sm text-cyan-300 font-medium mb-6"></div>
+
+    <div id="loading" class="hidden text-center py-12">
+      <div class="w-10 h-10 border-3 border-slate-700 border-t-cyan-500 rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-slate-400">AI 正在分析中，请稍等...</p>
+    </div>
+
+    <div id="errorBox" class="hidden text-center py-8 text-red-400 font-medium"></div>
+
+    <div id="resultBox" class="hidden space-y-4">
+      <div id="resultContent"></div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 bg-slate-950/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-slate-500">
+      <a href="/" class="hover:text-slate-300 transition-colors">← 返回工具列表</a>
+    </div>
+  </footer>
+
+  <script>
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const loading = document.getElementById('loading');
+    const errorBox = document.getElementById('errorBox');
+    const resultBox = document.getElementById('resultBox');
+    const resultContent = document.getElementById('resultContent');
+    const fileInfo = document.getElementById('fileInfo');
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFile);
+
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('border-cyan-500', 'bg-slate-900/50'); });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('border-cyan-500', 'bg-slate-900/50'); });
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('border-cyan-500', 'bg-slate-900/50');
+      const file = e.dataTransfer.files[0];
+      file && isAllowed(file) ? handleFileDirect(file) : showError('请上传 PDF 或 Word 文件');
+    });
+
+    function handleFile(e) { const f = e.target.files[0]; if (f) handleFileDirect(f); }
+
+    function isAllowed(file) {
+      const allowed = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+      return allowed.includes(file.type);
+    }
+
+    function handleFileDirect(file) {
+      if (file.size > 100 * 1024 * 1024) { showError('文件不能超过 100MB'); return; }
+      fileInfo.innerHTML = '&#x1F4CE; ' + file.name + ' · ' + formatSize(file.size);
+      fileInfo.classList.remove('hidden');
+      loading.classList.remove('hidden');
+      errorBox.classList.add('hidden');
+      resultBox.classList.add('hidden');
+
+      const fd = new FormData(); fd.append('file', file);
+      fetch('/api/paper/analyze', { method: 'POST', body: fd })
+        .then(r => r.json()).then(data => {
+          loading.classList.add('hidden');
+          if (data.error) { showError(data.error); return; }
+          fileInfo.innerHTML = '&#x1F4CE; ' + file.name + ' · ' + formatSize(file.size) + ' · ' + data.pages + ' 页';
+          renderResult(data);
+        }).catch(err => { loading.classList.add('hidden'); showError('请求失败: ' + err.message); });
+    }
+
+    function renderResult(data) {
+      let html = '';
+      const section = (icon, title, body) =>
+        '<div class="bg-slate-900 rounded-xl p-5 border border-slate-800 ring-1 ring-white/5">' +
+        '<h4 class="font-display font-semibold text-white mb-3">' + icon + ' ' + title + '</h4>' + body + '</div>';
+
+      if (data.summary) html += section('📝', '论文要点', '<p class="text-slate-300 leading-relaxed">' + esc(data.summary) + '</p>');
+      if (data.keyPoints?.length) {
+        html += section('🔑', '关键发现', '<ul class="space-y-2">' +
+          data.keyPoints.map(p => '<li class="text-slate-300 leading-relaxed pl-5 relative before:content-[\'\'] before:absolute before:left-0 before:top-2.5 before:w-2 before:h-2 before:bg-cyan-500 before:rounded-full">' + esc(p) + '</li>').join('') + '</ul>');
+      }
+      if (data.questions?.length) {
+        html += section('📝', '自测题目', '<ol class="space-y-2 list-decimal list-inside">' +
+          data.questions.map(q => '<li class="text-slate-300 leading-relaxed">' + esc(q) + '</li>').join('') + '</ol>');
+      }
+      if (data.keywords?.length) {
+        html += section('🏷', '关键词', data.keywords.map(k =>
+          '<span class="inline-block px-2.5 py-1 bg-cyan-950 text-cyan-300 rounded-lg text-xs font-medium mr-1.5 mb-1.5 border border-cyan-800/50">' + esc(k) + '</span>').join(''));
+      }
+      if (data.stats) {
+        html += section('📊', '统计',
+          '<div class="flex flex-wrap gap-4 text-sm text-slate-400">' +
+          '<span>字数: ' + data.stats.wordCount.toLocaleString() + '</span>' +
+          '<span>段落: ' + data.stats.paragraphCount + '</span>' +
+          '<span>预估阅读: ' + data.stats.readTime + ' 分钟</span></div>');
+      }
+      resultContent.innerHTML = html || '<p class="text-center text-slate-500 py-8">未能提取到内容，请确认 PDF 包含可读文字</p>';
+      resultBox.classList.remove('hidden');
+    }
+
+    function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); fileInfo.classList.add('hidden'); }
+    function formatSize(b) { return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB'; }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  </script>
+</body>
+</html>

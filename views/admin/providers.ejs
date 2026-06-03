@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{background:#0F172A}summary{cursor:pointer}</style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center gap-6">
+    <a href="/admin/dashboard" class="text-cyan-400 font-bold">API 中转站 管理</a>
+    <a href="/admin/dashboard" class="text-sm text-slate-300 hover:text-cyan-400 transition">总览</a>
+    <a href="/admin/providers" class="text-sm text-cyan-400 transition">渠道</a>
+    <a href="/admin/tokens" class="text-sm text-slate-300 hover:text-cyan-400 transition">令牌</a>
+    <a href="/admin/users" class="text-sm text-slate-300 hover:text-cyan-400 transition">用户</a>
+    <span class="flex-1"></span>
+    <a href="/admin/logout" class="text-sm text-red-400 hover:text-red-300 transition">登出</a>
+  </nav>
+  <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">渠道管理</h1>
+      <details class="relative">
+        <summary class="px-4 py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition">+ 添加渠道</summary>
+        <div class="absolute right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-80 z-10 shadow-xl">
+          <form method="POST" action="/admin/providers">
+            <input name="id" placeholder="ID (英文)" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="name" placeholder="名称" required class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="endpoint" placeholder="API Endpoint" required class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="api_key" placeholder="API Key" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <div class="flex gap-2 mb-2">
+              <input name="weight" placeholder="权重 (1-10)" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+              <input name="priority" placeholder="优先级 (1-10)" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+              <input name="timeout" placeholder="超时(ms)" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            </div>
+            <button class="w-full py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition cursor-pointer">添加</button>
+          </form>
+        </div>
+      </details>
+    </div>
+    <div class="space-y-4">
+      <% providers.forEach(p => { %>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="font-semibold text-lg"><%= p.name %></span>
+              <code class="ml-2 text-xs text-slate-400 bg-slate-900 px-2 py-0.5 rounded"><%= p.id %></code>
+              <span class="ml-2 text-xs px-2 py-0.5 rounded <%= p.enabled ? 'bg-green-900/50 text-green-400' : 'bg-slate-700 text-slate-400' %>"><%= p.enabled ? '启用' : '停用' %></span>
+            </div>
+            <div class="flex gap-2">
+              <details>
+                <summary class="px-3 py-1.5 border border-slate-600 rounded-lg text-sm text-slate-300 hover:border-cyan-400 hover:text-cyan-400 transition">编辑</summary>
+                <div class="absolute right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-80 z-10 shadow-xl">
+                  <form method="POST" action="/admin/providers/<%= p.id %>/update">
+                    <input name="name" value="<%= p.name %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="endpoint" value="<%= p.endpoint %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="api_key" value="<%= p.api_key %>" placeholder="API Key" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="models" value="<%= (p.models||[]).join(',') %>" placeholder="模型 (逗号分隔)" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <div class="flex gap-2 mb-2">
+                      <input name="prompt_price" value="<%= p.pricing.prompt %>" placeholder="输入价" class="w-1/2 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                      <input name="completion_price" value="<%= p.pricing.completion %>" placeholder="输出价" class="w-1/2 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+                    <div class="flex gap-2 mb-2">
+                      <input name="weight" value="<%= p.weight || 10 %>" placeholder="权重" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                      <input name="priority" value="<%= p.priority || 10 %>" placeholder="优先级" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                      <input name="timeout" value="<%= p.timeout || 60000 %>" placeholder="超时ms" class="w-1/3 px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    </div>
+                    <label class="flex items-center gap-2 text-sm text-slate-300 mb-3">
+                      <input type="checkbox" name="enabled" <%= p.enabled ? 'checked' : '' %> class="rounded"> 启用
+                    </label>
+                    <button class="w-full py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition cursor-pointer">保存</button>
+                  </form>
+                </div>
+              </details>
+              <form method="POST" action="/admin/providers/<%= p.id %>/delete" onsubmit="return confirm('确认删除 <%= p.name %>？')">
+                <button class="px-3 py-1.5 border border-red-700 rounded-lg text-sm text-red-400 hover:bg-red-900/30 transition cursor-pointer">删除</button>
+              </form>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 space-x-4">
+            <span>Endpoint: <%= p.endpoint %></span>
+            <span>模型: <%= (p.models||[]).join(', ') || '—' %></span>
+            <span>价格: ¥<%= p.pricing.prompt %> / ¥<%= p.pricing.completion %></span>
+            <span>权重: <%= p.weight || 10 %></span>
+            <span>优先级: <%= p.priority || 10 %></span>
+            <span>超时: <%= (p.timeout || 60000) / 1000 %>s</span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>

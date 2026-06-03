@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎 Markdown 缂栬緫鍣紝鏀寔瀹炴椂棰勮锛屽畬鍏ㄥ厤璐规棤闇€娉ㄥ唽">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Markdown 缂栬緫鍣?,
+    "description": "鍦ㄧ嚎 Markdown 瀹炴椂棰勮缂栬緫鍣?,
+    "url": "https://ijuhe.top/tools/markdown",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+  <style>
+    .markdown-preview { flex:1; min-height:360px; padding:16px; background:#fff; border:1px solid #dee2e6; border-radius:8px; overflow-y:auto; font-size:0.9rem; line-height:1.7; }
+    .markdown-preview h1,.markdown-preview h2,.markdown-preview h3 { margin:16px 0 8px; }
+    .markdown-preview code { background:#f1f3f5; padding:2px 6px; border-radius:4px; font-size:0.85em; }
+    .markdown-preview pre { background:#1a1a2e; color:#e0e0e0; padding:16px; border-radius:8px; overflow-x:auto; }
+    .markdown-preview pre code { background:none; padding:0; }
+    .markdown-preview blockquote { border-left:3px solid #4361ee; padding-left:12px; color:#6c757d; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">鉁嶏笍</span>
+        <h1>Markdown 缂栬緫鍣?/h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鍦ㄥ乏渚х紪杈戝尯杈撳叆 Markdown 鏍煎紡鏂囨湰</li><li>鍙充晶棰勮鍖哄疄鏃舵樉绀烘覆鏌撳悗鐨勬晥鏋?/li><li>鏀寔鏍囬銆佸垪琛ㄣ€佷唬鐮佸潡銆佸紩鐢ㄣ€侀摼鎺ャ€佸浘鐗囩瓑鏍囧噯璇硶</li><li>鍒濆宸插～鍏ョず渚嬪唴瀹逛緵鍙傝€冿紝鍙竻绌哄悗鑷缂栬緫</li></ol></div>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">缂栬緫</label>
+        <textarea id="input" placeholder="鍦ㄨ繖閲屽啓 Markdown..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label>棰勮</label>
+        <div id="preview" class="markdown-preview"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('input');
+    const preview = document.getElementById('preview');
+
+    const defaultMd = '# 娆㈣繋浣跨敤 Markdown\n\n' +
+      '## 鏍囬\n' +
+      '**绮椾綋** 鍜?*鏂滀綋* 鏂囨湰\n\n' +
+      '### 浠ｇ爜鍧梊n' +
+      '```javascript\nconsole.log("Hello World");\n```\n\n' +
+      '### 鍒楄〃\n' +
+      '- 椤圭洰 1\n' +
+      '- 椤圭洰 2\n' +
+      '- 椤圭洰 3\n\n' +
+      '### 寮曠敤\n> 杩欐槸涓€娈靛紩鐢ㄦ枃瀛梊n\n' +
+      '### 閾炬帴\n[璁块棶 Google](https://www.google.com)';
+
+    input.value = defaultMd;
+    preview.innerHTML = marked.parse(defaultMd);
+
+    input.addEventListener('input', () => {
+      preview.innerHTML = marked.parse(input.value || '');
+    });
+  </script>
+</body>
+</html>

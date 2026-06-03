@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{background:#0F172A}summary{cursor:pointer}</style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center gap-6">
+    <a href="/admin/dashboard" class="text-cyan-400 font-bold">API 中转站 管理</a>
+    <a href="/admin/dashboard" class="text-sm text-slate-300 hover:text-cyan-400 transition">总览</a>
+    <a href="/admin/providers" class="text-sm text-slate-300 hover:text-cyan-400 transition">渠道</a>
+    <a href="/admin/tokens" class="text-sm text-cyan-400 transition">令牌</a>
+    <a href="/admin/users" class="text-sm text-slate-300 hover:text-cyan-400 transition">用户</a>
+    <span class="flex-1"></span>
+    <a href="/admin/logout" class="text-sm text-red-400 hover:text-red-300 transition">登出</a>
+  </nav>
+  <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">令牌管理</h1>
+      <details class="relative">
+        <summary class="px-4 py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition">+ 创建令牌</summary>
+        <div class="absolute right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-80 z-10 shadow-xl">
+          <form method="POST" action="/admin/tokens">
+            <input name="name" placeholder="令牌名称" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="quota_total" type="number" value="1000" placeholder="调用额度" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="models" placeholder="模型 (逗号分隔，留空=全部)" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="expires_at" type="date" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-3 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <button class="w-full py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition cursor-pointer">创建</button>
+          </form>
+        </div>
+      </details>
+    </div>
+    <div class="space-y-3">
+      <% tokens.forEach(t => { %>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-3">
+              <span class="font-semibold"><%= t.name %></span>
+              <code class="text-xs text-slate-400 bg-slate-900 px-2 py-0.5 rounded select-all"><%= t.token.substring(0,8) %>...<%= t.token.slice(-4) %></code>
+              <% if (t.paused) { %>
+                <span class="text-xs px-2 py-0.5 rounded bg-yellow-900/50 text-yellow-400">已暂停</span>
+              <% } %>
+              <% if (t.expires_at && new Date(t.expires_at).getTime() < Date.now()) { %>
+                <span class="text-xs px-2 py-0.5 rounded bg-red-900/50 text-red-400">已过期</span>
+              <% } %>
+            </div>
+            <div class="flex gap-2">
+              <details>
+                <summary class="px-3 py-1.5 border border-slate-600 rounded-lg text-sm text-slate-300 hover:border-cyan-400 hover:text-cyan-400 transition">编辑</summary>
+                <div class="absolute right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-80 z-10 shadow-xl">
+                  <form method="POST" action="/admin/tokens/<%= t.id %>/update">
+                    <input name="name" value="<%= t.name %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="quota_total" type="number" value="<%= t.quota_total %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="models" value="<%= (t.models||[]).join(',') %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <input name="expires_at" type="date" value="<%= t.expires_at ? t.expires_at.slice(0,10) : '' %>" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-3 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+                    <label class="flex items-center gap-2 text-sm text-slate-300 mb-3">
+                      <input type="checkbox" name="paused" <%= t.paused ? 'checked' : '' %>> 暂停
+                    </label>
+                    <button class="w-full py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition cursor-pointer">保存</button>
+                  </form>
+                </div>
+              </details>
+              <form method="POST" action="/admin/tokens/<%= t.id %>/delete" onsubmit="return confirm('确认删除此令牌？')">
+                <button class="px-3 py-1.5 border border-red-700 rounded-lg text-sm text-red-400 hover:bg-red-900/30 transition cursor-pointer">删除</button>
+              </form>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 space-x-4">
+            <span>额度: <%= t.quota_used %> / <%= t.quota_total %></span>
+            <span>模型: <%= (t.models||[]).join(', ') || '*' %></span>
+            <span>创建: <%= t.created_at ? t.created_at.slice(0,10) : '—' %></span>
+            <% if (t.expires_at) { %><span>过期: <%= t.expires_at.slice(0,10) %></span><% } %>
+            <% if (t.last_used) { %><span>最近使用: <%= t.last_used.slice(0,16) %></span><% } %>
+          </div>
+        </div>
+      <% }) %>
+      <% if (tokens.length === 0) { %>
+        <p class="text-slate-500 text-center py-8">暂无令牌，点击右上角创建</p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{background:#0F172A}summary{cursor:pointer}</style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center gap-6">
+    <a href="/admin/dashboard" class="text-cyan-400 font-bold">API 中转站 管理</a>
+    <a href="/admin/dashboard" class="text-sm text-slate-300 hover:text-cyan-400 transition">总览</a>
+    <a href="/admin/providers" class="text-sm text-slate-300 hover:text-cyan-400 transition">渠道</a>
+    <a href="/admin/tokens" class="text-sm text-slate-300 hover:text-cyan-400 transition">令牌</a>
+    <a href="/admin/users" class="text-sm text-cyan-400 transition">用户</a>
+    <span class="flex-1"></span>
+    <a href="/admin/logout" class="text-sm text-red-400 hover:text-red-300 transition">登出</a>
+  </nav>
+  <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold">用户管理</h1>
+      <details class="relative">
+        <summary class="px-4 py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition">+ 添加用户</summary>
+        <div class="absolute right-0 mt-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-80 z-10 shadow-xl">
+          <form method="POST" action="/admin/users">
+            <input name="username" placeholder="用户名" required class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <input name="password" type="password" placeholder="密码" required class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-2 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+            <select name="role" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 mb-3 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+              <option value="user">普通用户</option>
+              <option value="admin">管理员</option>
+            </select>
+            <button class="w-full py-2 bg-cyan-500 text-slate-900 rounded-lg font-semibold text-sm hover:bg-cyan-600 transition cursor-pointer">添加</button>
+          </form>
+        </div>
+      </details>
+    </div>
+    <div class="space-y-3">
+      <% users.forEach(u => { %>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex items-center justify-between">
+          <div>
+            <span class="font-semibold"><%= u.username %></span>
+            <span class="ml-2 text-xs px-2 py-0.5 rounded <%= u.role === 'admin' ? 'bg-purple-900/50 text-purple-400' : 'bg-slate-700 text-slate-400' %>"><%= u.role %></span>
+            <span class="ml-3 text-sm text-slate-400">余额: ¥<%= u.balance || 0 %></span>
+          </div>
+          <div class="text-xs text-slate-500">创建于 <%= u.created_at ? u.created_at.slice(0,10) : '—' %></div>
+        </div>
+      <% }) %>
+    </div>
+    <h2 class="text-xl font-bold mt-10 mb-4">令牌用量一览</h2>
+    <div class="space-y-2">
+      <% tokens.forEach(t => { %>
+        <div class="bg-slate-800 rounded-lg border border-slate-700 p-3 flex items-center justify-between text-sm">
+          <div>
+            <span class="font-medium"><%= t.name %></span>
+            <code class="ml-2 text-xs text-slate-500"><%= t.token.substring(0,6) %>...</code>
+          </div>
+          <div class="text-slate-400">
+            用量: <span class="<%= t.quota_used >= t.quota_total ? 'text-red-400' : 'text-green-400' %>"><%= t.quota_used %>/<%= t.quota_total %></span>
+            <% if (t.paused) { %><span class="ml-2 text-yellow-400">暂停</span><% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>

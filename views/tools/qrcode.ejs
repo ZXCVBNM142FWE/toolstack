@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎浜岀淮鐮佺敓鎴愬櫒锛屽厤璐瑰皢鏂囧瓧鎴栫綉鍧€鐢熸垚浜岀淮鐮佸浘鐗?>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1/build/qrcode.min.js"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "浜岀淮鐮佺敓鎴?,
+    "description": "鍦ㄧ嚎浜岀淮鐮佺敓鎴愬櫒",
+    "url": "https://ijuhe.top/tools/qrcode",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃摫</span>
+        <h1>浜岀淮鐮佺敓鎴?/h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鍦ㄨ緭鍏ユ涓緭鍏ユ枃鏈垨缃戝潃锛圲RL锛?/li><li>鐐瑰嚮銆岀敓鎴愪簩缁寸爜銆嶆寜閽?/li><li>鐢熸垚鐨勪簩缁寸爜鍥剧墖鏄剧ず鍦ㄥ彸渚э紝鍙抽敭鍙繚瀛?/li><li>鐐瑰嚮銆屾竻绌恒€嶉噸鏂扮敓鎴?/li></ol></div>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">杈撳叆鏂囨湰鎴栫綉鍧€</label>
+        <textarea id="input" placeholder="杈撳叆瑕佺敓鎴愪簩缁寸爜鐨勬枃瀛楁垨缃戝潃..."></textarea>
+      </div>
+      <div class="tool-panel">
+        <label>浜岀淮鐮?/label>
+        <div style="display:flex;align-items:center;justify-content:center;min-height:360px;background:#f1f3f5;border:1px solid #dee2e6;border-radius:8px;">
+          <canvas id="qrcanvas"></canvas>
+        </div>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="generateBtn" class="btn btn-primary">鐢熸垚浜岀淮鐮?/button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('input');
+    const canvas = document.getElementById('qrcanvas');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      canvas.style.display = 'none';
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) {
+        showError('璇疯緭鍏ュ唴瀹?);
+        return;
+      }
+      QRCode.toCanvas(canvas, text, { width: 256 }, (err) => {
+        if (err) {
+          showError('鐢熸垚澶辫触: ' + err.message);
+        } else {
+          canvas.style.display = '';
+          hideError();
+        }
+      });
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      canvas.style.display = 'none';
+      hideError();
+    });
+  </script>
+</body>
+</html>

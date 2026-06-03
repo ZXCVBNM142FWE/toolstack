@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="全网热点聚合 — 实时追踪微博热搜、知乎热榜、B站热门、百度热搜，一站式追热点">
+  <meta name="keywords" content="热搜,热点,微博热搜,知乎热榜,B站热门,百度热搜,实时热搜">
+  <title><%= title %></title>
+  <link rel="canonical" href="https://ijuhe.top/tools/hot-topics">
+  <link rel="stylesheet" href="/style.css">
+  <meta property="og:title" content="全网热点聚合 — 微博/知乎/B站/百度热搜实时更新">
+  <meta property="og:description" content="一站式浏览全网热搜，实时更新，支持微博、知乎、B站、百度四大平台">
+  <meta property="og:type" content="website">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "热点分析",
+    "description": "聚合微博/知乎/B站/百度实时热搜，一站式追热点",
+    "url": "https://ijuhe.top/tools/hot-topics",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page hot-topics">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">🔥</span>
+        <h1>热点分析</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
+
+    <div class="usage-card"><h2>使用说明</h2><ol><li>点击顶部 Tab 切换数据源</li><li>点击标题可跳转查看详情</li><li>数据每 5 分钟自动刷新</li><li>各平台独立加载，互不影响</li></ol></div>
+
+    <div class="source-tabs">
+      <button class="source-tab active" data-source="weibo">🔥 微博热搜</button>
+      <button class="source-tab" data-source="zhihu">💡 知乎热榜</button>
+      <button class="source-tab" data-source="bilibili">📺 B站热门</button>
+      <button class="source-tab" data-source="baidu">🔍 百度热搜</button>
+      <button class="source-tab" data-source="all">🌐 全部</button>
+    </div>
+
+    <div class="hot-content" id="hotContent">
+      <div class="skeleton" id="skeleton">
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+        <div class="skeleton-item"></div>
+      </div>
+      <div class="hot-list" id="hotList" style="display:none"></div>
+      <div class="hot-error" id="hotError" style="display:none">加载失败，请稍后重试</div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
+  </footer>
+
+  <script>
+    (function () {
+      var currentSource = 'weibo';
+      var prefetch = <%- prefetchData %>;
+
+      var tabs = document.querySelectorAll('.source-tab');
+      var skeleton = document.getElementById('skeleton');
+      var hotList = document.getElementById('hotList');
+      var hotError = document.getElementById('hotError');
+
+      function showLoading() {
+        skeleton.style.display = '';
+        hotList.style.display = 'none';
+        hotError.style.display = 'none';
+      }
+
+      function showError() {
+        skeleton.style.display = 'none';
+        hotList.style.display = 'none';
+        hotError.style.display = '';
+      }
+
+      function showList() {
+        skeleton.style.display = 'none';
+        hotError.style.display = 'none';
+        hotList.style.display = '';
+      }
+
+      function rankClass(rank) {
+        if (rank === 1) return 'rank-gold';
+        if (rank === 2) return 'rank-silver';
+        if (rank === 3) return 'rank-bronze';
+        return '';
+      }
+
+      function renderSource(data) {
+        var html = '<div class="hot-source">';
+        html += '<span class="hot-source-icon">' + data.icon + '</span> ';
+        html += '<span class="hot-source-name">' + data.sourceName + '</span>';
+        html += '</div>';
+        data.items.forEach(function (item) {
+          html += '<a class="hot-item" href="' + item.url + '" target="_blank" rel="noopener">';
+          html += '<span class="hot-rank ' + rankClass(item.rank) + '">' + item.rank + '</span>';
+          html += '<span class="hot-title">' + escapeHtml(item.title) + '</span>';
+          html += '<span class="hot-heat">' + escapeHtml(item.heatDisplay) + '</span>';
+          html += '</a>';
+        });
+        return html;
+      }
+
+      function renderAll(dataList) {
+        var html = '';
+        dataList.forEach(function (data) {
+          html += renderSource(data);
+        });
+        return html;
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+
+      function displayResult(source, data) {
+        if (source === 'all') {
+          hotList.innerHTML = renderAll(data);
+        } else {
+          hotList.innerHTML = renderSource(data);
+        }
+        showList();
+      }
+
+      function loadSource(source) {
+        showLoading();
+        fetch('/api/hot-topics?source=' + source)
+          .then(function (res) { return res.json(); })
+          .then(function (json) {
+            if (json.success) {
+              if (source === 'all') {
+                displayResult('all', json.data);
+              } else {
+                displayResult(source, json.data);
+              }
+            } else {
+              if (currentSource === source) showError();
+            }
+          })
+          .catch(function () {
+            if (currentSource === source) showError();
+          });
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          var src = this.dataset.source;
+          if (src === currentSource) return;
+          tabs.forEach(function (t) { t.classList.remove('active'); });
+          this.classList.add('active');
+          currentSource = src;
+          loadSource(src);
+        });
+      });
+
+      if (prefetch) {
+        displayResult('weibo', prefetch);
+      } else {
+        loadSource('weibo');
+      }
+
+      function startAutoRefresh() {
+        setInterval(function () {
+          loadSource(currentSource);
+        }, 5 * 60 * 1000);
+      }
+      startAutoRefresh();
+    })();
+  </script>
+</body>
+</html>

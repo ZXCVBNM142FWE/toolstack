@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  .step-hidden{display:none}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+  .shake{animation:shake 0.4s ease}
+</style>
+</head>
+<body class="text-slate-100 min-h-screen flex items-center justify-center p-6">
+
+<div class="w-full max-w-sm">
+  <div class="text-center mb-8">
+    <a href="/" class="text-2xl font-bold text-cyan-400 no-underline">⚡ API 中转站</a>
+    <p class="text-sm text-slate-400 mt-2">创建免费账号</p>
+  </div>
+
+  <!-- messages -->
+  <div id="msg" class="hidden p-3 rounded-xl text-sm mb-4"></div>
+
+  <!-- step 1: email + password + captcha -->
+  <div id="step1">
+    <div class="space-y-3">
+      <input id="email" type="email" placeholder="邮箱地址" required class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+      <input id="password" type="password" placeholder="密码（至少 6 位）" required minlength="6" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+      <p class="text-xs text-slate-500">用户名将自动使用邮箱前缀</p>
+
+      <!-- captcha row -->
+      <div class="flex gap-2 items-center">
+        <input id="captchaInput" type="text" placeholder="图形验证码" maxlength="4" autocomplete="off" class="flex-1 px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm font-mono tracking-widest focus:ring-2 focus:ring-cyan-500 outline-none uppercase">
+        <div id="captchaImg" class="shrink-0 cursor-pointer rounded-xl overflow-hidden border border-slate-700 hover:border-cyan-600 transition" onclick="refreshCaptcha()" title="点击刷新">
+          <img id="captchaSvg" src="/captcha" alt="captcha" class="h-[48px]" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%2248%22><rect fill=%22%23f8f9fa%22 width=%22140%22 height=%2248%22 rx=%226%22/><text x=%2270%22 y=%2230%22 text-anchor=%22middle%22 font-size=%2216%22 fill=%22%23999%22>点击刷新</text></svg>'">
+        </div>
+      </div>
+
+      <button id="sendBtn" onclick="sendCode()" class="w-full py-3 bg-cyan-600 text-white rounded-xl font-semibold text-sm hover:bg-cyan-500 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">发送验证码</button>
+    </div>
+  </div>
+
+  <!-- step 2: enter code -->
+  <div id="step2" class="step-hidden">
+    <p class="text-sm text-slate-300 mb-1">验证码已发送至</p>
+    <p id="codeEmail" class="text-sm text-cyan-400 mb-3"></p>
+    <p id="codeHint" class="hidden text-xs text-yellow-400 bg-yellow-900/20 border border-yellow-800/50 rounded-lg px-3 py-2 mb-3"></p>
+    <div class="space-y-3">
+      <input id="codeInput" type="text" inputmode="numeric" placeholder="请输入 6 位验证码" maxlength="6" autocomplete="one-time-code" class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm font-mono tracking-[0.3em] text-center text-lg focus:ring-2 focus:ring-cyan-500 outline-none">
+      <button id="verifyBtn" onclick="verifyCode()" class="w-full py-3 bg-cyan-600 text-white rounded-xl font-semibold text-sm hover:bg-cyan-500 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">验证并注册</button>
+      <button onclick="backToStep1()" class="w-full py-2 text-sm text-slate-400 hover:text-slate-200 transition cursor-pointer bg-transparent border-0">← 返回修改</button>
+    </div>
+  </div>
+
+  <p class="text-center text-sm text-slate-500 mt-6">
+    已有账号？<a href="/login" class="text-cyan-400 hover:text-cyan-300 transition">登录</a>
+  </p>
+</div>
+
+<script>
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
+const msg = document.getElementById('msg');
+
+function showMsg(text, type) {
+  msg.textContent = text;
+  msg.className = 'p-3 rounded-xl text-sm mb-4 ' + (type === 'ok' ? 'bg-green-900/30 border border-green-800 text-green-300' : 'bg-red-900/30 border border-red-800 text-red-300');
+  msg.classList.remove('hidden');
+}
+
+function hideMsg() { msg.classList.add('hidden'); }
+
+function refreshCaptcha() {
+  document.getElementById('captchaSvg').src = '/captcha?' + Date.now();
+}
+
+function showStep2(email) {
+  document.getElementById('codeEmail').textContent = email;
+  step1.classList.add('step-hidden');
+  step2.classList.remove('step-hidden');
+  document.getElementById('codeInput').value = '';
+  document.getElementById('codeInput').focus();
+}
+
+function backToStep1() {
+  step2.classList.add('step-hidden');
+  step1.classList.remove('step-hidden');
+  hideMsg();
+}
+
+async function sendCode() {
+  hideMsg();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const captchaInput = document.getElementById('captchaInput').value.trim();
+
+  if (!email || !password || password.length < 6) {
+    showMsg('请输入有效邮箱，密码至少 6 位', 'err');
+    return;
+  }
+  if (!captchaInput) {
+    showMsg('请输入图形验证码', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.textContent = '发送中...';
+
+  try {
+    const resp = await fetch('/send-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, captchaInput })
+    });
+    const data = await resp.json();
+
+    if (data.ok) {
+      showMsg(data.message, 'ok');
+      // dev mode: show code on page if no SMTP configured
+      if (data.devCode) {
+        document.getElementById('codeHint').textContent = '开发模式，验证码: ' + data.devCode;
+        document.getElementById('codeHint').classList.remove('hidden');
+        document.getElementById('codeInput').value = data.devCode;
+      } else {
+        document.getElementById('codeHint').classList.add('hidden');
+      }
+      showStep2(email);
+    } else {
+      showMsg(data.error, 'err');
+      if (data.newCaptcha) {
+        // inject new captcha SVG directly
+        document.getElementById('captchaSvg').src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data.newCaptcha)));
+        document.getElementById('captchaInput').value = '';
+      } else {
+        refreshCaptcha();
+        document.getElementById('captchaInput').value = '';
+      }
+    }
+  } catch (e) {
+    showMsg('网络错误，请重试', 'err');
+    refreshCaptcha();
+  }
+
+  btn.disabled = false;
+  btn.textContent = '发送验证码';
+}
+
+async function verifyCode() {
+  hideMsg();
+  const code = document.getElementById('codeInput').value.trim();
+  if (code.length !== 6) {
+    showMsg('请输入 6 位验证码', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('verifyBtn');
+  btn.disabled = true;
+  btn.textContent = '验证中...';
+
+  try {
+    const resp = await fetch('/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code })
+    });
+    const data = await resp.json();
+
+    if (data.ok) {
+      window.location.href = data.redirect;
+    } else {
+      showMsg(data.error, 'err');
+      document.getElementById('codeInput').classList.add('shake');
+      setTimeout(() => document.getElementById('codeInput').classList.remove('shake'), 400);
+    }
+  } catch (e) {
+    showMsg('网络错误，请重试', 'err');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '验证并注册';
+}
+
+// Enter key to submit
+document.getElementById('captchaInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendCode(); });
+document.getElementById('codeInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyCode(); });
+
+// Auto-focus email field
+document.getElementById('email').focus();
+</script>
+</body>
+</html>

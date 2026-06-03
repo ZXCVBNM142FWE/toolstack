@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .dot{animation:blink 1.4s infinite;animation-fill-mode:both}
+  .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+  .tab-active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:#22d3ee;border-radius:1px 1px 0 0}
+</style>
+</head>
+<body class="h-screen flex text-slate-100">
+
+<!-- sidebar: conversation tabs -->
+<aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 hidden md:flex">
+  <div class="p-3 border-b border-slate-800">
+    <a href="/" class="text-cyan-400 font-bold text-sm no-underline">⚡ API 中转站</a>
+  </div>
+  <div class="p-2">
+    <button onclick="newChat()" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 hover:border-cyan-700 transition cursor-pointer text-left">+ 新对话</button>
+  </div>
+  <div id="tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
+  <div class="p-3 border-t border-slate-800 text-xs text-slate-500">
+    <span><%= user.username %></span>
+    <a href="/tools" class="ml-2 text-slate-400 hover:text-cyan-400 no-underline">工具箱</a>
+    <a href="/dashboard" class="ml-2 text-cyan-400 hover:text-cyan-300 no-underline">控制台</a>
+    <a href="/logout" class="ml-2 text-slate-500 hover:text-red-400 no-underline">退出</a>
+  </div>
+</aside>
+
+<!-- main chat area -->
+<main class="flex-1 flex flex-col min-w-0">
+
+  <!-- topbar -->
+  <header class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center gap-3 shrink-0">
+    <!-- mobile menu button -->
+    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 cursor-pointer text-lg">☰</button>
+    <span class="flex-1"></span>
+    <span id="token-count" class="text-xs text-slate-500"></span>
+  </header>
+
+  <!-- messages -->
+  <div id="msgs" class="flex-1 overflow-y-auto">
+    <div class="flex items-center justify-center h-full text-slate-500">
+      <div class="text-center">
+        <div class="text-4xl mb-3">💬</div>
+        <p class="text-lg">开始对话</p>
+        <p class="text-sm text-slate-600 mt-1">选择一个模型，在下方输入消息</p>
+        <p class="text-xs text-slate-600 mt-3">对话自动保存在本地浏览器中</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- input -->
+  <div class="border-t border-slate-800 bg-slate-900 p-4 shrink-0">
+    <div class="max-w-3xl mx-auto space-y-2">
+      <div class="flex gap-2">
+        <textarea id="input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" class="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 text-sm resize-none focus:ring-2 focus:ring-cyan-500 outline-none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+        <button id="send-btn" onclick="send()" class="px-5 py-3 bg-cyan-600 text-white rounded-xl text-sm font-semibold hover:bg-cyan-500 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">发送</button>
+      </div>
+      <select id="model-select" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer">
+        <% models.forEach(m => { %>
+          <option value="<%= m.id %>"><%= m.id %> (<%= m.name %>)</option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+
+</main>
+
+<!-- mobile sidebar overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+<aside id="mobile-sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-slate-800 z-50 flex flex-col -translate-x-full transition-transform md:hidden">
+  <div class="p-3 border-b border-slate-800 flex items-center justify-between">
+    <span class="text-cyan-400 font-bold text-sm">⚡ API 中转站</span>
+    <button onclick="toggleSidebar()" class="text-slate-400 hover:text-cyan-400 cursor-pointer">✕</button>
+  </div>
+  <div class="p-2">
+    <button onclick="newChat();toggleSidebar()" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 hover:border-cyan-700 transition cursor-pointer text-left">+ 新对话</button>
+  </div>
+  <div id="mobile-tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
+  <div class="p-3 border-t border-slate-800 text-xs text-slate-500">
+    <span><%= user.username %></span>
+    <a href="/dashboard" class="ml-2 text-cyan-400 no-underline">控制台</a>
+  </div>
+</aside>
+
+<script>
+const TOKEN = "<%= apiToken %>";
+const BASE = "/v1";
+let sending = false;
+let activeChatId = null;
+let chats = {};
+
+// load chats from localStorage
+try {
+  const saved = localStorage.getItem('ai-chats');
+  if (saved) chats = JSON.parse(saved);
+} catch(e) { chats = {}; }
+
+// create a default chat if none
+if (Object.keys(chats).length === 0) {
+  const id = Date.now().toString(36);
+  chats[id] = { title: '新对话', model: document.getElementById('model-select')?.value || '', messages: [], createdAt: Date.now() };
+  activeChatId = id;
+} else {
+  activeChatId = Object.keys(chats).sort((a,b) => chats[b].createdAt - chats[a].createdAt)[0];
+}
+
+const modelSelect = document.getElementById('model-select');
+const msgsEl = document.getElementById('msgs');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send-btn');
+const tokenCount = document.getElementById('token-count');
+
+function save() { localStorage.setItem('ai-chats', JSON.stringify(chats)); }
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(text) {
+  let h = esc(text);
+  h = h.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-slate-950 rounded-lg p-3 my-2 text-xs overflow-x-auto border border-slate-700"><code>$2</code></pre>');
+  h = h.replace(/`([^`]+)`/g, '<code class="bg-slate-800 px-1 rounded text-xs text-cyan-300">$1</code>');
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/\n/g, '<br>');
+  return h;
+}
+
+function currentChat() { return chats[activeChatId]; }
+
+function renderTabs() {
+  const list = Object.entries(chats).sort((a,b) => b[1].createdAt - a[1].createdAt);
+  const html = list.map(([id, chat]) => {
+    const active = id === activeChatId;
+    return `<div class="group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-xs transition ${active ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}" onclick="switchChat('${id}')" title="${esc(chat.title)}">
+      <span class="truncate flex-1">${esc(chat.title.substring(0, 20))}</span>
+      <button onclick="event.stopPropagation();deleteChat('${id}')" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition shrink-0 cursor-pointer">×</button>
+    </div>`;
+  }).join('');
+  document.getElementById('tab-list').innerHTML = html;
+  document.getElementById('mobile-tab-list').innerHTML = html;
+}
+
+function switchChat(id) {
+  activeChatId = id;
+  renderTabs();
+  render();
+  modelSelect.value = currentChat().model || modelSelect.value;
+}
+
+function newChat() {
+  const id = Date.now().toString(36);
+  chats[id] = { title: '新对话', model: modelSelect.value, messages: [], createdAt: Date.now() };
+  activeChatId = id;
+  save();
+  renderTabs();
+  render();
+  input.focus();
+}
+
+function deleteChat(id) {
+  if (Object.keys(chats).length <= 1) return;
+  delete chats[id];
+  if (activeChatId === id) activeChatId = Object.keys(chats)[Object.keys(chats).length - 1];
+  save();
+  renderTabs();
+  render();
+}
+
+function render() {
+  const chat = currentChat();
+  if (!chat || chat.messages.length === 0) {
+    msgsEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500"><div class="text-center"><div class="text-4xl mb-3">💬</div><p class="text-lg">开始对话</p><p class="text-sm text-slate-600 mt-1">选择一个模型，在下方输入消息</p></div></div>';
+    return;
+  }
+  // auto-title from first user message
+  if (chat.title === '新对话' && chat.messages.some(m => m.role === 'user')) {
+    const first = chat.messages.find(m => m.role === 'user');
+    chat.title = first.content.substring(0, 30);
+    save();
+    renderTabs();
+  }
+  msgsEl.innerHTML = '<div class="max-w-3xl mx-auto space-y-4 px-4 py-6">' + chat.messages.map(m =>
+    m.role === 'user'
+      ? '<div class="flex justify-end"><div class="bg-blue-900/40 rounded-2xl rounded-br-md px-4 py-2.5 max-w-[80%] text-sm">' + esc(m.content) + '</div></div>'
+      : m.role === 'error'
+        ? '<div class="bg-red-900/30 border border-red-800 rounded-xl px-4 py-2.5 text-sm text-red-300">⚠️ ' + esc(m.content) + '</div>'
+        : '<div class="flex gap-3"><div class="w-6 h-6 rounded-full bg-cyan-900 flex items-center justify-center text-xs shrink-0 mt-0.5">AI</div><div class="bg-slate-800/80 rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%] text-sm text-slate-200">' + fmt(m.content) + '</div></div>'
+  ).join('') + '</div>';
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+async function send() {
+  const text = input.value.trim();
+  if (!text || sending) return;
+  sending = true; sendBtn.disabled = true; sendBtn.textContent = '...';
+  input.value = ''; input.style.height = 'auto';
+
+  const chat = currentChat();
+  const model = modelSelect.value;
+  chat.model = model;
+  chat.messages.push({ role: 'user', content: text });
+  chat.messages.push({ role: 'assistant', content: '' });
+  save();
+  renderTabs();
+  render();
+
+  try {
+    const apiMsgs = chat.messages.filter(m => m.role !== 'error').slice(0, -1).map(m => ({ role: m.role, content: m.content }));
+    const resp = await fetch(BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+      body: JSON.stringify({ model, messages: apiMsgs, stream: true, max_tokens: 4096 })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      let errMsg = 'HTTP ' + resp.status;
+      try { const j = JSON.parse(err); errMsg += ': ' + (j.error || j.message || err.substring(0, 100)); } catch { errMsg += ': ' + err.substring(0, 200); }
+      throw new Error(errMsg);
+    }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    const ai = chat.messages[chat.messages.length - 1];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const d = line.slice(6).trim();
+        if (d === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(d).choices?.[0]?.delta?.content;
+          if (delta) {
+            ai.content += delta;
+            // truncate if too long (avoid localStorage quota issues)
+            if (ai.content.length > 50000) ai.content = ai.content.slice(-50000);
+            save();
+            render();
+          }
+        } catch {}
+      }
+    }
+    if (!ai.content) ai.content = '(空响应)';
+  } catch (e) {
+    chat.messages[chat.messages.length - 1] = { role: 'error', content: e.message };
+  }
+
+  sending = false; sendBtn.disabled = false; sendBtn.textContent = '发送';
+  save(); render(); input.focus();
+}
+
+// model change → save to current chat
+modelSelect.addEventListener('change', () => {
+  const chat = currentChat();
+  if (chat) { chat.model = modelSelect.value; save(); }
+});
+
+// auto-resize textarea
+input.addEventListener('input', () => {
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+});
+
+// mobile sidebar toggle
+function toggleSidebar() {
+  const overlay = document.getElementById('sidebar-overlay');
+  const sidebar = document.getElementById('mobile-sidebar');
+  const show = sidebar.classList.contains('-translate-x-full');
+  overlay.classList.toggle('hidden', !show);
+  sidebar.classList.toggle('-translate-x-full', !show);
+}
+
+// keyboard shortcut: Ctrl+N new chat
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newChat(); }
+});
+
+// update token count periodically (estimate)
+function updateCount() {
+  let total = 0;
+  Object.values(chats).forEach(c => {
+    c.messages.forEach(m => total += m.content ? m.content.length : 0);
+  });
+  tokenCount.textContent = total > 0 ? '~' + Math.ceil(total / 3).toLocaleString() + ' tokens' : '';
+}
+setInterval(updateCount, 3000);
+
+renderTabs();
+render();
+</script>
+</body>
+</html>

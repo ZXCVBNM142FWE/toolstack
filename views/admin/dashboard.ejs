@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>body{background:#0F172A}</style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center gap-6">
+    <a href="/admin/dashboard" class="text-cyan-400 font-bold">API 中转站 管理</a>
+    <a href="/admin/dashboard" class="text-sm text-slate-300 hover:text-cyan-400 transition">总览</a>
+    <a href="/admin/providers" class="text-sm text-slate-300 hover:text-cyan-400 transition">渠道</a>
+    <a href="/admin/tokens" class="text-sm text-slate-300 hover:text-cyan-400 transition">令牌</a>
+    <a href="/admin/users" class="text-sm text-slate-300 hover:text-cyan-400 transition">用户</a>
+    <span class="flex-1"></span>
+    <a href="/" class="text-sm text-slate-400 hover:text-cyan-400 transition">← 首页</a>
+    <a href="/admin/logout" class="text-sm text-red-400 hover:text-red-300 transition">登出</a>
+  </nav>
+  <div class="max-w-6xl mx-auto px-6 py-8">
+    <h1 class="text-2xl font-bold mb-6">总览</h1>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-3xl font-bold text-cyan-400"><%= todayCount %></p>
+        <p class="text-sm text-slate-400 mt-1">今日调用</p>
+      </div>
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-3xl font-bold text-green-400"><%= activeTokens %></p>
+        <p class="text-sm text-slate-400 mt-1">活跃令牌</p>
+      </div>
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-3xl font-bold text-yellow-400"><%= totalModels %></p>
+        <p class="text-sm text-slate-400 mt-1">可用模型</p>
+      </div>
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-3xl font-bold text-purple-400"><%= userCount %></p>
+        <p class="text-sm text-slate-400 mt-1">用户数</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-slate-300 font-semibold mb-1">渠道</p>
+        <p class="text-3xl font-bold text-cyan-400"><%= providerCount %></p>
+      </div>
+      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+        <p class="text-slate-300 font-semibold mb-1">令牌</p>
+        <p class="text-3xl font-bold text-green-400"><%= tokenCount %></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

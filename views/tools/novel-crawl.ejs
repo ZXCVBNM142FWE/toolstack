@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📥</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .crawl-form {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .crawl-form .form-group {
+      margin-bottom: 20px;
+    }
+    .crawl-form label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .crawl-form input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+    }
+    .crawl-form input:focus {
+      border-color: var(--primary);
+    }
+    .crawl-form .hint {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .crawl-form button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--primary);
+      color: #fff;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+    .crawl-form button:hover {
+      background: var(--primary-hover);
+    }
+    .crawl-form button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .progress-card {
+      max-width: 500px;
+      margin: 24px auto 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: none;
+    }
+    .progress-card .novel-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: var(--header-color);
+    }
+    .progress-bar-wrap {
+      height: 8px;
+      background: var(--code-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+    .progress-stats {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress-done {
+      margin-top: 16px;
+      padding: 12px;
+      background: #e6f9ed;
+      border-radius: 8px;
+      color: #0d6b2e;
+      font-size: 0.9rem;
+      display: none;
+      text-align: center;
+    }
+    .progress-done a {
+      color: var(--primary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .progress-error {
+      margin-top: 16px;
+      padding: 12px;
+      background: #ffe3e3;
+      border-radius: 8px;
+      color: #c92a2a;
+      font-size: 0.9rem;
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      .progress-done {
+        background: #0d2b1a;
+        color: #69db7c;
+      }
+      .progress-error {
+        background: #2b0d0d;
+        color: #ff6b6b;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">📥</span>
+        <h1>添加小说</h1>
+      </div>
+      <a href="/" class="tool-header-back">← 返回首页</a>
+    </div>
+
+    <form class="crawl-form" id="crawlForm">
+      <div class="form-group">
+        <label>目录页 URL</label>
+        <input type="url" id="urlInput" placeholder="https://www.example.com/book/123/" required>
+        <div class="hint">粘贴小说目录页的完整网址</div>
+      </div>
+      <div class="form-group">
+        <label>书名标识</label>
+        <input type="text" id="slugInput" placeholder="斗破苍穹" required pattern="[a-zA-Z0-9一-鿿_\-]+">
+        <div class="hint">用作文件名，用中文即可，不要特殊符号</div>
+      </div>
+      <button type="submit" id="startBtn">开始爬取</button>
+    </form>
+
+    <div class="progress-card" id="progressCard">
+      <div class="novel-title" id="progressTitle"></div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="progress-stats">
+        <span id="progressPhase">准备中...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-done" id="progressDone">
+        ✅ 爬取完成！<br>
+        <a href="/tools/novel-reader">去书架看 →</a>
+      </div>
+      <div class="progress-error" id="progressError"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="/tools/novel-reader" style="color:inherit;text-decoration:none;margin:0 8px;">小说阅读器</a>
+      <span style="margin:0 4px;">·</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
+    </p>
+  </footer>
+
+  <script>
+    const form = document.getElementById('crawlForm');
+    const urlInput = document.getElementById('urlInput');
+    const slugInput = document.getElementById('slugInput');
+    const startBtn = document.getElementById('startBtn');
+    const progressCard = document.getElementById('progressCard');
+    const progressTitle = document.getElementById('progressTitle');
+    const progressBar = document.getElementById('progressBar');
+    const progressPhase = document.getElementById('progressPhase');
+    const progressPct = document.getElementById('progressPct');
+    const progressDone = document.getElementById('progressDone');
+    const progressError = document.getElementById('progressError');
+
+    let pollTimer = null;
+    let currentSlug = '';
+    let stuckCount = 0;
+
+    function startPolling(slug) {
+      currentSlug = slug;
+      stuckCount = 0;
+      progressCard.style.display = 'block';
+      progressDone.style.display = 'none';
+      progressError.style.display = 'none';
+      poll();
+      pollTimer = setInterval(poll, 2000);
+    }
+
+    async function poll() {
+      if (!currentSlug) return;
+      try {
+        const resp = await fetch('/api/novel/crawl/status/' + encodeURIComponent(currentSlug));
+        const s = await resp.json();
+        progressTitle.textContent = s.title || currentSlug;
+
+        const pct = s.total > 0 ? Math.round(s.done / s.total * 100) : 0;
+        progressBar.style.width = pct + '%';
+        progressPct.textContent = pct + '%';
+
+        if (s.phase === 'parsing') {
+          progressPhase.textContent = '正在解析目录...';
+          if (s.stuck) progressPhase.textContent += ' ⚠️ 似乎卡住了';
+        } else if (s.phase === 'crawling') {
+          progressPhase.textContent = '已爬 ' + s.done + '/' + s.total + ' 章';
+          if (s.failed > 0) progressPhase.textContent += '（' + s.failed + ' 章失败）';
+          if (s.stuck) {
+            stuckCount++;
+            if (stuckCount >= 3) {
+              progressPhase.textContent += ' ⚠️ 长时间无进度，可点下方按钮重试续爬';
+              startBtn.disabled = false;
+              startBtn.textContent = '续爬（断点）';
+              startBtn.style.background = '#f08c00';
+            }
+          } else {
+            stuckCount = 0;
+          }
+        } else if (s.phase === 'done') {
+          progressPhase.textContent = '完成！共 ' + s.total + ' 章';
+          progressBar.style.width = '100%';
+          progressPct.textContent = '100%';
+          progressDone.style.display = 'block';
+          clearInterval(pollTimer);
+          startBtn.disabled = false;
+          startBtn.textContent = '开始爬取';
+          startBtn.style.background = '';
+        } else if (s.phase === 'error') {
+          progressPhase.textContent = '出错了';
+          progressError.textContent = '❌ ' + (s.error || '未知错误');
+          progressError.style.display = 'block';
+          clearInterval(pollTimer);
+          startBtn.disabled = false;
+          startBtn.textContent = '重试';
+          startBtn.style.background = '';
+        }
+      } catch (e) {
+        // Server might be restarting, keep polling
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = urlInput.value.trim();
+      const slug = slugInput.value.trim();
+      if (!url || !slug) return;
+
+      startBtn.disabled = true;
+      startBtn.textContent = '启动中...';
+      progressError.style.display = 'none';
+      progressDone.style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/novel/crawl/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, slug })
+        });
+        const data = await resp.json();
+        if (resp.status === 409) {
+          if (data.stuck) {
+            // Stuck crawl — server will allow restart on next submit
+            progressError.textContent = '⚠️ 爬取似乎中断了，请点"续爬"继续';
+            progressError.style.display = 'block';
+            startBtn.disabled = false;
+            startBtn.textContent = '续爬（断点）';
+            startBtn.style.background = '#f08c00';
+          } else {
+            progressError.textContent = '⚠️ ' + data.error + '，正在跟踪进度...';
+            progressError.style.display = 'block';
+            startBtn.disabled = false;
+            startBtn.textContent = '开始爬取';
+            startBtn.style.background = '';
+          }
+          progressCard.style.display = 'block';
+          startPolling(slug);
+          return;
+        }
+        if (!resp.ok) throw new Error(data.error || '请求失败');
+
+        startPolling(slug);
+        startBtn.textContent = '爬取中...';
+      } catch (e) {
+        progressError.textContent = '❌ ' + e.message;
+        progressError.style.display = 'block';
+        progressCard.style.display = 'block';
+        startBtn.disabled = false;
+        startBtn.textContent = '开始爬取';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="鍦ㄧ嚎 JSON 鏍煎紡鍖栧伐鍏凤紝鏀寔 JSON 鏍煎紡鍖栥€佸帇缂╁拰楠岃瘉锛屽畬鍏ㄥ厤璐规棤闇€娉ㄥ唽">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "JSON 鏍煎紡鍖?,
+    "description": "鍦ㄧ嚎 JSON 鏍煎紡鍖栥€佸帇缂┿€侀獙璇佸伐鍏?,
+    "url": "https://ijuhe.top/tools/json-formatter",
+    "applicationCategory": "UtilityApplication"
+  }
+  </script>
+</head>
+<body>
+  <main class="tool-page">
+    <div class="tool-header">
+      <div class="tool-header-left">
+        <span class="tool-header-icon">馃敡</span>
+        <h1>JSON 鏍煎紡鍖?/h1>
+      </div>
+      <a href="/" class="tool-header-back">鈫?杩斿洖棣栭〉</a>
+    </div>
+
+<div class="usage-card"><h2>浣跨敤璇存槑</h2><ol><li>鍦ㄥ乏渚ц緭鍏ユ涓矘璐?JSON 瀛楃涓?/li><li>鐐瑰嚮銆屾牸寮忓寲銆嶆寜閽編鍖?JSON锛屾垨鐐瑰嚮銆屽帇缂┿€嶅幓闄ゅ浣欑┖鏍?/li><li>鍙充晶闈㈡澘鏄剧ず澶勭悊缁撴灉锛屽鏈夎娉曢敊璇細鏍囩孩鎻愮ず</li><li>鐐瑰嚮銆屾竻绌恒€嶆寜閽噸缃緭鍏ュ拰杈撳嚭</li></ol></div>
+
+    <div class="tool-workspace">
+      <div class="tool-panel">
+        <label for="input">杈撳叆</label>
+        <textarea id="input" placeholder='{"hello":"world"}'></textarea>
+      </div>
+      <div class="tool-panel">
+        <label for="output">杈撳嚭</label>
+        <pre id="output"></pre>
+        <div id="error" class="error-msg"></div>
+      </div>
+
+      <div class="tool-actions">
+        <button id="formatBtn" class="btn btn-primary">鏍煎紡鍖?/button>
+        <button id="compressBtn" class="btn btn-secondary">鍘嬬缉</button>
+        <button id="clearBtn" class="btn btn-secondary">娓呯┖</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
+      <span style="margin:0 4px;">路</span>
+      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
+    </p>
+    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
+  </footer>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const error = document.getElementById('error');
+
+    function hideError() { error.style.display = 'none'; }
+    function showError(msg) {
+      error.textContent = msg;
+      error.style.display = 'block';
+      output.textContent = '';
+    }
+
+    document.getElementById('formatBtn').addEventListener('click', () => {
+      try {
+        const obj = JSON.parse(input.value);
+        output.textContent = JSON.stringify(obj, null, 2);
+        hideError();
+      } catch (e) {
+        showError('JSON 鏍煎紡閿欒: ' + e.message);
+      }
+    });
+
+    document.getElementById('compressBtn').addEventListener('click', () => {
+      try {
+        const obj = JSON.parse(input.value);
+        output.textContent = JSON.stringify(obj);
+        hideError();
+      } catch (e) {
+        showError('JSON 鏍煎紡閿欒: ' + e.message);
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      input.value = '';
+      output.textContent = '';
+      hideError();
+    });
+  </script>
+</body>
+</html>

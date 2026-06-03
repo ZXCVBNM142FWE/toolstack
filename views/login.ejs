@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><%= title %></title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}</style>
+</head>
+<body class="text-slate-100 min-h-screen flex items-center justify-center p-6">
+
+<div class="w-full max-w-sm">
+  <div class="text-center mb-8">
+    <a href="/" class="text-2xl font-bold text-cyan-400 no-underline">⚡ API 中转站</a>
+    <p class="text-sm text-slate-400 mt-2">登录你的账号</p>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+  <div class="p-3 bg-red-900/30 border border-red-800 rounded-xl text-sm text-red-300 mb-4"><%= error %></div>
+  <% } %>
+
+  <form method="POST" action="/login" class="space-y-4">
+    <input name="email" type="email" placeholder="邮箱地址" required class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+    <input name="password" type="password" placeholder="密码" required class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-cyan-500 outline-none">
+    <button class="w-full py-3 bg-cyan-600 text-white rounded-xl font-semibold text-sm hover:bg-cyan-500 transition cursor-pointer">登录</button>
+  </form>
+
+  <p class="text-center text-sm text-slate-500 mt-4">
+    还没有账号？<a href="/register" class="text-cyan-400 hover:text-cyan-300 transition">注册</a>
+  </p>
+  <p class="text-center text-xs text-slate-600 mt-2">
+    <a href="/forgot-password" class="hover:text-slate-400 transition">忘记密码？</a>
+  </p>
+</div>
+
+</body>
+</html>
