@@ -11,134 +11,201 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
   .typing-dot{animation:blink 1.4s infinite;animation-fill-mode:both}
   .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
-  .msg-user{background:rgba(30,58,95,0.6);border-radius:16px 16px 4px 16px;backdrop-filter:blur(4px)}
-  .msg-ai{background:rgba(26,35,50,0.7);border-radius:16px 16px 16px 4px;backdrop-filter:blur(4px)}
-  .msg-error{background:rgba(59,30,30,0.6);border-radius:12px;backdrop-filter:blur(4px)}
-  .code-block{background:#0D1520;border-radius:8px;padding:12px;margin:8px 0;overflow-x:auto;font-size:13px;font-family:'Cascadia Code',Consolas,monospace;border:1px solid #1E293B}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .float-icon{animation:float 3s ease-in-out infinite}
+
+  /* message bubbles */
+  .msg-user{background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(59,130,246,0.12));border:1px solid rgba(6,182,212,0.2);border-radius:18px 18px 4px 18px;backdrop-filter:blur(8px)}
+  .msg-ai{background:rgba(15,23,42,0.85);border:1px solid rgba(51,65,85,0.4);border-radius:18px 18px 18px 4px;backdrop-filter:blur(8px)}
+  .msg-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:14px}
+  .code-block{background:rgba(2,6,14,0.8);border:1px solid rgba(51,65,85,0.3);border-radius:10px;padding:14px;margin:10px 0;overflow-x:auto;font-size:13px;font-family:'Cascadia Code',Consolas,monospace}
   pre{margin:0;white-space:pre-wrap;word-break:break-word}
-  .preview-strip{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px 0}
-  .preview-chip{display:flex;align-items:center;gap:4px;background:rgba(30,41,59,0.7);border:1px solid #334155;border-radius:8px;padding:4px 8px;font-size:12px;color:#CBD5E1;max-width:200px;backdrop-filter:blur(4px)}
-  .preview-chip img{width:32px;height:32px;object-fit:cover;border-radius:4px}
+
+  /* preview chips */
+  .preview-strip{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 10px 0}
+  .preview-chip{display:flex;align-items:center;gap:5px;background:rgba(30,41,59,0.6);border:1px solid rgba(51,65,85,0.5);border-radius:10px;padding:5px 10px;font-size:12px;color:#CBD5E1;max-width:220px;backdrop-filter:blur(4px)}
+  .preview-chip img{width:36px;height:36px;object-fit:cover;border-radius:6px}
   .preview-chip .chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-  .preview-chip .chip-remove{cursor:pointer;color:#64748B;font-size:14px;line-height:1;transition:color .15s}
-  .preview-chip .chip-remove:hover{color:#EF4444}
-  .toggle-switch{position:relative;display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:#94A3B8;user-select:none}
+  .preview-chip .chip-remove{cursor:pointer;color:#64748B;font-size:15px;line-height:1;padding:2px;border-radius:4px;transition:all .15s}
+  .preview-chip .chip-remove:hover{color:#EF4444;background:rgba(239,68,68,0.15)}
+
+  /* toggles */
+  .toggle-switch{position:relative;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:#94A3B8;user-select:none;padding:4px 10px;border-radius:8px;transition:all .15s}
+  .toggle-switch:hover{background:rgba(51,65,85,0.3)}
   .toggle-switch input{display:none}
-  .toggle-track{width:28px;height:16px;background:#334155;border-radius:10px;position:relative;transition:background .2s}
-  .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:#64748B;border-radius:50%;transition:all .2s}
-  .toggle-switch input:checked+.toggle-track{background:#0891B2}
-  .toggle-switch input:checked+.toggle-track::after{left:14px;background:#fff}
+  .toggle-track{width:30px;height:17px;background:#334155;border-radius:10px;position:relative;transition:all .2s}
+  .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;background:#64748B;border-radius:50%;transition:all .2s}
+  .toggle-switch input:checked+.toggle-track{background:linear-gradient(135deg,#0891B2,#06B6D4)}
+  .toggle-switch input:checked+.toggle-track::after{left:15px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+
+  /* action buttons */
   .input-actions{display:flex;align-items:center;gap:2px;padding-right:4px}
-  .input-actions button{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:8px;cursor:pointer;font-size:16px;color:#64748B;transition:all .15s}
-  .input-actions button:hover{background:rgba(30,41,59,0.7);color:#CBD5E1}
-  .input-actions button.active{color:#0891B2}
-  #drop-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,145,178,0.15);backdrop-filter:blur(4px);align-items:center;justify-content:center;pointer-events:none}
-  #drop-overlay .drop-box{border:3px dashed #0891B2;border-radius:24px;padding:48px 64px;text-align:center;background:rgba(8,145,178,0.1)}
-  #drop-overlay .drop-box .drop-icon{font-size:48px;margin-bottom:8px}
-  #drop-overlay .drop-box .drop-text{color:#CBD5E1;font-size:16px;font-weight:600}
-  .reasoning-block{margin-bottom:8px;border:1px solid rgba(30,58,95,0.5);border-radius:12px;overflow:hidden}
-  .reasoning-header{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(15,29,46,0.6);cursor:pointer;user-select:none;font-size:12px;color:#64748B;transition:color .15s}
-  .reasoning-header:hover{color:#94A3B8}
+  .input-actions button{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:10px;cursor:pointer;font-size:17px;color:#64748B;transition:all .15s}
+  .input-actions button:hover{background:rgba(51,65,85,0.4);color:#CBD5E1}
+  .input-actions button.active{color:#06B6D4;background:rgba(6,182,212,0.15)}
+
+  /* drop overlay */
+  #drop-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(6,182,212,0.12);backdrop-filter:blur(6px);align-items:center;justify-content:center;pointer-events:none}
+  #drop-overlay .drop-box{border:3px dashed rgba(6,182,212,0.6);border-radius:24px;padding:56px 72px;text-align:center;background:rgba(6,182,212,0.08)}
+  #drop-overlay .drop-box .drop-icon{font-size:56px;margin-bottom:12px}
+  #drop-overlay .drop-box .drop-text{color:#CBD5E1;font-size:18px;font-weight:600}
+
+  /* reasoning block */
+  .reasoning-block{margin-bottom:10px;border:1px solid rgba(6,182,212,0.25);border-radius:12px;overflow:hidden}
+  .reasoning-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(6,182,212,0.06);cursor:pointer;user-select:none;font-size:12px;color:#64748B;transition:all .15s}
+  .reasoning-header:hover{color:#94A3B8;background:rgba(6,182,212,0.1)}
   .reasoning-header .arrow{transition:transform .2s;font-size:10px}
   .reasoning-header .arrow.open{transform:rotate(90deg)}
-  .reasoning-body{background:rgba(10,21,32,0.6);padding:10px 14px;font-size:13px;color:#94A3B8;font-family:'Cascadia Code',Consolas,monospace;white-space:pre-wrap;word-break:break-word;line-height:1.6;max-height:300px;overflow-y:auto;display:none}
+  .reasoning-body{background:rgba(2,6,14,0.5);padding:12px 16px;font-size:13px;color:#94A3B8;font-family:'Cascadia Code',Consolas,monospace;white-space:pre-wrap;word-break:break-word;line-height:1.7;max-height:320px;overflow-y:auto;display:none}
   .reasoning-body.open{display:block}
+
+  /* chat bg animation */
+  .chat-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .chat-bg .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.04}
+  .chat-bg .orb-1{width:500px;height:500px;background:#06B6D4;top:-15%;right:-10%;animation:orbMove 20s ease-in-out infinite}
+  .chat-bg .orb-2{width:400px;height:400px;background:#8B5CF6;bottom:-10%;left:-8%;animation:orbMove 25s ease-in-out infinite reverse}
+  @keyframes orbMove{0%,100%{transform:translate(0,0)}33%{transform:translate(40px,-30px)}66%{transform:translate(-20px,20px)}}
+
+  /* quick prompts */
+  .quick-prompt{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(15,23,42,0.7);border:1px solid rgba(51,65,85,0.4);border-radius:100px;font-size:13px;color:#CBD5E1;cursor:pointer;transition:all .2s;backdrop-filter:blur(4px)}
+  .quick-prompt:hover{border-color:rgba(6,182,212,0.5);background:rgba(6,182,212,0.08);color:#06B6D4;transform:translateY(-2px);box-shadow:0 8px 25px rgba(6,182,212,0.1)}
 </style>
 </head>
-<body class="h-screen flex text-slate-100 bg-[#030712]">
+<body class="h-screen flex text-slate-100 bg-[#030712] relative">
+
+<!-- ambient background -->
+<div class="chat-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 
 <!-- drop overlay -->
 <div id="drop-overlay"><div class="drop-box"><div class="drop-icon">📥</div><div class="drop-text">松开以上传文件 / 图片</div></div></div>
 
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-1 overflow-hidden relative z-10">
 
 <!-- sidebar -->
-<aside id="sidebar" class="w-64 bg-slate-950/80 backdrop-blur border-r border-slate-800/50 flex flex-col shrink-0 hidden md:flex">
-  <div class="p-2">
-    <button onclick="newChat()" class="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 hover:border-cyan-500/50 hover:text-cyan-400 transition cursor-pointer text-left">+ 新对话</button>
+<aside id="sidebar" class="w-64 bg-slate-950/60 backdrop-blur-xl border-r border-slate-800/30 flex flex-col shrink-0 hidden md:flex">
+  <div class="p-4 border-b border-slate-800/30">
+    <a href="/" class="inline-flex items-center gap-2.5 no-underline group">
+      <span class="w-9 h-9 rounded-xl bg-cyan-500/15 flex items-center justify-center text-lg group-hover:bg-cyan-500/25 transition">⚡</span>
+      <span class="gradient-text font-extrabold text-sm">API 中转站</span>
+    </a>
+  </div>
+  <div class="p-3">
+    <button onclick="newChat()" class="w-full px-4 py-2.5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl text-sm text-cyan-300 hover:border-cyan-500/40 hover:from-cyan-500/20 hover:to-blue-500/20 transition cursor-pointer text-left font-medium flex items-center gap-2">
+      <span class="text-lg">+</span> 新对话
+    </button>
   </div>
   <div id="tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
-  <div class="p-3 border-t border-slate-800/50 text-xs text-slate-500 flex flex-col gap-1">
-    <div class="flex justify-between"><span>模型</span><span id="model-count" class="text-slate-600"><%= models.length %></span></div>
-    <div class="flex justify-between"><span>用户</span><span class="text-cyan-400"><%= user.username %></span></div>
-    <div class="flex gap-3 mt-1">
-      <a href="/dashboard" class="text-cyan-400 hover:text-cyan-300 no-underline">控制台</a>
-      <a href="/tools" class="text-slate-400 hover:text-cyan-400 no-underline">工具箱</a>
-      <a href="/logout" class="text-slate-500 hover:text-red-400 no-underline">退出</a>
+  <div class="p-4 border-t border-slate-800/30 space-y-3">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-xs font-bold"><%= user.username.charAt(0).toUpperCase() %></div>
+      <div>
+        <div class="text-xs text-slate-300 font-medium"><%= user.username %></div>
+        <div class="text-[10px] text-slate-500"><%= models.length %> 个可用模型</div>
+      </div>
+    </div>
+    <div class="flex gap-3 text-[11px]">
+      <a href="/dashboard" class="text-cyan-400 hover:text-cyan-300 transition no-underline font-medium">控制台</a>
+      <a href="/tools" class="text-slate-400 hover:text-cyan-400 transition no-underline">工具箱</a>
+      <a href="/logout" class="text-slate-500 hover:text-red-400 transition no-underline ml-auto">退出</a>
     </div>
   </div>
 </aside>
 
-<!-- main chat area -->
-<main class="flex-1 flex flex-col min-w-0 bg-[#030712]">
+<!-- main -->
+<main class="flex-1 flex flex-col min-w-0 relative">
 
-  <!-- topbar with model selector -->
-  <header class="bg-slate-950/50 border-b border-slate-800/50 px-4 py-2 flex items-center gap-3 shrink-0 backdrop-blur">
-    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 cursor-pointer text-lg">☰</button>
-    <select id="model-select" class="bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer backdrop-blur">
-      <% models.forEach(m => { %>
-        <option value="<%= m.id %>"><%= m.id %></option>
-      <% }) %>
-    </select>
+  <!-- top bar -->
+  <header class="bg-slate-950/40 backdrop-blur-xl border-b border-slate-800/30 px-4 py-2.5 flex items-center gap-3 shrink-0">
+    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 cursor-pointer text-lg w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-800/50 transition">☰</button>
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+      <select id="model-select" class="bg-transparent border-0 text-sm text-slate-200 font-medium outline-none cursor-pointer py-1">
+        <% models.forEach(m => { %>
+          <option value="<%= m.id %>" class="bg-slate-900"><%= m.id %></option>
+        <% }) %>
+      </select>
+    </div>
     <span class="flex-1"></span>
-    <span id="token-info" class="text-xs text-slate-600"></span>
+    <span id="token-info" class="text-[11px] text-slate-500 hidden sm:inline"></span>
   </header>
 
-  <!-- messages -->
-  <div id="msgs" class="flex-1 overflow-y-auto">
-    <div class="flex items-center justify-center h-full text-slate-500">
-      <div class="text-center">
-        <div class="text-4xl mb-3">💬</div>
-        <p class="text-lg">开始对话</p>
-        <p class="text-sm text-slate-600 mt-1">选择一个模型开始 AI 对话</p>
+  <!-- messages area -->
+  <div id="msgs" class="flex-1 overflow-y-auto relative">
+    <!-- empty state — shown when no messages -->
+    <div id="empty-state" class="flex items-center justify-center h-full px-4">
+      <div class="text-center max-w-lg">
+        <div class="text-6xl mb-6 float-icon">🤖</div>
+        <h2 class="text-2xl font-bold mb-2"><span class="gradient-text">AI 对话</span></h2>
+        <p class="text-slate-400 text-sm mb-8">一个 Key 调用所有大模型，完全免费</p>
+
+        <!-- quick prompts -->
+        <div class="flex flex-wrap justify-center gap-2.5 mb-8">
+          <div class="quick-prompt" onclick="quickAsk('写一首关于人工智能的七言绝句')">✨ 写一首诗</div>
+          <div class="quick-prompt" onclick="quickAsk('用通俗易懂的方式解释量子计算')">🔬 解释量子计算</div>
+          <div class="quick-prompt" onclick="quickAsk('帮我写一份项目计划书的大纲')">📋 项目计划书</div>
+          <div class="quick-prompt" onclick="quickAsk('比较 Python 和 JavaScript 的优缺点')">⚡ 语言对比</div>
+          <div class="quick-prompt" onclick="quickAsk('写一段快速排序的代码并解释')">💻 算法实现</div>
+          <div class="quick-prompt" onclick="quickAsk('帮我翻译一段中文到英文')">🌐 中英翻译</div>
+        </div>
+
+        <!-- model selector hint -->
+        <p class="text-xs text-slate-600">Ctrl + Enter 发送 · 支持拖拽上传文件/图片 · Ctrl + N 新建对话</p>
+      </div>
+    </div>
+    <!-- message list (hidden when empty) -->
+    <div id="msg-list" class="max-w-3xl mx-auto space-y-5 px-4 py-8" style="display:none"></div>
+  </div>
+
+  <!-- input area -->
+  <div class="border-t border-slate-800/30 bg-slate-950/40 backdrop-blur-xl p-4 shrink-0">
+    <div class="max-w-3xl mx-auto">
+      <div id="preview-strip" class="preview-strip"></div>
+      <div class="flex gap-2.5 items-end">
+        <div class="input-actions self-end mb-1.5">
+          <button id="btn-file" onclick="pickFile()" title="上传文件 (txt, pdf, docx, md)">📎</button>
+          <button id="btn-image" onclick="pickImage()" title="上传图片">🖼️</button>
+        </div>
+        <textarea id="user-input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" class="flex-1 px-5 py-3.5 bg-slate-800/30 border border-slate-700/30 rounded-2xl text-slate-200 text-sm resize-none placeholder-slate-500 outline-none focus:border-cyan-500/40 focus:ring-2 focus:ring-cyan-500/10 transition-all backdrop-blur min-h-[48px]" onkeydown="handleInputKey(event)"></textarea>
+        <button id="send-btn" onclick="sendMessage()" class="self-end mb-0.5 px-6 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl text-sm font-bold hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 flex items-center gap-2">
+          发送 <span class="text-xs opacity-70">⌘↵</span>
+        </button>
+      </div>
+      <div class="flex items-center gap-3 flex-wrap mt-2.5 ml-10">
+        <label class="toggle-switch">
+          <input type="checkbox" id="web-search-toggle" onchange="state.webSearch=this.checked;save()"> <span class="toggle-track"></span> 🌐 联网搜索
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="deep-thinking-toggle" onchange="state.deepThinking=this.checked;save()"> <span class="toggle-track"></span> 🧠 深度思考
+        </label>
+        <span class="flex-1"></span>
+        <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+          <input type="checkbox" id="stream-toggle" checked class="rounded accent-cyan-500"> 流式输出
+        </label>
       </div>
     </div>
   </div>
 
-  <!-- input -->
-  <div class="border-t border-slate-800/50 bg-slate-950/50 p-4 shrink-0 backdrop-blur">
-    <div class="max-w-3xl mx-auto">
-      <div id="preview-strip" class="preview-strip"></div>
-      <div class="flex gap-2">
-        <div class="input-actions">
-          <button id="btn-file" onclick="pickFile()" title="上传文件 (txt, pdf, docx, md, json, csv)">📎</button>
-          <button id="btn-image" onclick="pickImage()" title="上传图片">🖼️</button>
-        </div>
-        <textarea id="user-input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" class="flex-1 px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-slate-200 text-sm resize-none placeholder-slate-500 outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 transition backdrop-blur" onkeydown="handleInputKey(event)"></textarea>
-        <button id="send-btn" onclick="sendMessage()" class="btn-glow px-5 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-bold hover:from-cyan-400 hover:to-blue-400 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xl shadow-cyan-500/25">发送</button>
-      </div>
-      <div class="flex items-center gap-4 flex-wrap mt-2">
-        <label class="toggle-switch" title="启用联网搜索">
-          <input type="checkbox" id="web-search-toggle" onchange="state.webSearch=this.checked;save()"> <span class="toggle-track"></span> 🌐 联网
-        </label>
-        <label class="toggle-switch" title="启用深度思考">
-          <input type="checkbox" id="deep-thinking-toggle" onchange="state.deepThinking=this.checked;save()"> <span class="toggle-track"></span> 🧠 深度思考
-        </label>
-        <label class="flex items-center gap-1 text-xs text-slate-500 cursor-pointer">
-          <input type="checkbox" id="stream-toggle" checked class="rounded"> 流式输出
-        </label>
-      </div>
-    </div>
-  </div>
   <input type="file" id="file-input" style="display:none" accept=".txt,.md,.json,.csv,.js,.ts,.py,.html,.css,.xml,.yaml,.yml,.toml,.ini,.cfg,.log,.env,.pdf,.docx" onchange="handleFilePick(event)" multiple>
   <input type="file" id="image-input" style="display:none" accept="image/*" onchange="handleImagePick(event)" multiple>
 </main>
 </div>
 
 <!-- mobile sidebar -->
-<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
-<aside id="mobile-sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950/95 backdrop-blur border-r border-slate-800/50 z-50 flex flex-col -translate-x-full transition-transform md:hidden">
-  <div class="p-3 border-b border-slate-800/50 flex items-center justify-between">
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden backdrop-blur-sm" onclick="toggleSidebar()"></div>
+<aside id="mobile-sidebar" class="fixed left-0 top-0 bottom-0 w-72 bg-slate-950/95 backdrop-blur-xl border-r border-slate-800/30 z-50 flex flex-col -translate-x-full transition-transform duration-300 md:hidden">
+  <div class="p-4 border-b border-slate-800/30 flex items-center justify-between">
     <span class="gradient-text font-extrabold text-sm">API 中转站</span>
-    <button onclick="toggleSidebar()" class="text-slate-400 hover:text-red-400 cursor-pointer">✕</button>
+    <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition cursor-pointer">✕</button>
   </div>
-  <div class="p-2">
-    <button onclick="newChat();toggleSidebar()" class="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 hover:border-cyan-500/50 transition cursor-pointer text-left">+ 新对话</button>
+  <div class="p-3">
+    <button onclick="newChat();toggleSidebar()" class="w-full px-4 py-2.5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl text-sm text-cyan-300 hover:border-cyan-500/40 transition cursor-pointer text-left flex items-center gap-2">
+      <span class="text-lg">+</span> 新对话
+    </button>
   </div>
   <div id="mobile-tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
-  <div class="p-3 border-t border-slate-800/50 text-xs text-slate-500">
-    <div><%= user.username %></div>
-    <div class="flex gap-3 mt-1">
+  <div class="p-4 border-t border-slate-800/30 space-y-2">
+    <div class="text-xs text-slate-400 font-medium"><%= user.username %></div>
+    <div class="flex gap-3 text-[11px]">
       <a href="/dashboard" class="text-cyan-400 no-underline">控制台</a>
       <a href="/tools" class="text-slate-400 no-underline">工具箱</a>
     </div>
@@ -167,13 +234,35 @@ function save() { localStorage.setItem(LS, JSON.stringify(state)); }
   document.getElementById('web-search-toggle').checked = state.webSearch;
   document.getElementById('deep-thinking-toggle').checked = state.deepThinking;
   if (Object.keys(state.chats).length === 0) {
-    newChat();
+    showEmpty();
   } else {
     state.activeChat = state.activeChat || Object.keys(state.chats).sort((a,b) => state.chats[b].createdAt - state.chats[a].createdAt)[0];
-    switchChat(state.activeChat);
+    if (state.activeChat && state.chats[state.activeChat]) {
+      switchChat(state.activeChat);
+    } else {
+      showEmpty();
+    }
   }
   renderTabs();
 })();
+
+function quickAsk(text) {
+  document.getElementById('user-input').value = text;
+  document.getElementById('user-input').focus();
+  document.getElementById('user-input').style.height = 'auto';
+  document.getElementById('user-input').style.height = Math.min(document.getElementById('user-input').scrollHeight, 150) + 'px';
+}
+
+function showEmpty() {
+  document.getElementById('empty-state').style.display = '';
+  document.getElementById('msg-list').style.display = 'none';
+  document.getElementById('token-info').textContent = '';
+}
+
+function hideEmpty() {
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('msg-list').style.display = '';
+}
 
 // ── chat management ──
 function newChat() {
@@ -184,6 +273,7 @@ function newChat() {
   save();
   switchChat(chatId);
   renderTabs();
+  hideEmpty();
   document.getElementById('user-input').focus();
 }
 
@@ -191,47 +281,56 @@ function switchChat(chatId) {
   state.activeChat = chatId;
   save();
   const chat = state.chats[chatId];
-  if (!chat) return;
+  if (!chat) { showEmpty(); return; }
 
   document.getElementById('model-select').value = chat.model;
 
-  const msgs = document.getElementById('msgs');
   if (chat.messages.length === 0) {
-    msgs.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500"><div class="text-center"><div class="text-4xl mb-3">💬</div><p class="text-lg">开始对话</p><p class="text-sm text-slate-600 mt-1">模型: <span class="text-cyan-400">' + escHtml(chat.model) + '</span></p></div></div>';
+    showEmpty();
+    document.getElementById('model-select').value = chat.model;
   } else {
-    msgs.innerHTML = '<div class="max-w-3xl mx-auto space-y-4 px-4 py-6">' + chat.messages.map(m => renderMessage(m)).join('') + '</div>';
-    msgs.scrollTop = msgs.scrollHeight;
+    hideEmpty();
+    document.getElementById('msg-list').innerHTML = chat.messages.map(m => renderMessage(m)).join('');
   }
+  document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
   renderTabs();
   updateTokenInfo();
 }
 
 function deleteChat(chatId, e) {
   e && e.stopPropagation();
-  if (Object.keys(state.chats).length <= 1) return;
+  if (Object.keys(state.chats).length <= 1 && state.chats[chatId] && state.chats[chatId].messages.length === 0) return;
   delete state.chats[chatId];
-  if (state.activeChat === chatId) state.activeChat = Object.keys(state.chats)[Object.keys(state.chats).length - 1];
+  if (state.activeChat === chatId) {
+    const remaining = Object.keys(state.chats);
+    state.activeChat = remaining.length > 0 ? remaining[remaining.length - 1] : null;
+  }
   save();
-  switchChat(state.activeChat);
+  if (state.activeChat && state.chats[state.activeChat] && state.chats[state.activeChat].messages.length > 0) {
+    switchChat(state.activeChat);
+  } else if (state.activeChat && state.chats[state.activeChat]) {
+    switchChat(state.activeChat);
+  } else {
+    showEmpty();
+  }
   renderTabs();
 }
 
 function renderTabs() {
-  const chats = Object.values(state.chats);
-  const html = chats.map(c => {
-    const cid = Object.keys(state.chats).find(k => state.chats[k] === c);
+  const html = Object.entries(state.chats).sort((a,b) => b[1].createdAt - a[1].createdAt).map(([cid, c]) => {
     const active = cid === state.activeChat;
     const title = c.name === '新对话' && c.messages.length > 0
-      ? (c.messages.find(m => m.role === 'user')?.content || '').substring(0, 20) || '新对话'
-      : (c.name || c.model).substring(0, 20);
-    return '<div class="group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-xs transition ' + (active ? 'bg-slate-800/70 text-slate-100' : 'text-slate-400 hover:bg-slate-800/30 hover:text-slate-200') + '" onclick="switchChat(\'' + cid + '\')" title="' + escAttr(title) + '">' +
-      '<span class="truncate flex-1">' + escHtml(title) + '</span>' +
-      '<span class="text-[10px] text-slate-600">' + escHtml(c.model.substring(0, 12)) + '</span>' +
-      '<button onclick="deleteChat(\'' + cid + '\', event)" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition shrink-0 cursor-pointer ml-1">✕</button>' +
+      ? (c.messages.find(m => m.role === 'user')?.content || '').substring(0, 18) || '新对话'
+      : (c.name || c.model).substring(0, 18);
+    const msgs = c.messages.filter(m => m.role !== 'error').length;
+    return '<div class="group flex items-center gap-1.5 px-3 py-2 rounded-xl cursor-pointer text-xs transition ' + (active ? 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-300' : 'text-slate-400 hover:bg-slate-800/30 hover:text-slate-200 border border-transparent') + '" onclick="switchChat(\'' + cid + '\')" title="' + escAttr(c.model + ': ' + title) + '">' +
+      '<span class="text-[10px] w-4 h-4 rounded bg-slate-800 flex items-center justify-center shrink-0">' + (msgs || '·') + '</span>' +
+      '<span class="truncate flex-1 font-medium">' + escHtml(title) + '</span>' +
+      '<button onclick="deleteChat(\'' + cid + '\', event)" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition shrink-0 cursor-pointer text-base leading-none p-0.5">✕</button>' +
     '</div>';
   }).join('');
-  document.getElementById('tab-list').innerHTML = html;
-  document.getElementById('mobile-tab-list').innerHTML = html;
+  document.getElementById('tab-list').innerHTML = html || '<div class="text-xs text-slate-600 text-center py-6">暂无对话</div>';
+  document.getElementById('mobile-tab-list').innerHTML = html || '<div class="text-xs text-slate-600 text-center py-6">暂无对话</div>';
 }
 
 // ── render message ──
@@ -243,42 +342,42 @@ function renderMessage(m) {
     } else if (Array.isArray(m.content)) {
       const textParts = m.content.filter(c => c.type === 'text').map(c => escHtml(c.text)).join('<br>');
       const imgParts = m.content.filter(c => c.type === 'image_url').map(c =>
-        '<img src="' + escAttr(c.image_url.url) + '" class="rounded-lg max-w-[200px] max-h-[150px] object-cover mt-1">'
+        '<img src="' + escAttr(c.image_url.url) + '" class="rounded-xl max-w-[220px] max-h-[180px] object-cover mt-2 border border-slate-700/50">'
       ).join('');
-      contentHtml = textParts + imgParts;
+      contentHtml = (textParts ? '<div class="mb-1">' + textParts + '</div>' : '') + imgParts;
     } else {
       contentHtml = escHtml(String(m.content));
     }
-    return '<div class="flex justify-end"><div class="msg-user px-4 py-2.5 max-w-[80%] text-sm text-slate-100">' + contentHtml + '</div></div>';
+    return '<div class="flex justify-end"><div class="msg-user px-5 py-3 max-w-[80%] text-sm text-slate-50 leading-relaxed">' + contentHtml + '</div></div>';
   }
   if (m.role === 'error') {
-    return '<div class="msg-error px-4 py-2.5 text-sm text-red-300">⚠️ ' + escHtml(m.content) + '</div>';
+    return '<div class="msg-error px-5 py-3 text-sm text-red-300 flex items-start gap-2"><span class="shrink-0">⚠️</span><span>' + escHtml(m.content) + '</span></div>';
   }
   let reasoningHtml = '';
   if (m.reasoning) {
-    const rId = 'reasoning-' + Math.random().toString(36).slice(2, 8);
+    const rId = 'r-' + Math.random().toString(36).slice(2, 8);
     reasoningHtml = '<div class="reasoning-block">' +
       '<div class="reasoning-header" onclick="toggleReasoning(this)">' +
-      '<span>🧠 思考过程</span>' +
-      '<span class="arrow open" id="' + rId + '-arrow">▶</span>' +
+      '<span class="text-sm">🧠</span><span>思考过程</span>' +
+      '<span class="arrow open ml-auto" id="' + rId + '-arrow">▶</span>' +
       '</div>' +
       '<div class="reasoning-body open" id="' + rId + '">' + escHtml(m.reasoning) + '</div>' +
     '</div>';
   }
-  return '<div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-cyan-500/15 flex items-center justify-center text-xs shrink-0 mt-0.5">🤖</div><div class="msg-ai px-4 py-2.5 max-w-[85%] text-sm text-slate-200">' + reasoningHtml + '<div class="markdown-body">' + formatContent(m.content) + '</div></div></div>';
+  return '<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20 flex items-center justify-center text-sm shrink-0 mt-0.5">🤖</div><div class="msg-ai px-5 py-3 max-w-[85%] text-sm text-slate-200 leading-relaxed">' + reasoningHtml + '<div class="markdown-body">' + formatContent(m.content) + '</div></div></div>';
 }
 
 function formatContent(text) {
-  if (!text) return '';
+  if (!text) return '<span class="typing-dot">●</span><span class="typing-dot">●</span><span class="typing-dot">●</span>';
   let html = escHtml(text);
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<div class="code-block"><pre>$2</pre></div>');
-  html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-800 px-1 py-0.5 rounded text-xs text-cyan-300">$1</code>');
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/`([^`]+)`/g, '<code class="bg-cyan-500/10 text-cyan-300 px-1.5 py-0.5 rounded-md text-xs">$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-50">$1</strong>');
   html = html.replace(/\n/g, '<br>');
   return html;
 }
 
-// ── send message ──
+// ── send ──
 async function sendMessage() {
   if (loading || !state.activeChat) return;
   const chat = state.chats[state.activeChat];
@@ -316,11 +415,13 @@ async function sendMessage() {
 
   const model = document.getElementById('model-select').value;
   chat.model = model;
+  if (chat.name === '新对话' && text) chat.name = text.substring(0, 25);
   chat.messages.push({ role: 'user', content: userContent });
   input.value = '';
   input.style.height = 'auto';
   save();
   switchChat(state.activeChat);
+  hideEmpty();
 
   const aiMsg = { role: 'assistant', content: '' };
   chat.messages.push(aiMsg);
@@ -329,7 +430,7 @@ async function sendMessage() {
 
   loading = true;
   document.getElementById('send-btn').disabled = true;
-  document.getElementById('send-btn').textContent = '...';
+  document.getElementById('send-btn').innerHTML = '<span class="typing-dot">●</span><span class="typing-dot">●</span><span class="typing-dot">●</span>';
 
   const reqBody = {
     model,
@@ -353,19 +454,16 @@ async function sendMessage() {
     }
 
     let usage = null;
-
     if (stream) {
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
-
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue;
           const data = line.slice(6).trim();
@@ -373,17 +471,8 @@ async function sendMessage() {
           try {
             const json = JSON.parse(data);
             const delta = json.choices?.[0]?.delta;
-            if (delta?.content) {
-              aiMsg.content += delta.content;
-              save();
-              updateLastAiMessage(aiMsg);
-            }
-            if (delta?.reasoning_content) {
-              if (!aiMsg.reasoning) aiMsg.reasoning = '';
-              aiMsg.reasoning += delta.reasoning_content;
-              save();
-              updateLastAiMessage(aiMsg);
-            }
+            if (delta?.content) { aiMsg.content += delta.content; save(); updateLastAiMessage(aiMsg); }
+            if (delta?.reasoning_content) { if (!aiMsg.reasoning) aiMsg.reasoning = ''; aiMsg.reasoning += delta.reasoning_content; save(); updateLastAiMessage(aiMsg); }
             if (json.usage) usage = json.usage;
           } catch {}
         }
@@ -399,7 +488,6 @@ async function sendMessage() {
     }
 
     if (!aiMsg.content) aiMsg.content = '(空响应)';
-
     if (usage) {
       if (!chat.usage) chat.usage = { prompt: 0, completion: 0 };
       chat.usage.prompt += usage.prompt_tokens || 0;
@@ -415,63 +503,55 @@ async function sendMessage() {
 
   loading = false;
   document.getElementById('send-btn').disabled = false;
-  document.getElementById('send-btn').textContent = '发送';
+  document.getElementById('send-btn').innerHTML = '发送 <span class="text-xs opacity-70">⌘↵</span>';
   document.getElementById('user-input').focus();
   updateTokenInfo();
 }
 
 function updateLastAiMessage(aiMsg) {
-  const msgsEl = document.getElementById('msgs');
-  const msgs = msgsEl.querySelector('.space-y-4');
-  if (!msgs) return;
-  const lastMsg = msgs.lastElementChild;
-  if (!lastMsg) return;
+  const list = document.getElementById('msg-list');
+  const last = list.lastElementChild;
+  if (!last) return;
   if (aiMsg.role === 'error') {
-    lastMsg.outerHTML = renderMessage(aiMsg);
+    last.outerHTML = renderMessage(aiMsg);
   } else {
-    const body = lastMsg.querySelector('.markdown-body');
+    const body = last.querySelector('.markdown-body');
     if (body) body.innerHTML = formatContent(aiMsg.content);
     if (aiMsg.reasoning) {
-      let rBlock = lastMsg.querySelector('.reasoning-block');
+      let rBlock = last.querySelector('.reasoning-block');
       if (!rBlock) {
-        const rId = 'reasoning-' + Math.random().toString(36).slice(2, 8);
+        const rId = 'r-' + Math.random().toString(36).slice(2, 8);
         rBlock = document.createElement('div');
         rBlock.className = 'reasoning-block';
-        rBlock.innerHTML = '<div class="reasoning-header" onclick="toggleReasoning(this)"><span>🧠 思考过程</span><span class="arrow open" id="' + rId + '-arrow">▶</span></div><div class="reasoning-body open" id="' + rId + '"></div>';
+        rBlock.innerHTML = '<div class="reasoning-header" onclick="toggleReasoning(this)"><span class="text-sm">🧠</span><span>思考过程</span><span class="arrow open ml-auto" id="' + rId + '-arrow">▶</span></div><div class="reasoning-body open" id="' + rId + '"></div>';
         body.parentNode.insertBefore(rBlock, body);
       }
       const rBody = rBlock.querySelector('.reasoning-body');
       if (rBody) rBody.textContent = aiMsg.reasoning;
     }
   }
-  msgsEl.scrollTop = msgsEl.scrollHeight;
+  document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
 }
 
 function toggleReasoning(header) {
   const block = header.parentElement;
-  const body = block.querySelector('.reasoning-body');
-  const arrow = header.querySelector('.arrow');
-  body.classList.toggle('open');
-  arrow.classList.toggle('open');
+  block.querySelector('.reasoning-body').classList.toggle('open');
+  block.querySelector('.arrow').classList.toggle('open');
 }
 
 function updateTokenInfo() {
   const chat = state.activeChat ? state.chats[state.activeChat] : null;
   const el = document.getElementById('token-info');
-  if (chat) {
-    const count = chat.messages.filter(m => m.role !== 'error').length;
-    const u = chat.usage || { prompt: 0, completion: 0 };
-    const total = u.prompt + u.completion;
-    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n;
-    el.innerHTML = '消息: ' + count + ' | 模型: ' + escHtml(chat.model.substring(0, 25)) + ' | 🔢 ' + fmt(total);
-  } else {
-    el.textContent = '';
-  }
+  if (!chat || chat.messages.length === 0) { el.textContent = ''; return; }
+  const u = chat.usage || { prompt: 0, completion: 0 };
+  const total = u.prompt + u.completion;
+  const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n;
+  el.innerHTML = '🔢 <span class="text-cyan-400 font-medium">' + fmt(total) + '</span> tokens';
 }
 
-// ── input handling ──
+// ── input ──
 function handleInputKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  if ((e.key === 'Enter' && !e.shiftKey) || (e.key === 'Enter' && e.ctrlKey)) { e.preventDefault(); sendMessage(); }
   setTimeout(() => {
     const el = document.getElementById('user-input');
     el.style.height = 'auto';
@@ -484,24 +564,16 @@ function updateToggleButtons() {
   document.getElementById('btn-file').classList.toggle('active', pendingFiles.length > 0);
 }
 
-// ── file & image upload ──
+// ── file/image upload ──
 function pickFile() { document.getElementById('file-input').click(); }
 function pickImage() { document.getElementById('image-input').click(); }
 
 async function handleFilePick(e) {
-  const files = Array.from(e.target.files);
-  for (const f of files) {
+  for (const f of Array.from(e.target.files)) {
     if (f.size > 10 * 1024 * 1024) { alert(f.name + ' 超过 10MB 限制'); continue; }
-    try {
-      const text = await readFileContent(f);
-      pendingFiles.push({ name: f.name, text });
-    } catch (err) {
-      alert(f.name + ' 读取失败: ' + err.message);
-    }
+    try { pendingFiles.push({ name: f.name, text: await readFileContent(f) }); } catch (err) { alert(f.name + ' 读取失败'); }
   }
-  e.target.value = '';
-  renderPreviews();
-  updateToggleButtons();
+  e.target.value = ''; renderPreviews(); updateToggleButtons();
 }
 
 async function readFileContent(file) {
@@ -518,17 +590,13 @@ async function readFileContent(file) {
 }
 
 function handleImagePick(e) {
-  const files = Array.from(e.target.files);
-  for (const f of files) {
+  for (const f of Array.from(e.target.files)) {
     if (f.size > 20 * 1024 * 1024) { alert(f.name + ' 超过 20MB 限制'); continue; }
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
-      const mime = dataUrl.split(';')[0].split(':')[1] || 'image/png';
-      const base64 = dataUrl.split(',')[1];
-      pendingImages.push({ name: f.name, base64, mime, dataUrl });
-      renderPreviews();
-      updateToggleButtons();
+      pendingImages.push({ name: f.name, base64: dataUrl.split(',')[1], mime: dataUrl.split(';')[0].split(':')[1] || 'image/png', dataUrl });
+      renderPreviews(); updateToggleButtons();
     };
     reader.readAsDataURL(f);
   }
@@ -539,7 +607,6 @@ function removeFile(idx) { pendingFiles.splice(idx, 1); renderPreviews(); update
 function removeImage(idx) { pendingImages.splice(idx, 1); renderPreviews(); updateToggleButtons(); }
 
 function renderPreviews() {
-  const strip = document.getElementById('preview-strip');
   let html = '';
   pendingFiles.forEach((f, i) => {
     html += '<div class="preview-chip"><span>📄</span><span class="chip-name">' + escHtml(f.name) + '</span><span class="chip-remove" onclick="removeFile(' + i + ')">✕</span></div>';
@@ -547,37 +614,25 @@ function renderPreviews() {
   pendingImages.forEach((img, i) => {
     html += '<div class="preview-chip"><img src="' + img.dataUrl + '" alt=""><span class="chip-name">' + escHtml(img.name) + '</span><span class="chip-remove" onclick="removeImage(' + i + ')">✕</span></div>';
   });
-  strip.innerHTML = html;
+  document.getElementById('preview-strip').innerHTML = html;
 }
 
 // ── drag & drop ──
 let dragCounter = 0;
-document.addEventListener('dragenter', e => {
-  e.preventDefault(); dragCounter++;
-  if (dragCounter === 1) document.getElementById('drop-overlay').style.display = 'flex';
-});
-document.addEventListener('dragleave', e => {
-  e.preventDefault(); dragCounter--;
-  if (dragCounter === 0) document.getElementById('drop-overlay').style.display = 'none';
-});
+document.addEventListener('dragenter', e => { e.preventDefault(); dragCounter++; if (dragCounter === 1) document.getElementById('drop-overlay').style.display = 'flex'; });
+document.addEventListener('dragleave', e => { e.preventDefault(); dragCounter--; if (dragCounter === 0) document.getElementById('drop-overlay').style.display = 'none'; });
 document.addEventListener('dragover', e => { e.preventDefault(); });
 document.addEventListener('drop', async e => {
   e.preventDefault(); dragCounter = 0;
   document.getElementById('drop-overlay').style.display = 'none';
-  const files = Array.from(e.dataTransfer.files);
-  for (const f of files) {
-    if (f.type.startsWith('image/')) {
-      await addImageFile(f);
-    } else {
+  for (const f of Array.from(e.dataTransfer.files)) {
+    if (f.type.startsWith('image/')) { await addImageFile(f); }
+    else {
       if (f.size > 10 * 1024 * 1024) { alert(f.name + ' 超过 10MB 限制'); continue; }
-      try {
-        const text = await readFileContent(f);
-        pendingFiles.push({ name: f.name, text });
-      } catch (err) { alert(f.name + ' 读取失败: ' + err.message); }
+      try { pendingFiles.push({ name: f.name, text: await readFileContent(f) }); } catch (err) { alert(f.name + ' 读取失败'); }
     }
   }
-  renderPreviews();
-  updateToggleButtons();
+  renderPreviews(); updateToggleButtons();
 });
 
 function addImageFile(f) {
@@ -586,29 +641,24 @@ function addImageFile(f) {
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
-      const mime = dataUrl.split(';')[0].split(':')[1] || 'image/png';
-      const base64 = dataUrl.split(',')[1];
-      pendingImages.push({ name: f.name, base64, mime, dataUrl });
+      pendingImages.push({ name: f.name, base64: dataUrl.split(',')[1], mime: dataUrl.split(';')[0].split(':')[1] || 'image/png', dataUrl });
       resolve();
     };
     reader.readAsDataURL(f);
   });
 }
 
-// ── paste image ──
+// ── paste ──
 document.addEventListener('paste', async e => {
   if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
-    const items = Array.from(e.clipboardData.items);
-    const imageItems = items.filter(item => item.type.startsWith('image/'));
+    const imageItems = Array.from(e.clipboardData.items).filter(i => i.type.startsWith('image/'));
     if (imageItems.length === 0) return;
     e.preventDefault();
     for (const item of imageItems) {
-      const blob = item.getAsFile();
-      blob.name = 'clipboard-' + Date.now() + '.png';
+      const blob = item.getAsFile(); blob.name = 'clipboard-' + Date.now() + '.png';
       await addImageFile(blob);
     }
-    renderPreviews();
-    updateToggleButtons();
+    renderPreviews(); updateToggleButtons();
   }
 });
 
@@ -618,27 +668,21 @@ document.getElementById('model-select').addEventListener('change', () => {
   if (chat) { chat.model = document.getElementById('model-select').value; save(); }
 });
 
-// ── sidebar toggle ──
+// ── sidebar ──
 function toggleSidebar() {
-  const overlay = document.getElementById('sidebar-overlay');
-  const sidebar = document.getElementById('mobile-sidebar');
-  const show = sidebar.classList.contains('-translate-x-full');
-  overlay.classList.toggle('hidden', !show);
-  sidebar.classList.toggle('-translate-x-full', !show);
+  const o = document.getElementById('sidebar-overlay');
+  const s = document.getElementById('mobile-sidebar');
+  const show = s.classList.contains('-translate-x-full');
+  o.classList.toggle('hidden', !show);
+  s.classList.toggle('-translate-x-full', !show);
 }
 
-// keyboard: Ctrl+N new chat
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newChat(); }
 });
 
-function escHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
-}
+function escHtml(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 </script>
 </body>
 </html>
