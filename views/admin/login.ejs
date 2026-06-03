@@ -4,35 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306B6D4'><path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { background: #0F172A; }
-  </style>
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body class="min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-sm mx-4">
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-bold text-cyan-400">API 中转站</h1>
-      <p class="text-slate-400 text-sm mt-2">管理后台</p>
+<body class="text-slate-100 bg-[#030712]">
+
+<div class="hero-bg relative overflow-hidden">
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-sm">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 text-2xl no-underline">
+          <span class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center text-xl">⚡</span>
+          <span class="gradient-text font-extrabold">API 中转站</span>
+        </div>
+        <p class="text-sm text-slate-400 mt-3">管理后台</p>
+      </div>
+
+      <div class="glass-card rounded-2xl p-6">
+        <% if (typeof error !== 'undefined' && error) { %>
+          <div class="p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-sm mb-4"><%= error %></div>
+        <% } %>
+        <form method="POST" action="/admin/login" class="space-y-4">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5 ml-1">用户名</label>
+            <input name="username" type="text" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-200 text-sm placeholder-slate-500 outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 transition backdrop-blur">
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5 ml-1">密码</label>
+            <input name="password" type="password" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-xl text-slate-200 text-sm placeholder-slate-500 outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 transition backdrop-blur">
+          </div>
+          <button type="submit" class="btn-glow w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-bold text-sm hover:from-cyan-400 hover:to-blue-400 transition cursor-pointer shadow-xl shadow-cyan-500/25">
+            登录
+          </button>
+        </form>
+      </div>
     </div>
-    <form method="POST" action="/admin/login" class="bg-slate-800 rounded-xl p-6 shadow-lg border border-slate-700">
-      <% if (error) { %>
-        <div class="bg-red-900/30 border border-red-500/50 text-red-300 px-4 py-2 rounded-lg text-sm mb-4"><%= error %></div>
-      <% } %>
-      <div class="mb-4">
-        <label class="block text-slate-300 text-sm mb-1.5">用户名</label>
-        <input name="username" type="text" required
-          class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-cyan-500 outline-none transition">
-      </div>
-      <div class="mb-6">
-        <label class="block text-slate-300 text-sm mb-1.5">密码</label>
-        <input name="password" type="password" required
-          class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-slate-100 focus:ring-2 focus:ring-cyan-500 outline-none transition">
-      </div>
-      <button type="submit" class="w-full py-2.5 bg-cyan-500 hover:bg-cyan-600 text-slate-900 font-semibold rounded-lg transition cursor-pointer">
-        登录
-      </button>
-    </form>
   </div>
+</div>
+
 </body>
 </html>
