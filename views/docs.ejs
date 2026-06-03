@@ -3,19 +3,26 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%= title %></title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306B6D4'><path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
-<style>body{background:#0B1120}code{font-family:'Cascadia Code',Consolas,monospace}pre{margin:0;white-space:pre-wrap;word-break:break-word}.code-block{background:#0D1520;border:1px solid #1E293B;border-radius:12px;padding:16px 20px;margin:12px 0;overflow-x:auto;font-size:13px;line-height:1.7}</style>
+<link rel="stylesheet" href="/style.css">
+<style>
+code{font-family:'Cascadia Code',Consolas,monospace}
+pre{margin:0;white-space:pre-wrap;word-break:break-word}
+.code-block{background:rgba(15,23,42,0.6);border:1px solid rgba(51,65,85,0.4);border-radius:12px;padding:16px 20px;margin:12px 0;overflow-x:auto;font-size:13px;line-height:1.7;backdrop-filter:blur(8px)}
+</style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col">
+<body class="text-slate-100 bg-[#030712]">
 
 <%- include('partials/nav', { currentPage: 'docs', user: typeof user !== 'undefined' ? user : null }) %>
 
-<main class="flex-1 max-w-4xl mx-auto px-6 py-12 w-full">
-  <h1 class="text-2xl font-bold mb-2">API 文档</h1>
+<div class="hero-bg">
+<main class="max-w-4xl mx-auto px-6 py-12 w-full">
+  <h1 class="text-3xl font-bold mb-2">API <span class="gradient-text">文档</span></h1>
   <p class="text-sm text-slate-400 mb-8">兼容 OpenAI / Claude 格式，替换 Endpoint 即可使用，完全免费</p>
 
   <!-- quick start -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">快速开始</h2>
     <div class="code-block"><pre># 1. 获取 API Key（注册后在控制台复制）
 # 2. 替换 Base URL 为本站地址
@@ -31,12 +38,12 @@ curl https://你的域名/v1/chat/completions \
   </section>
 
   <!-- OpenAI -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">OpenAI 兼容模式</h2>
     <div class="space-y-6">
       <div>
         <div class="flex items-center gap-2 mb-2">
-          <span class="px-2 py-0.5 bg-green-900/50 text-green-400 text-xs font-mono rounded">POST</span>
+          <span class="px-2 py-0.5 bg-green-500/10 text-green-400 text-xs font-mono rounded border border-green-500/20">POST</span>
           <code class="text-sm text-slate-200">/v1/chat/completions</code>
         </div>
         <p class="text-xs text-slate-400 mb-3">发送聊天请求，支持流式和非流式</p>
@@ -58,7 +65,7 @@ for chunk in response:
       </div>
       <div>
         <div class="flex items-center gap-2 mb-2">
-          <span class="px-2 py-0.5 bg-blue-900/50 text-blue-400 text-xs font-mono rounded">GET</span>
+          <span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs font-mono rounded border border-blue-500/20">GET</span>
           <code class="text-sm text-slate-200">/v1/models</code>
         </div>
         <p class="text-xs text-slate-400">获取所有可用模型列表</p>
@@ -67,12 +74,12 @@ for chunk in response:
   </section>
 
   <!-- Claude -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">Claude Messages 模式</h2>
     <div class="space-y-6">
       <div>
         <div class="flex items-center gap-2 mb-2">
-          <span class="px-2 py-0.5 bg-green-900/50 text-green-400 text-xs font-mono rounded">POST</span>
+          <span class="px-2 py-0.5 bg-green-500/10 text-green-400 text-xs font-mono rounded border border-green-500/20">POST</span>
           <code class="text-sm text-slate-200">/v1/messages</code>
         </div>
         <p class="text-xs text-slate-400 mb-3">Anthropic Messages API 兼容端点，支持 Claude SDK 直接调用</p>
@@ -95,7 +102,7 @@ print(message.content[0].text)</pre></div>
   </section>
 
   <!-- JS -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">JavaScript / Node.js</h2>
     <div class="code-block"><pre>// 使用 OpenAI SDK
 import OpenAI from "openai";
@@ -114,7 +121,7 @@ console.log(completion.choices[0].message.content);</pre></div>
   </section>
 
   <!-- 认证 -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">认证方式</h2>
     <div class="code-block"><pre># 方式 1：Bearer Token（推荐）
 Authorization: Bearer sk-你的APIKey
@@ -124,7 +131,7 @@ x-api-key: sk-你的APIKey</pre></div>
   </section>
 
   <!-- 流式 -->
-  <section class="mb-12">
+  <section class="glass-card p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">流式输出</h2>
     <p class="text-sm text-slate-400 mb-3">设置 <code>stream: true</code>，响应为 SSE (Server-Sent Events)</p>
     <div class="code-block"><pre>// 流式请求
@@ -140,6 +147,7 @@ for await (const chunk of stream) {
   </section>
 </main>
 
-<footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-600">API 中转站 · 完全免费</footer>
+<%- include('partials/footer') %>
+</div>
 </body>
 </html>
