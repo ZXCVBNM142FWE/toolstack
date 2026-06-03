@@ -9,7 +9,8 @@
     "weight": 10,
     "priority": 1,
     "timeout": 60000,
-    "enabled": true
+    "enabled": true,
+    "features": { "web_search": true, "thinking": true }
   },
   {
     "id": "qwen",
@@ -21,7 +22,8 @@
     "weight": 10,
     "priority": 2,
     "timeout": 60000,
-    "enabled": true
+    "enabled": true,
+    "features": { "web_search": false, "thinking": true }
   },
   {
     "id": "glm",
@@ -33,7 +35,8 @@
     "weight": 8,
     "priority": 3,
     "timeout": 60000,
-    "enabled": true
+    "enabled": true,
+    "features": { "web_search": true, "thinking": false }
   },
   {
     "id": "moonshot",
@@ -45,7 +48,8 @@
     "weight": 8,
     "priority": 4,
     "timeout": 60000,
-    "enabled": true
+    "enabled": true,
+    "features": { "web_search": true, "thinking": false }
   },
   {
     "id": "qianfan",
@@ -57,7 +61,8 @@
     "weight": 5,
     "priority": 5,
     "timeout": 60000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": false }
   },
   {
     "id": "grok",
@@ -69,7 +74,8 @@
     "weight": 5,
     "priority": 6,
     "timeout": 90000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": true, "thinking": true }
   },
   {
     "id": "openrouter",
@@ -81,7 +87,8 @@
     "weight": 5,
     "priority": 7,
     "timeout": 90000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": false }
   },
   {
     "id": "doubao",
@@ -93,7 +100,8 @@
     "weight": 8,
     "priority": 8,
     "timeout": 60000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": true, "thinking": true }
   },
   {
     "id": "minimax",
@@ -105,7 +113,8 @@
     "weight": 7,
     "priority": 9,
     "timeout": 60000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": false }
   },
   {
     "id": "yi",
@@ -117,7 +126,8 @@
     "weight": 7,
     "priority": 10,
     "timeout": 60000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": false }
   },
   {
     "id": "spark",
@@ -129,7 +139,8 @@
     "weight": 6,
     "priority": 11,
     "timeout": 60000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": false }
   },
   {
     "id": "anthropic",
@@ -141,7 +152,8 @@
     "weight": 5,
     "priority": 12,
     "timeout": 120000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": false, "thinking": true }
   },
   {
     "id": "gemini",
@@ -153,6 +165,7 @@
     "weight": 7,
     "priority": 13,
     "timeout": 90000,
-    "enabled": false
+    "enabled": false,
+    "features": { "web_search": true, "thinking": true }
   }
 ]

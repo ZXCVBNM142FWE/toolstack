@@ -171,10 +171,10 @@
         </button>
       </div>
       <div class="flex items-center gap-3 flex-wrap mt-2.5 ml-10">
-        <label class="toggle-switch">
+        <label class="toggle-switch" id="web-search-label">
           <input type="checkbox" id="web-search-toggle" onchange="state.webSearch=this.checked;save()"> <span class="toggle-track"></span> 🌐 联网搜索
         </label>
-        <label class="toggle-switch">
+        <label class="toggle-switch" id="deep-thinking-label">
           <input type="checkbox" id="deep-thinking-toggle" onchange="state.deepThinking=this.checked;save()"> <span class="toggle-track"></span> 🧠 深度思考
         </label>
         <span class="flex-1"></span>
@@ -295,6 +295,20 @@ function switchChat(chatId) {
   document.getElementById('msgs').scrollTop = document.getElementById('msgs').scrollHeight;
   renderTabs();
   updateTokenInfo();
+  updateFeatureToggles();
+}
+
+function updateFeatureToggles() {
+  const chat = state.activeChat ? state.chats[state.activeChat] : null;
+  const modelId = chat ? chat.model : null;
+  const m = models.find(x => x.id === modelId);
+  const ws = m && m.features && m.features.web_search;
+  const dt = m && m.features && m.features.thinking;
+  document.getElementById('web-search-label').style.display = ws ? '' : 'none';
+  document.getElementById('deep-thinking-label').style.display = dt ? '' : 'none';
+  if (!ws) { document.getElementById('web-search-toggle').checked = false; state.webSearch = false; }
+  if (!dt) { document.getElementById('deep-thinking-toggle').checked = false; state.deepThinking = false; }
+  save();
 }
 
 function deleteChat(chatId, e) {

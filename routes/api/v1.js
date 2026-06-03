@@ -211,7 +211,12 @@ router.get("/models", (req, res) => {
     .forEach((p) => {
       p.models.forEach((m) => {
         if (!models.find((x) => x.id === m)) {
-          models.push({ id: m, object: "model", owned_by: p.name });
+          models.push({
+            id: m,
+            object: "model",
+            owned_by: p.name,
+            features: p.features || { web_search: false, thinking: false },
+          });
         }
       });
     });

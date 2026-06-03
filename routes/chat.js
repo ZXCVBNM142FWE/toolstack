@@ -53,7 +53,7 @@ router.get("/", requireUser, (req, res) => {
     .forEach((p) => {
       p.models.forEach((m) => {
         if (!models.find((x) => x.id === m)) {
-          models.push({ id: m, name: p.name });
+          models.push({ id: m, name: p.name, features: p.features || { web_search: false, thinking: false } });
         }
       });
     });
