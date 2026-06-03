@@ -11,6 +11,7 @@
   <meta property="og:description" content="涓婁紶鏂囨。鑷畾涔夋帓鐗堜负鏍囧噯瀛︽湳鏍煎紡">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -22,7 +23,9 @@
   }
   </script>
 </head>
-<body>
+<body class="text-slate-100 bg-[#030712]">
+<%- include('../partials/nav', { currentPage: 'tools', user: typeof user !== 'undefined' ? user : null }) %>
+<div class="hero-bg">
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
@@ -143,16 +146,8 @@
 
   </main>
 
-  <footer class="footer">
-    <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">棣栭〉</a>
-      <span style="margin:0 4px;">路</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">宸ュ叿鍒楄〃</a>
-      <span style="margin:0 4px;">路</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">鍙嶉</a>
-    </p>
-    <p style="margin-top:4px;">鐢ㄧ埍鍙戠數 路 姘镐笉鏀惰垂</p>
-  </footer>
+  <%- include('../partials/footer') %>
+</div>
 
   <script>
     function checkFile() {

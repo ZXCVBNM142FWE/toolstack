@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %></title>
   <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .crawl-form {
       max-width: 500px;
@@ -131,7 +132,9 @@
     }
   </style>
 </head>
-<body>
+<body class="text-slate-100 bg-[#030712]">
+<%- include('../partials/nav', { currentPage: 'tools', user: typeof user !== 'undefined' ? user : null }) %>
+<div class="hero-bg">
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
@@ -170,15 +173,8 @@
     </div>
   </main>
 
-  <footer class="footer">
-    <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/tools/novel-reader" style="color:inherit;text-decoration:none;margin:0 8px;">小说阅读器</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
-    </p>
-  </footer>
+  <%- include('../partials/footer') %>
+</div>
 
   <script>
     const form = document.getElementById('crawlForm');

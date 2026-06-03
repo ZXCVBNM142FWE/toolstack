@@ -7,6 +7,7 @@
   <meta name="description" content="在线小说阅读器，舒适阅读体验">
   <title><%= title %></title>
   <link rel="stylesheet" href="/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .novel-layout {
       display: grid;
@@ -339,7 +340,9 @@
     }
   </style>
 </head>
-<body>
+<body class="text-slate-100 bg-[#030712]">
+<%- include('../partials/nav', { currentPage: 'tools', user: typeof user !== 'undefined' ? user : null }) %>
+<div class="hero-bg">
   <main class="tool-page">
     <div class="tool-header">
       <div class="tool-header-left">
@@ -416,16 +419,8 @@
     </div>
   </main>
 
-  <footer class="footer">
-    <p>
-      <a href="/" style="color:inherit;text-decoration:none;margin:0 8px;">首页</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="/#toolGrid" style="color:inherit;text-decoration:none;margin:0 8px;">工具列表</a>
-      <span style="margin:0 4px;">·</span>
-      <a href="mailto:admin@ijuhe.top" style="color:inherit;text-decoration:none;margin:0 8px;">反馈</a>
-    </p>
-    <p style="margin-top:4px;">用爱发电 · 永不收费</p>
-  </footer>
+  <%- include('../partials/footer') %>
+</div>
 
   <script>
     const STORAGE_KEY = 'novel-reader-state';
