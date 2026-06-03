@@ -198,7 +198,7 @@ router.get('/users', requireAdmin, (req, res) => {
 
 // POST /admin/users
 router.post('/users', requireAdmin, (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, password, role, balance, daily_limit } = req.body;
   const users = readJSON('users.json');
   const hash = bcrypt.hashSync(password, 10);
   users.push({
@@ -206,9 +206,23 @@ router.post('/users', requireAdmin, (req, res) => {
     username,
     password_hash: hash,
     role: role || 'user',
-    balance: 0,
+    balance: parseFloat(balance) || 0,
+    daily_limit: parseInt(daily_limit) || 0,
     created_at: new Date().toISOString()
   });
+  writeJSON('users.json', users);
+  res.redirect('/admin/users');
+});
+
+// POST /admin/users/:id/update
+router.post('/users/:id/update', requireAdmin, (req, res) => {
+  const { balance, daily_limit, role } = req.body;
+  const users = readJSON('users.json');
+  const u = users.find(u => u.id === req.params.id);
+  if (!u) return res.status(404).send('Not found');
+  if (balance !== undefined && balance !== '') u.balance = parseFloat(balance) || 0;
+  if (daily_limit !== undefined && daily_limit !== '') u.daily_limit = parseInt(daily_limit) || 0;
+  if (role) u.role = role;
   writeJSON('users.json', users);
   res.redirect('/admin/users');
 });
