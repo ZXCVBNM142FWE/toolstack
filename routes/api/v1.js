@@ -255,6 +255,9 @@ router.post("/chat/completions", authToken, async (req, res) => {
       top_p: top_p ?? 1,
       stream: stream || false,
     };
+    // pass through advanced params from client
+    if (req.body.web_search_options) body.web_search_options = req.body.web_search_options;
+    if (req.body.thinking) body.thinking = req.body.thinking;
 
     const { upstream, error } = await relayToProvider(provider, model, body, stream, req);
 
@@ -319,6 +322,8 @@ router.post("/messages", authToken, async (req, res) => {
     top_p: top_p ?? 1,
     stream: stream || false,
   };
+  if (req.body.web_search_options) openaiBody.web_search_options = req.body.web_search_options;
+  if (req.body.thinking) openaiBody.thinking = req.body.thinking;
 
   const candidates = findProviders(model);
   if (candidates.length === 0) {
