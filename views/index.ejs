@@ -4,206 +4,225 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="API 中转站 — 一个 Key 调用 DeepSeek · 通义千问 · 智谱 · Kimi · Grok · Claude 等大模型，兼容 OpenAI / Claude 格式，完全免费">
 <title><%= title %></title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2322D3EE'><path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306B6D4'><path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
-<style>body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}code{font-family:'Cascadia Code',Consolas,monospace}</style>
+<link rel="stylesheet" href="/style.css">
 </head>
-<body class="text-slate-100">
+<body class="text-slate-100 bg-[#030712]">
 
 <%- include('partials/nav', { currentPage: 'home', user: typeof user !== 'undefined' ? user : null }) %>
 
-<!-- hero -->
-<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950 border-b border-slate-800">
-  <div class="absolute inset-0">
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[128px]"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[128px]"></div>
-  </div>
-  <div class="relative max-w-4xl mx-auto px-6 py-20 md:py-28 text-center">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs mb-6">
-      🎉 完全免费 · 无需付费
+<!-- ── Hero ── -->
+<section class="hero-bg relative overflow-hidden border-b border-slate-800/50">
+  <div class="relative z-10 max-w-5xl mx-auto px-6 py-24 md:py-36 text-center">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-8 backdrop-blur">
+      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+      完全免费 · 无需付费 · 持续更新
     </div>
-    <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-4">
+    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
       一个 Key<br class="md:hidden">
-      <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">调用所有大模型</span>
+      <span class="gradient-text">调用所有大模型</span>
     </h1>
-    <p class="text-slate-300/80 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
+    <p class="text-slate-400 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
       兼容 OpenAI / Claude 双格式，智能路由 + 自动故障转移<br class="hidden md:block">
       无需自建，注册即用，让你的应用零成本接入 AI
     </p>
-    <div class="flex gap-3 justify-center flex-wrap">
-      <a href="/register" class="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-bold text-sm hover:from-cyan-400 hover:to-blue-400 transition shadow-lg shadow-cyan-500/25 no-underline">免费注册 →</a>
-      <a href="/docs" class="px-8 py-3 border border-slate-600 text-slate-300 rounded-xl font-semibold text-sm hover:border-cyan-500 hover:text-cyan-400 transition no-underline">查看文档</a>
+    <div class="flex gap-4 justify-center flex-wrap">
+      <a href="/register" class="btn-glow inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl font-bold text-sm hover:from-cyan-400 hover:to-blue-400 transition shadow-xl shadow-cyan-500/25 no-underline">
+        免费注册 <span class="text-lg">→</span>
+      </a>
+      <a href="/docs" class="inline-flex items-center gap-2 px-8 py-3.5 border border-slate-600/50 text-slate-300 rounded-xl font-semibold text-sm hover:border-cyan-500/50 hover:text-cyan-400 hover:bg-cyan-500/5 transition no-underline backdrop-blur">
+        查看文档
+      </a>
     </div>
-    <div class="mt-10 max-w-lg mx-auto">
-      <div class="bg-slate-950/80 rounded-xl border border-slate-700/50 p-4 text-left">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
-          <span class="w-3 h-3 rounded-full bg-yellow-500/80"></span>
-          <span class="w-3 h-3 rounded-full bg-green-500/80"></span>
-          <span class="text-xs text-slate-500 ml-2">终端</span>
+
+    <!-- terminal preview -->
+    <div class="mt-12 max-w-xl mx-auto">
+      <div class="glass-card rounded-2xl p-5 text-left">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-3 h-3 rounded-full bg-red-500/60"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-500/60"></span>
+          <span class="w-3 h-3 rounded-full bg-green-500/60"></span>
+          <span class="text-xs text-slate-500 ml-2 font-mono">terminal</span>
         </div>
-        <pre class="text-xs text-slate-300 font-mono leading-relaxed overflow-x-auto"><span class="text-slate-500"># 替换 YOUR_TOKEN 即可使用</span>
-curl https://<span class="text-cyan-400">你的域名</span>/v1/chat/completions \
+        <pre class="text-xs md:text-sm text-slate-300 font-mono leading-relaxed overflow-x-auto"><span class="text-slate-500"># 替换 YOUR_TOKEN 即可使用</span>
+curl <span class="text-cyan-400">https://你的域名</span>/v1/chat/completions \
   -H <span class="text-green-400">"Authorization: Bearer YOUR_TOKEN"</span> \
-  -H <span class="text-green-400">"Content-Type: application/json"</span> \
   -d <span class="text-yellow-400">'{
   "model": "deepseek-chat",
-  "messages": [{"role": "user", "content": "你好"}]
+  "messages": [{"role":"user","content":"你好"}]
 }'</span></pre>
       </div>
     </div>
   </div>
 </section>
 
-<!-- stat bar -->
-<div class="max-w-lg mx-auto px-4 -mt-5 relative z-20">
-  <div class="grid grid-cols-3 gap-3 text-center">
-    <div class="bg-slate-900/95 backdrop-blur rounded-xl border border-slate-700/50 px-4 py-3">
-      <div class="text-cyan-400 text-xl font-bold"><%= models.length %></div>
-      <div class="text-slate-400 text-xs">可用模型</div>
+<!-- ── Stats ── -->
+<div class="max-w-2xl mx-auto px-4 -mt-6 relative z-20">
+  <div class="grid grid-cols-3 gap-4">
+    <div class="stat-card">
+      <div class="text-2xl font-extrabold gradient-text"><%= models.length %></div>
+      <div class="text-xs text-slate-400 mt-1">可用模型</div>
     </div>
-    <div class="bg-slate-900/95 backdrop-blur rounded-xl border border-slate-700/50 px-4 py-3">
-      <div class="text-green-400 text-xl font-bold">免费</div>
-      <div class="text-slate-400 text-xs">零成本接入</div>
+    <div class="stat-card">
+      <div class="text-2xl font-extrabold text-green-400">免费</div>
+      <div class="text-xs text-slate-400 mt-1">零成本接入</div>
     </div>
-    <div class="bg-slate-900/95 backdrop-blur rounded-xl border border-slate-700/50 px-4 py-3">
-      <div class="text-purple-400 text-xl font-bold">双协议</div>
-      <div class="text-slate-400 text-xs">OpenAI + Claude</div>
+    <div class="stat-card">
+      <div class="text-2xl font-extrabold text-purple-400">双协议</div>
+      <div class="text-xs text-slate-400 mt-1">OpenAI + Claude</div>
     </div>
   </div>
 </div>
 
-<main class="max-w-6xl mx-auto px-4 sm:px-6 mt-12">
+<main class="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
 
-  <!-- features -->
-  <section class="mb-16">
-    <div class="text-center mb-10">
-      <h2 class="text-2xl font-bold mb-2">为什么选择我们</h2>
+  <!-- ── Features (bento) ── -->
+  <section class="mb-20">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold mb-3">为什么选择<span class="gradient-text">我们</span></h2>
       <p class="text-slate-400 text-sm">简单、快速、免费</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="group p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-cyan-800 transition">
-        <div class="w-10 h-10 rounded-xl bg-cyan-900/50 flex items-center justify-center mb-4 text-xl">🔄</div>
-        <h3 class="font-semibold mb-2">双格式兼容</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">同时支持 OpenAI Chat Completions 和 Anthropic Claude Messages 格式，ChatBox / NextChat / Cursor 等所有客户端即插即用</p>
+    <div class="bento-grid">
+      <div class="bento-card">
+        <div class="feature-icon cyan">🔄</div>
+        <h3 class="font-bold text-lg mb-2">双格式兼容</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">同时支持 OpenAI Chat Completions 和 Anthropic Messages 格式，ChatBox / NextChat / Cursor 等所有客户端即插即用</p>
       </div>
-      <div class="group p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-cyan-800 transition">
-        <div class="w-10 h-10 rounded-xl bg-green-900/50 flex items-center justify-center mb-4 text-xl">⚖️</div>
-        <h3 class="font-semibold mb-2">智能路由</h3>
+      <div class="bento-card">
+        <div class="feature-icon purple">⚖️</div>
+        <h3 class="font-bold text-lg mb-2">智能路由</h3>
         <p class="text-sm text-slate-400 leading-relaxed">加权负载均衡 + 自动故障转移，单个渠道挂了自动切到备用渠道，保证服务高可用</p>
       </div>
-      <div class="group p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-cyan-800 transition">
-        <div class="w-10 h-10 rounded-xl bg-purple-900/50 flex items-center justify-center mb-4 text-xl">⚡</div>
-        <h3 class="font-semibold mb-2">流式响应</h3>
+      <div class="bento-card">
+        <div class="feature-icon green">⚡</div>
+        <h3 class="font-bold text-lg mb-2">流式响应</h3>
         <p class="text-sm text-slate-400 leading-relaxed">完整支持 SSE 流式输出，首 Token 延迟低至 200ms，体验丝滑流畅</p>
       </div>
     </div>
   </section>
 
-  <!-- models showcase (no pricing) -->
-  <section class="mb-16">
+  <!-- ── Model Marquee ── -->
+  <section class="mb-20">
     <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold mb-2">支持的模型</h2>
+      <h2 class="text-2xl font-bold mb-2">接入 <span class="gradient-text">40+</span> 模型</h2>
       <p class="text-slate-400 text-sm">覆盖国内外主流大模型，持续接入中</p>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-      <% const shown = []; models.forEach(m => { if (!shown.includes(m.id) && shown.length < 15) { shown.push(m.id); %>
-      <div class="p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-center hover:border-cyan-800 transition">
-        <div class="font-mono text-xs text-cyan-300 truncate"><%= m.id %></div>
-        <div class="text-xs text-slate-500 mt-1"><%= m.name %></div>
-      </div>
-      <% } }) %>
-    </div>
-    <p class="text-center mt-6"><a href="/models" class="text-sm text-cyan-400 hover:text-cyan-300 transition">查看全部模型 →</a></p>
-  </section>
-
-  <!-- quickstart -->
-  <section id="quickstart" class="mb-16 scroll-mt-20">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold mb-2">三步接入</h2>
-      <p class="text-slate-400 text-sm">一分钟完成接入</p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
-      <div class="text-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-        <div class="w-10 h-10 rounded-full bg-cyan-900/80 text-cyan-400 flex items-center justify-center font-bold mx-auto mb-3 text-sm">1</div>
-        <h3 class="font-semibold mb-2">注册获取 Key</h3>
-        <p class="text-xs text-slate-400">免费注册，立即获得 API Key，无需审核</p>
-      </div>
-      <div class="text-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-        <div class="w-10 h-10 rounded-full bg-cyan-900/80 text-cyan-400 flex items-center justify-center font-bold mx-auto mb-3 text-sm">2</div>
-        <h3 class="font-semibold mb-2">替换 Base URL</h3>
-        <p class="text-xs text-slate-400">把 API 地址改成你的中转站地址，Key 用你的 Token</p>
-      </div>
-      <div class="text-center p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-        <div class="w-10 h-10 rounded-full bg-cyan-900/80 text-cyan-400 flex items-center justify-center font-bold mx-auto mb-3 text-sm">3</div>
-        <h3 class="font-semibold mb-2">像官方一样调用</h3>
-        <p class="text-xs text-slate-400">用 OpenAI / Claude SDK 直接调用，代码一行不改</p>
+    <div class="model-scroll mb-6">
+      <div class="model-track">
+        <% const shown = []; models.forEach(m => { if (!shown.includes(m.id)) { shown.push(m.id); %>
+        <span class="model-chip"><%= m.id %></span>
+        <% }}); %>
+        <!-- duplicate for seamless loop -->
+        <% shown.forEach(id => { %>
+        <span class="model-chip"><%= id %></span>
+        <% }); %>
       </div>
     </div>
-    <p class="text-center text-slate-500 text-xs">
-      支持所有 OpenAI 兼容客户端 · base_url 改成 <code class="text-cyan-400 bg-slate-800 px-1.5 py-0.5 rounded">你的域名/v1</code> 即可
+    <p class="text-center">
+      <a href="/models" class="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 transition">
+        查看全部模型 <span>→</span>
+      </a>
     </p>
   </section>
 
-  <!-- tools section -->
-  <section id="tools" class="mb-16 scroll-mt-20">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold mb-2">免费工具箱</h2>
+  <!-- ── Quickstart ── -->
+  <section id="quickstart" class="mb-20 scroll-mt-20">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-bold mb-3">三步<span class="gradient-text">接入</span></h2>
+      <p class="text-slate-400 text-sm">一分钟完成接入</p>
+    </div>
+    <div class="step-connector max-w-3xl mx-auto mb-10">
+      <div class="step-item">
+        <div class="w-12 h-12 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold mx-auto mb-4 text-lg">1</div>
+        <h3 class="font-bold mb-2">注册获取 Key</h3>
+        <p class="text-xs text-slate-400">免费注册，立即获得 API Key</p>
+      </div>
+      <div class="step-item">
+        <div class="w-12 h-12 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center font-bold mx-auto mb-4 text-lg">2</div>
+        <h3 class="font-bold mb-2">替换 Base URL</h3>
+        <p class="text-xs text-slate-400">把 API 地址改成中转站地址</p>
+      </div>
+      <div class="step-item">
+        <div class="w-12 h-12 rounded-full bg-green-500/15 border border-green-500/30 text-green-400 flex items-center justify-center font-bold mx-auto mb-4 text-lg">3</div>
+        <h3 class="font-bold mb-2">像官方一样调用</h3>
+        <p class="text-xs text-slate-400">OpenAI / Claude SDK 直接调用</p>
+      </div>
+    </div>
+    <p class="text-center text-slate-500 text-xs">
+      支持所有 OpenAI 兼容客户端 · base_url 改成 <code class="text-cyan-400 bg-slate-800/50 px-2 py-1 rounded-lg font-mono">你的域名/v1</code> 即可
+    </p>
+  </section>
+
+  <!-- ── Tools ── -->
+  <section id="tools" class="mb-20 scroll-mt-20">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold mb-3">免费<span class="gradient-text">工具箱</span></h2>
       <p class="text-slate-400 text-sm"><%= tools.length %> 个实用工具，全部免费使用</p>
     </div>
 
-    <div class="max-w-md mx-auto mb-6">
-      <div class="relative bg-slate-900 rounded-xl border border-slate-700 focus-within:border-cyan-600 transition">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input id="search" class="w-full pl-10 pr-10 py-3 text-sm text-slate-200 placeholder-slate-500 bg-transparent outline-none" type="text" placeholder="搜索工具..." autocomplete="off">
-        <button id="searchClear" class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 hover:text-slate-400 transition-colors hidden cursor-pointer">✕</button>
+    <!-- search -->
+    <div class="max-w-md mx-auto mb-8">
+      <div class="relative">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input id="search" class="w-full pl-10 pr-10 py-3 text-sm bg-slate-900/60 border border-slate-700/50 rounded-xl text-slate-200 placeholder-slate-500 outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 transition backdrop-blur" type="text" placeholder="搜索工具..." autocomplete="off">
+        <button id="searchClear" class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 hover:text-slate-400 transition hidden cursor-pointer">✕</button>
       </div>
     </div>
 
-    <div class="flex justify-center gap-2 mb-6 flex-wrap" id="categoryTabs">
+    <!-- category tabs -->
+    <div class="flex justify-center gap-2 mb-8 flex-wrap" id="categoryTabs">
       <% categories.forEach((cat, i) => { %>
-        <button class="category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border <%= i === 0 ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400 border-slate-700/50 hover:text-slate-200 bg-transparent' %>" data-category="<%= cat %>"><%= cat %></button>
+        <button class="category-tab px-4 py-2 rounded-full text-xs font-medium transition cursor-pointer border <%= i === 0 ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'text-slate-400 border-slate-700/50 hover:text-slate-200 hover:border-slate-600 bg-transparent' %>" data-category="<%= cat %>"><%= cat %></button>
       <% }) %>
     </div>
 
-    <p class="text-center text-slate-500 text-xs mb-6">共 <span id="countNum"><%= tools.length %></span> 个工具</p>
+    <p class="text-center text-slate-500 text-xs mb-8">共 <span id="countNum"><%= tools.length %></span> 个工具</p>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 mb-6" id="toolGrid">
+    <!-- tool cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="toolGrid">
       <% tools.forEach((tool, i) => { %>
-        <a href="<%= tool.url %>" class="tool-card group block bg-slate-800/80 rounded-xl border border-slate-700/50 p-4 hover:border-cyan-700 hover:-translate-y-1 transition-all duration-200 cursor-pointer" data-category="<%= tool.category %>" data-name="<%= tool.name %>" data-desc="<%= tool.desc %>">
-          <div class="mb-2"><%- tool.icon %></div>
-          <h3 class="text-sm font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors"><%= tool.name %></h3>
-          <p class="text-xs text-slate-400 leading-relaxed line-clamp-2"><%= tool.desc %></p>
-          <% if (tool.badge) { %>
-            <span class="inline-block mt-2 px-2 py-0.5 bg-cyan-950 text-cyan-400 text-xs rounded-full border border-cyan-800"><%= tool.badge %></span>
-          <% } %>
+        <a href="<%= tool.url %>" class="tool-card-new group" data-category="<%= tool.category %>" data-name="<%= tool.name %>" data-desc="<%= tool.desc %>">
+          <div class="flex items-start gap-3">
+            <div class="tool-icon-wrap w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-lg shrink-0 transition-colors"><%- tool.icon %></div>
+            <div class="min-w-0">
+              <h3 class="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors truncate"><%= tool.name %></h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed"><%= tool.desc %></p>
+              <% if (tool.badge) { %>
+                <span class="inline-block mt-2 px-2 py-0.5 bg-cyan-500/10 text-cyan-400 text-[10px] rounded-md border border-cyan-500/20"><%= tool.badge %></span>
+              <% } %>
+            </div>
+          </div>
         </a>
       <% }) %>
     </div>
-    <div id="noResults" class="text-center text-slate-500 py-16 hidden">
+    <div id="noResults" class="text-center text-slate-500 py-20 hidden">
+      <div class="text-4xl mb-3">🔍</div>
       <p>没有匹配的工具</p>
     </div>
   </section>
 
 </main>
 
-<footer class="border-t border-slate-800 bg-slate-950/50">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-center text-sm text-slate-500">
-    <div class="flex justify-center gap-6 mb-3">
-      <a href="/models" class="hover:text-cyan-400 transition-colors">模型</a>
-      <a href="/docs" class="hover:text-cyan-400 transition-colors">文档</a>
-      <a href="#tools" class="hover:text-cyan-400 transition-colors">工具</a>
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  <div class="max-w-6xl mx-auto px-6 py-10 text-center">
+    <div class="flex justify-center gap-8 mb-6">
+      <a href="/models" class="text-sm text-slate-400 hover:text-cyan-400 transition">模型</a>
+      <a href="/docs" class="text-sm text-slate-400 hover:text-cyan-400 transition">文档</a>
+      <a href="#tools" class="text-sm text-slate-400 hover:text-cyan-400 transition">工具</a>
+      <a href="https://github.com/ZXCVBNM142FWE/side-hustle" class="text-sm text-slate-400 hover:text-cyan-400 transition" target="_blank">开源</a>
     </div>
-    <p>API 中转站 · 一个 Key 调用所有大模型 · 完全免费</p>
+    <p class="text-sm text-slate-500">API 中转站 · 一个 Key 调用所有大模型 · 完全免费</p>
   </div>
 </footer>
 
-<button id="backToTop" class="fixed bottom-6 right-6 w-11 h-11 bg-cyan-600 text-white rounded-full shadow-lg hover:bg-cyan-500 transition-all duration-200 opacity-0 pointer-events-none cursor-pointer flex items-center justify-center z-50">↑</button>
+<button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 rounded-full shadow-lg hover:bg-cyan-500/30 transition-all duration-200 opacity-0 pointer-events-none cursor-pointer flex items-center justify-center z-50 backdrop-blur text-lg">↑</button>
 
 <script>
 const btn = document.getElementById('backToTop');
 window.addEventListener('scroll', () => {
-  const v = window.scrollY > 300;
+  const v = window.scrollY > 400;
   btn.style.opacity = v ? '1' : '0';
   btn.style.pointerEvents = v ? 'auto' : 'none';
 });
@@ -211,7 +230,7 @@ btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth'
 
 const search = document.getElementById('search');
 const clearBtn = document.getElementById('searchClear');
-const cards = document.querySelectorAll('.tool-card');
+const cards = document.querySelectorAll('.tool-card-new');
 const noResults = document.getElementById('noResults');
 const countNum = document.getElementById('countNum');
 const categoryTabs = document.querySelectorAll('.category-tab');
@@ -236,7 +255,7 @@ categoryTabs.forEach(tab => {
   tab.addEventListener('click', () => {
     activeCat = tab.dataset.category;
     categoryTabs.forEach(t => {
-      t.className = t.dataset.category === activeCat ? 'category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'category-tab px-3 py-1.5 rounded-full text-xs font-medium transition cursor-pointer border text-slate-400 border-slate-700/50 hover:text-slate-200 bg-transparent';
+      t.className = t.dataset.category === activeCat ? 'category-tab px-4 py-2 rounded-full text-xs font-medium transition cursor-pointer border bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'category-tab px-4 py-2 rounded-full text-xs font-medium transition cursor-pointer border text-slate-400 border-slate-700/50 hover:text-slate-200 hover:border-slate-600 bg-transparent';
     });
     filter();
   });
