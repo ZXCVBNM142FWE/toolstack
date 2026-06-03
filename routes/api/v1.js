@@ -169,6 +169,64 @@ function openAIToClaude(openaiResp, model) {
   };
 }
 
+// ── web search (DuckDuckGo) ──
+
+const DDG = 'https://lite.duckduckgo.com/lite/';
+
+async function searchWeb(query) {
+  try {
+    const resp = await fetch(DDG + '?q=' + encodeURIComponent(query), {
+      headers: { 'User-Agent': 'Toolstack/1.0' },
+      signal: AbortSignal.timeout(8000),
+    });
+    const html = await resp.text();
+    // scrape result links + snippets from DuckDuckGo Lite
+    const results = [];
+    const linkRe = /<a[^>]*href="([^"]*)"[^>]*class="result-link"[^>]*>([^<]*)<\/a>/gi;
+    const snippetRe = /<td[^>]*class="result-snippet"[^>]*>([\s\S]*?)<\/td>/gi;
+    const urlRe = /uddg=([^'"]*)/g;
+
+    let m;
+    while ((m = linkRe.exec(html)) !== null) {
+      let url = m[1];
+      // decode DuckDuckGo redirect
+      const uddg = url.match(/uddg=([^'"]*)/);
+      if (uddg) url = decodeURIComponent(uddg[1]);
+      results.push({ title: m[2].replace(/<[^>]*>/g, ''), url });
+      if (results.length >= 5) break;
+    }
+
+    let si = 0;
+    while ((m = snippetRe.exec(html)) !== null && si < results.length) {
+      results[si].snippet = m[1].replace(/<[^>]*>/g, '').trim();
+      si++;
+    }
+
+    return results.filter(r => r.snippet && r.url.startsWith('http'));
+  } catch (e) {
+    console.log('  ⚠️ Web search failed:', e.message);
+    return [];
+  }
+}
+
+function enrichWithSearch(messages, system) {
+  // extract last user message as query
+  let query = '';
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === 'user') {
+      if (typeof messages[i].content === 'string') query = messages[i].content;
+      else if (Array.isArray(messages[i].content)) {
+        query = messages[i].content
+          .filter(b => b.type === 'text' || b.text)
+          .map(b => b.text || b.content || '')
+          .join(' ');
+      }
+      break;
+    }
+  }
+  return { query };
+}
+
 // ── upstream request with retry + failover ──
 
 async function relayToProvider(provider, model, body, stream, req) {
@@ -237,6 +295,27 @@ router.post("/chat/completions", authToken, async (req, res) => {
     return res.status(400).json({ error: `No available provider for model: ${model}` });
   }
 
+  // web search: fetch results + inject into messages
+  const wantSearch = !!req.body.web_search_options;
+  let enrichedMessages = messages;
+  if (wantSearch) {
+    const { query } = enrichWithSearch(messages);
+    if (query) {
+      console.log(`  🔍 Web search: "${query.substring(0, 60)}"`);
+      const results = await searchWeb(query);
+      if (results.length > 0) {
+        const ctx = '【以下为联网搜索结果，请基于此回答用户问题】\n\n' +
+          results.map((r, i) => `${i + 1}. ${r.title}\n   URL: ${r.url}\n   ${r.snippet}`).join('\n\n') +
+          '\n\n【搜索结果结束，请综合以上信息回答】';
+        // prepend search context as system message
+        enrichedMessages = [{ role: 'system', content: ctx }, ...messages];
+        console.log(`  ✅ Found ${results.length} web results`);
+      } else {
+        console.log(`  ⚠️ No web results found`);
+      }
+    }
+  }
+
   // weighted pick with failover (try up to 3)
   const tried = new Set();
   let lastError = null;
@@ -254,14 +333,12 @@ router.post("/chat/completions", authToken, async (req, res) => {
 
     const body = {
       model,
-      messages,
+      messages: enrichedMessages,
       max_tokens: max_tokens || 4096,
       temperature: temperature ?? 0.7,
       top_p: top_p ?? 1,
       stream: stream || false,
     };
-    // pass through advanced params from client
-    if (req.body.web_search_options) body.web_search_options = req.body.web_search_options;
     if (req.body.thinking) body.thinking = req.body.thinking;
 
     const { upstream, error } = await relayToProvider(provider, model, body, stream, req);
@@ -292,7 +369,7 @@ router.post("/chat/completions", authToken, async (req, res) => {
       res.json(data);
     }
 
-    const tokensUsed = estimateTokens(messages);
+    const tokensUsed = estimateTokens(enrichedMessages);
     recordUsage(req.apiToken.token, model, provider.id, tokensUsed);
     console.log(`  ✅ [${provider.name}] ~${tokensUsed} tokens`);
     return;
@@ -319,15 +396,33 @@ router.post("/messages", authToken, async (req, res) => {
 
   // convert Claude → OpenAI format
   const openaiMsgs = claudeToOpenAI(messages, system);
+
+  // web search
+  const wantSearch = !!req.body.web_search_options;
+  let enrichedMsgs = openaiMsgs;
+  if (wantSearch) {
+    const { query } = enrichWithSearch(messages);
+    if (query) {
+      console.log(`  🔍 Web search [Claude]: "${query.substring(0, 60)}"`);
+      const results = await searchWeb(query);
+      if (results.length > 0) {
+        const ctx = '【以下为联网搜索结果，请基于此回答用户问题】\n\n' +
+          results.map((r, i) => `${i + 1}. ${r.title}\n   URL: ${r.url}\n   ${r.snippet}`).join('\n\n') +
+          '\n\n【搜索结果结束，请综合以上信息回答】';
+        enrichedMsgs = [{ role: 'system', content: ctx }, ...openaiMsgs];
+        console.log(`  ✅ Found ${results.length} web results`);
+      }
+    }
+  }
+
   const openaiBody = {
     model,
-    messages: openaiMsgs,
+    messages: enrichedMsgs,
     max_tokens: max_tokens || 4096,
     temperature: temperature ?? 0.7,
     top_p: top_p ?? 1,
     stream: stream || false,
   };
-  if (req.body.web_search_options) openaiBody.web_search_options = req.body.web_search_options;
   if (req.body.thinking) openaiBody.thinking = req.body.thinking;
 
   const candidates = findProviders(model);
@@ -382,7 +477,7 @@ router.post("/messages", authToken, async (req, res) => {
       res.json(claudeResp);
     }
 
-    const tokensUsed = estimateTokens(messages);
+    const tokensUsed = estimateTokens(enrichedMsgs);
     recordUsage(req.apiToken.token, model, provider.id, tokensUsed);
     console.log(`  ✅ [${provider.name}] ~${tokensUsed} tokens`);
     return;
