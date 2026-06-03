@@ -302,11 +302,8 @@ function updateFeatureToggles() {
   const chat = state.activeChat ? state.chats[state.activeChat] : null;
   const modelId = chat ? chat.model : null;
   const m = models.find(x => x.id === modelId);
-  const ws = m && m.features && m.features.web_search;
   const dt = m && m.features && m.features.thinking;
-  document.getElementById('web-search-label').style.display = ws ? '' : 'none';
   document.getElementById('deep-thinking-label').style.display = dt ? '' : 'none';
-  if (!ws) { document.getElementById('web-search-toggle').checked = false; state.webSearch = false; }
   if (!dt) { document.getElementById('deep-thinking-toggle').checked = false; state.deepThinking = false; }
   save();
 }
