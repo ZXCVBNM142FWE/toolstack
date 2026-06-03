@@ -3,44 +3,85 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%= title %></title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306B6D4'><path d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/style.css">
 <style>
-  body{background:#0B1120;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
   ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-  .dot{animation:blink 1.4s infinite;animation-fill-mode:both}
-  .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-  .tab-active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:#22d3ee;border-radius:1px 1px 0 0}
+  .typing-dot{animation:blink 1.4s infinite;animation-fill-mode:both}
+  .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+  .msg-user{background:rgba(30,58,95,0.6);border-radius:16px 16px 4px 16px;backdrop-filter:blur(4px)}
+  .msg-ai{background:rgba(26,35,50,0.7);border-radius:16px 16px 16px 4px;backdrop-filter:blur(4px)}
+  .msg-error{background:rgba(59,30,30,0.6);border-radius:12px;backdrop-filter:blur(4px)}
+  .code-block{background:#0D1520;border-radius:8px;padding:12px;margin:8px 0;overflow-x:auto;font-size:13px;font-family:'Cascadia Code',Consolas,monospace;border:1px solid #1E293B}
+  pre{margin:0;white-space:pre-wrap;word-break:break-word}
+  .preview-strip{display:flex;gap:6px;flex-wrap:wrap;padding:0 0 8px 0}
+  .preview-chip{display:flex;align-items:center;gap:4px;background:rgba(30,41,59,0.7);border:1px solid #334155;border-radius:8px;padding:4px 8px;font-size:12px;color:#CBD5E1;max-width:200px;backdrop-filter:blur(4px)}
+  .preview-chip img{width:32px;height:32px;object-fit:cover;border-radius:4px}
+  .preview-chip .chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .preview-chip .chip-remove{cursor:pointer;color:#64748B;font-size:14px;line-height:1;transition:color .15s}
+  .preview-chip .chip-remove:hover{color:#EF4444}
+  .toggle-switch{position:relative;display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:#94A3B8;user-select:none}
+  .toggle-switch input{display:none}
+  .toggle-track{width:28px;height:16px;background:#334155;border-radius:10px;position:relative;transition:background .2s}
+  .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:#64748B;border-radius:50%;transition:all .2s}
+  .toggle-switch input:checked+.toggle-track{background:#0891B2}
+  .toggle-switch input:checked+.toggle-track::after{left:14px;background:#fff}
+  .input-actions{display:flex;align-items:center;gap:2px;padding-right:4px}
+  .input-actions button{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:8px;cursor:pointer;font-size:16px;color:#64748B;transition:all .15s}
+  .input-actions button:hover{background:rgba(30,41,59,0.7);color:#CBD5E1}
+  .input-actions button.active{color:#0891B2}
+  #drop-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,145,178,0.15);backdrop-filter:blur(4px);align-items:center;justify-content:center;pointer-events:none}
+  #drop-overlay .drop-box{border:3px dashed #0891B2;border-radius:24px;padding:48px 64px;text-align:center;background:rgba(8,145,178,0.1)}
+  #drop-overlay .drop-box .drop-icon{font-size:48px;margin-bottom:8px}
+  #drop-overlay .drop-box .drop-text{color:#CBD5E1;font-size:16px;font-weight:600}
+  .reasoning-block{margin-bottom:8px;border:1px solid rgba(30,58,95,0.5);border-radius:12px;overflow:hidden}
+  .reasoning-header{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(15,29,46,0.6);cursor:pointer;user-select:none;font-size:12px;color:#64748B;transition:color .15s}
+  .reasoning-header:hover{color:#94A3B8}
+  .reasoning-header .arrow{transition:transform .2s;font-size:10px}
+  .reasoning-header .arrow.open{transform:rotate(90deg)}
+  .reasoning-body{background:rgba(10,21,32,0.6);padding:10px 14px;font-size:13px;color:#94A3B8;font-family:'Cascadia Code',Consolas,monospace;white-space:pre-wrap;word-break:break-word;line-height:1.6;max-height:300px;overflow-y:auto;display:none}
+  .reasoning-body.open{display:block}
 </style>
 </head>
-<body class="h-screen flex text-slate-100">
+<body class="h-screen flex text-slate-100 bg-[#030712]">
 
-<!-- sidebar: conversation tabs -->
-<aside class="w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 hidden md:flex">
-  <div class="p-3 border-b border-slate-800">
-    <a href="/" class="text-cyan-400 font-bold text-sm no-underline">⚡ API 中转站</a>
-  </div>
+<!-- drop overlay -->
+<div id="drop-overlay"><div class="drop-box"><div class="drop-icon">📥</div><div class="drop-text">松开以上传文件 / 图片</div></div></div>
+
+<div class="flex flex-1 overflow-hidden">
+
+<!-- sidebar -->
+<aside id="sidebar" class="w-64 bg-slate-950/80 backdrop-blur border-r border-slate-800/50 flex flex-col shrink-0 hidden md:flex">
   <div class="p-2">
-    <button onclick="newChat()" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 hover:border-cyan-700 transition cursor-pointer text-left">+ 新对话</button>
+    <button onclick="newChat()" class="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 hover:border-cyan-500/50 hover:text-cyan-400 transition cursor-pointer text-left">+ 新对话</button>
   </div>
   <div id="tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
-  <div class="p-3 border-t border-slate-800 text-xs text-slate-500">
-    <span><%= user.username %></span>
-    <a href="/tools" class="ml-2 text-slate-400 hover:text-cyan-400 no-underline">工具箱</a>
-    <a href="/dashboard" class="ml-2 text-cyan-400 hover:text-cyan-300 no-underline">控制台</a>
-    <a href="/logout" class="ml-2 text-slate-500 hover:text-red-400 no-underline">退出</a>
+  <div class="p-3 border-t border-slate-800/50 text-xs text-slate-500 flex flex-col gap-1">
+    <div class="flex justify-between"><span>模型</span><span id="model-count" class="text-slate-600"><%= models.length %></span></div>
+    <div class="flex justify-between"><span>用户</span><span class="text-cyan-400"><%= user.username %></span></div>
+    <div class="flex gap-3 mt-1">
+      <a href="/dashboard" class="text-cyan-400 hover:text-cyan-300 no-underline">控制台</a>
+      <a href="/tools" class="text-slate-400 hover:text-cyan-400 no-underline">工具箱</a>
+      <a href="/logout" class="text-slate-500 hover:text-red-400 no-underline">退出</a>
+    </div>
   </div>
 </aside>
 
 <!-- main chat area -->
-<main class="flex-1 flex flex-col min-w-0">
+<main class="flex-1 flex flex-col min-w-0 bg-[#030712]">
 
-  <!-- topbar -->
-  <header class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center gap-3 shrink-0">
-    <!-- mobile menu button -->
+  <!-- topbar with model selector -->
+  <header class="bg-slate-950/50 border-b border-slate-800/50 px-4 py-2 flex items-center gap-3 shrink-0 backdrop-blur">
     <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-cyan-400 cursor-pointer text-lg">☰</button>
+    <select id="model-select" class="bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer backdrop-blur">
+      <% models.forEach(m => { %>
+        <option value="<%= m.id %>"><%= m.id %></option>
+      <% }) %>
+    </select>
     <span class="flex-1"></span>
-    <span id="token-count" class="text-xs text-slate-500"></span>
+    <span id="token-info" class="text-xs text-slate-600"></span>
   </header>
 
   <!-- messages -->
@@ -49,229 +90,535 @@
       <div class="text-center">
         <div class="text-4xl mb-3">💬</div>
         <p class="text-lg">开始对话</p>
-        <p class="text-sm text-slate-600 mt-1">选择一个模型，在下方输入消息</p>
-        <p class="text-xs text-slate-600 mt-3">对话自动保存在本地浏览器中</p>
+        <p class="text-sm text-slate-600 mt-1">选择一个模型开始 AI 对话</p>
       </div>
     </div>
   </div>
 
   <!-- input -->
-  <div class="border-t border-slate-800 bg-slate-900 p-4 shrink-0">
-    <div class="max-w-3xl mx-auto space-y-2">
+  <div class="border-t border-slate-800/50 bg-slate-950/50 p-4 shrink-0 backdrop-blur">
+    <div class="max-w-3xl mx-auto">
+      <div id="preview-strip" class="preview-strip"></div>
       <div class="flex gap-2">
-        <textarea id="input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" class="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-200 text-sm resize-none focus:ring-2 focus:ring-cyan-500 outline-none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-        <button id="send-btn" onclick="send()" class="px-5 py-3 bg-cyan-600 text-white rounded-xl text-sm font-semibold hover:bg-cyan-500 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">发送</button>
+        <div class="input-actions">
+          <button id="btn-file" onclick="pickFile()" title="上传文件 (txt, pdf, docx, md, json, csv)">📎</button>
+          <button id="btn-image" onclick="pickImage()" title="上传图片">🖼️</button>
+        </div>
+        <textarea id="user-input" rows="1" placeholder="输入消息... (Enter 发送, Shift+Enter 换行)" class="flex-1 px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-slate-200 text-sm resize-none placeholder-slate-500 outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 transition backdrop-blur" onkeydown="handleInputKey(event)"></textarea>
+        <button id="send-btn" onclick="sendMessage()" class="btn-glow px-5 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl text-sm font-bold hover:from-cyan-400 hover:to-blue-400 transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-xl shadow-cyan-500/25">发送</button>
       </div>
-      <select id="model-select" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:ring-1 focus:ring-cyan-500 cursor-pointer">
-        <% models.forEach(m => { %>
-          <option value="<%= m.id %>"><%= m.id %> (<%= m.name %>)</option>
-        <% }) %>
-      </select>
+      <div class="flex items-center gap-4 flex-wrap mt-2">
+        <label class="toggle-switch" title="启用联网搜索">
+          <input type="checkbox" id="web-search-toggle" onchange="state.webSearch=this.checked;save()"> <span class="toggle-track"></span> 🌐 联网
+        </label>
+        <label class="toggle-switch" title="启用深度思考">
+          <input type="checkbox" id="deep-thinking-toggle" onchange="state.deepThinking=this.checked;save()"> <span class="toggle-track"></span> 🧠 深度思考
+        </label>
+        <label class="flex items-center gap-1 text-xs text-slate-500 cursor-pointer">
+          <input type="checkbox" id="stream-toggle" checked class="rounded"> 流式输出
+        </label>
+      </div>
     </div>
   </div>
-
+  <input type="file" id="file-input" style="display:none" accept=".txt,.md,.json,.csv,.js,.ts,.py,.html,.css,.xml,.yaml,.yml,.toml,.ini,.cfg,.log,.env,.pdf,.docx" onchange="handleFilePick(event)" multiple>
+  <input type="file" id="image-input" style="display:none" accept="image/*" onchange="handleImagePick(event)" multiple>
 </main>
+</div>
 
-<!-- mobile sidebar overlay -->
+<!-- mobile sidebar -->
 <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
-<aside id="mobile-sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950 border-r border-slate-800 z-50 flex flex-col -translate-x-full transition-transform md:hidden">
-  <div class="p-3 border-b border-slate-800 flex items-center justify-between">
-    <span class="text-cyan-400 font-bold text-sm">⚡ API 中转站</span>
-    <button onclick="toggleSidebar()" class="text-slate-400 hover:text-cyan-400 cursor-pointer">✕</button>
+<aside id="mobile-sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-slate-950/95 backdrop-blur border-r border-slate-800/50 z-50 flex flex-col -translate-x-full transition-transform md:hidden">
+  <div class="p-3 border-b border-slate-800/50 flex items-center justify-between">
+    <span class="gradient-text font-extrabold text-sm">API 中转站</span>
+    <button onclick="toggleSidebar()" class="text-slate-400 hover:text-red-400 cursor-pointer">✕</button>
   </div>
   <div class="p-2">
-    <button onclick="newChat();toggleSidebar()" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-200 hover:border-cyan-700 transition cursor-pointer text-left">+ 新对话</button>
+    <button onclick="newChat();toggleSidebar()" class="w-full px-3 py-2 bg-slate-800/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 hover:border-cyan-500/50 transition cursor-pointer text-left">+ 新对话</button>
   </div>
   <div id="mobile-tab-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
-  <div class="p-3 border-t border-slate-800 text-xs text-slate-500">
-    <span><%= user.username %></span>
-    <a href="/dashboard" class="ml-2 text-cyan-400 no-underline">控制台</a>
+  <div class="p-3 border-t border-slate-800/50 text-xs text-slate-500">
+    <div><%= user.username %></div>
+    <div class="flex gap-3 mt-1">
+      <a href="/dashboard" class="text-cyan-400 no-underline">控制台</a>
+      <a href="/tools" class="text-slate-400 no-underline">工具箱</a>
+    </div>
   </div>
 </aside>
 
 <script>
 const TOKEN = "<%= apiToken %>";
 const BASE = "/v1";
-let sending = false;
-let activeChatId = null;
-let chats = {};
+const LS = 'ai-chat-main';
+let state = JSON.parse(localStorage.getItem(LS) || '{}');
+if (!state.chats) state.chats = {};
+if (!state.activeChat) state.activeChat = null;
+if (state.webSearch === undefined) state.webSearch = false;
+if (state.deepThinking === undefined) state.deepThinking = false;
 
-// load chats from localStorage
-try {
-  const saved = localStorage.getItem('ai-chats');
-  if (saved) chats = JSON.parse(saved);
-} catch(e) { chats = {}; }
+let models = <%- JSON.stringify(models) %>;
+let loading = false;
+let pendingFiles = [];
+let pendingImages = [];
 
-// create a default chat if none
-if (Object.keys(chats).length === 0) {
-  const id = Date.now().toString(36);
-  chats[id] = { title: '新对话', model: document.getElementById('model-select')?.value || '', messages: [], createdAt: Date.now() };
-  activeChatId = id;
-} else {
-  activeChatId = Object.keys(chats).sort((a,b) => chats[b].createdAt - chats[a].createdAt)[0];
+function save() { localStorage.setItem(LS, JSON.stringify(state)); }
+
+// init
+(function init() {
+  document.getElementById('web-search-toggle').checked = state.webSearch;
+  document.getElementById('deep-thinking-toggle').checked = state.deepThinking;
+  if (Object.keys(state.chats).length === 0) {
+    newChat();
+  } else {
+    state.activeChat = state.activeChat || Object.keys(state.chats).sort((a,b) => state.chats[b].createdAt - state.chats[a].createdAt)[0];
+    switchChat(state.activeChat);
+  }
+  renderTabs();
+})();
+
+// ── chat management ──
+function newChat() {
+  const modelId = document.getElementById('model-select').value || (models.length > 0 ? models[0].id : 'unknown');
+  const chatId = 'chat_' + Date.now();
+  state.chats[chatId] = { model: modelId, name: '新对话', messages: [], usage: { prompt: 0, completion: 0 }, createdAt: Date.now() };
+  state.activeChat = chatId;
+  save();
+  switchChat(chatId);
+  renderTabs();
+  document.getElementById('user-input').focus();
 }
 
-const modelSelect = document.getElementById('model-select');
-const msgsEl = document.getElementById('msgs');
-const input = document.getElementById('input');
-const sendBtn = document.getElementById('send-btn');
-const tokenCount = document.getElementById('token-count');
+function switchChat(chatId) {
+  state.activeChat = chatId;
+  save();
+  const chat = state.chats[chatId];
+  if (!chat) return;
 
-function save() { localStorage.setItem('ai-chats', JSON.stringify(chats)); }
+  document.getElementById('model-select').value = chat.model;
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function fmt(text) {
-  let h = esc(text);
-  h = h.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre class="bg-slate-950 rounded-lg p-3 my-2 text-xs overflow-x-auto border border-slate-700"><code>$2</code></pre>');
-  h = h.replace(/`([^`]+)`/g, '<code class="bg-slate-800 px-1 rounded text-xs text-cyan-300">$1</code>');
-  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  h = h.replace(/\n/g, '<br>');
-  return h;
+  const msgs = document.getElementById('msgs');
+  if (chat.messages.length === 0) {
+    msgs.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500"><div class="text-center"><div class="text-4xl mb-3">💬</div><p class="text-lg">开始对话</p><p class="text-sm text-slate-600 mt-1">模型: <span class="text-cyan-400">' + escHtml(chat.model) + '</span></p></div></div>';
+  } else {
+    msgs.innerHTML = '<div class="max-w-3xl mx-auto space-y-4 px-4 py-6">' + chat.messages.map(m => renderMessage(m)).join('') + '</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+  renderTabs();
+  updateTokenInfo();
 }
 
-function currentChat() { return chats[activeChatId]; }
+function deleteChat(chatId, e) {
+  e && e.stopPropagation();
+  if (Object.keys(state.chats).length <= 1) return;
+  delete state.chats[chatId];
+  if (state.activeChat === chatId) state.activeChat = Object.keys(state.chats)[Object.keys(state.chats).length - 1];
+  save();
+  switchChat(state.activeChat);
+  renderTabs();
+}
 
 function renderTabs() {
-  const list = Object.entries(chats).sort((a,b) => b[1].createdAt - a[1].createdAt);
-  const html = list.map(([id, chat]) => {
-    const active = id === activeChatId;
-    return `<div class="group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-xs transition ${active ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}" onclick="switchChat('${id}')" title="${esc(chat.title)}">
-      <span class="truncate flex-1">${esc(chat.title.substring(0, 20))}</span>
-      <button onclick="event.stopPropagation();deleteChat('${id}')" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition shrink-0 cursor-pointer">×</button>
-    </div>`;
+  const chats = Object.values(state.chats);
+  const html = chats.map(c => {
+    const cid = Object.keys(state.chats).find(k => state.chats[k] === c);
+    const active = cid === state.activeChat;
+    const title = c.name === '新对话' && c.messages.length > 0
+      ? (c.messages.find(m => m.role === 'user')?.content || '').substring(0, 20) || '新对话'
+      : (c.name || c.model).substring(0, 20);
+    return '<div class="group flex items-center gap-1 px-2 py-1.5 rounded-lg cursor-pointer text-xs transition ' + (active ? 'bg-slate-800/70 text-slate-100' : 'text-slate-400 hover:bg-slate-800/30 hover:text-slate-200') + '" onclick="switchChat(\'' + cid + '\')" title="' + escAttr(title) + '">' +
+      '<span class="truncate flex-1">' + escHtml(title) + '</span>' +
+      '<span class="text-[10px] text-slate-600">' + escHtml(c.model.substring(0, 12)) + '</span>' +
+      '<button onclick="deleteChat(\'' + cid + '\', event)" class="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition shrink-0 cursor-pointer ml-1">✕</button>' +
+    '</div>';
   }).join('');
   document.getElementById('tab-list').innerHTML = html;
   document.getElementById('mobile-tab-list').innerHTML = html;
 }
 
-function switchChat(id) {
-  activeChatId = id;
-  renderTabs();
-  render();
-  modelSelect.value = currentChat().model || modelSelect.value;
-}
-
-function newChat() {
-  const id = Date.now().toString(36);
-  chats[id] = { title: '新对话', model: modelSelect.value, messages: [], createdAt: Date.now() };
-  activeChatId = id;
-  save();
-  renderTabs();
-  render();
-  input.focus();
-}
-
-function deleteChat(id) {
-  if (Object.keys(chats).length <= 1) return;
-  delete chats[id];
-  if (activeChatId === id) activeChatId = Object.keys(chats)[Object.keys(chats).length - 1];
-  save();
-  renderTabs();
-  render();
-}
-
-function render() {
-  const chat = currentChat();
-  if (!chat || chat.messages.length === 0) {
-    msgsEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-500"><div class="text-center"><div class="text-4xl mb-3">💬</div><p class="text-lg">开始对话</p><p class="text-sm text-slate-600 mt-1">选择一个模型，在下方输入消息</p></div></div>';
-    return;
+// ── render message ──
+function renderMessage(m) {
+  if (m.role === 'user') {
+    let contentHtml = '';
+    if (typeof m.content === 'string') {
+      contentHtml = escHtml(m.content);
+    } else if (Array.isArray(m.content)) {
+      const textParts = m.content.filter(c => c.type === 'text').map(c => escHtml(c.text)).join('<br>');
+      const imgParts = m.content.filter(c => c.type === 'image_url').map(c =>
+        '<img src="' + escAttr(c.image_url.url) + '" class="rounded-lg max-w-[200px] max-h-[150px] object-cover mt-1">'
+      ).join('');
+      contentHtml = textParts + imgParts;
+    } else {
+      contentHtml = escHtml(String(m.content));
+    }
+    return '<div class="flex justify-end"><div class="msg-user px-4 py-2.5 max-w-[80%] text-sm text-slate-100">' + contentHtml + '</div></div>';
   }
-  // auto-title from first user message
-  if (chat.title === '新对话' && chat.messages.some(m => m.role === 'user')) {
-    const first = chat.messages.find(m => m.role === 'user');
-    chat.title = first.content.substring(0, 30);
-    save();
-    renderTabs();
+  if (m.role === 'error') {
+    return '<div class="msg-error px-4 py-2.5 text-sm text-red-300">⚠️ ' + escHtml(m.content) + '</div>';
   }
-  msgsEl.innerHTML = '<div class="max-w-3xl mx-auto space-y-4 px-4 py-6">' + chat.messages.map(m =>
-    m.role === 'user'
-      ? '<div class="flex justify-end"><div class="bg-blue-900/40 rounded-2xl rounded-br-md px-4 py-2.5 max-w-[80%] text-sm">' + esc(m.content) + '</div></div>'
-      : m.role === 'error'
-        ? '<div class="bg-red-900/30 border border-red-800 rounded-xl px-4 py-2.5 text-sm text-red-300">⚠️ ' + esc(m.content) + '</div>'
-        : '<div class="flex gap-3"><div class="w-6 h-6 rounded-full bg-cyan-900 flex items-center justify-center text-xs shrink-0 mt-0.5">AI</div><div class="bg-slate-800/80 rounded-2xl rounded-bl-md px-4 py-2.5 max-w-[85%] text-sm text-slate-200">' + fmt(m.content) + '</div></div>'
-  ).join('') + '</div>';
-  msgsEl.scrollTop = msgsEl.scrollHeight;
+  let reasoningHtml = '';
+  if (m.reasoning) {
+    const rId = 'reasoning-' + Math.random().toString(36).slice(2, 8);
+    reasoningHtml = '<div class="reasoning-block">' +
+      '<div class="reasoning-header" onclick="toggleReasoning(this)">' +
+      '<span>🧠 思考过程</span>' +
+      '<span class="arrow open" id="' + rId + '-arrow">▶</span>' +
+      '</div>' +
+      '<div class="reasoning-body open" id="' + rId + '">' + escHtml(m.reasoning) + '</div>' +
+    '</div>';
+  }
+  return '<div class="flex gap-3"><div class="w-7 h-7 rounded-full bg-cyan-500/15 flex items-center justify-center text-xs shrink-0 mt-0.5">🤖</div><div class="msg-ai px-4 py-2.5 max-w-[85%] text-sm text-slate-200">' + reasoningHtml + '<div class="markdown-body">' + formatContent(m.content) + '</div></div></div>';
 }
 
-async function send() {
+function formatContent(text) {
+  if (!text) return '';
+  let html = escHtml(text);
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<div class="code-block"><pre>$2</pre></div>');
+  html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-800 px-1 py-0.5 rounded text-xs text-cyan-300">$1</code>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+// ── send message ──
+async function sendMessage() {
+  if (loading || !state.activeChat) return;
+  const chat = state.chats[state.activeChat];
+  if (!chat) return;
+
+  const input = document.getElementById('user-input');
   const text = input.value.trim();
-  if (!text || sending) return;
-  sending = true; sendBtn.disabled = true; sendBtn.textContent = '...';
-  input.value = ''; input.style.height = 'auto';
+  if (!text && pendingFiles.length === 0 && pendingImages.length === 0) return;
 
-  const chat = currentChat();
-  const model = modelSelect.value;
+  const stream = document.getElementById('stream-toggle').checked;
+  const webSearch = document.getElementById('web-search-toggle').checked;
+  const deepThinking = document.getElementById('deep-thinking-toggle').checked;
+
+  let userContent;
+  if (pendingImages.length > 0) {
+    userContent = [{ type: 'text', text: text || '请描述这张图片' }];
+    pendingImages.forEach(img => {
+      userContent.push({ type: 'image_url', image_url: { url: 'data:' + img.mime + ';base64,' + img.base64 } });
+    });
+    if (pendingFiles.length > 0) {
+      const fileTexts = pendingFiles.map(f => '【文件: ' + f.name + '】\n' + f.text).join('\n\n');
+      userContent[0].text = fileTexts + '\n\n' + userContent[0].text;
+    }
+  } else if (pendingFiles.length > 0) {
+    const fileTexts = pendingFiles.map(f => '【文件: ' + f.name + '】\n' + f.text).join('\n\n');
+    userContent = fileTexts + '\n\n' + (text || '请分析以上文件内容');
+  } else {
+    userContent = text;
+  }
+
+  pendingFiles = [];
+  pendingImages = [];
+  updateToggleButtons();
+  renderPreviews();
+
+  const model = document.getElementById('model-select').value;
   chat.model = model;
-  chat.messages.push({ role: 'user', content: text });
-  chat.messages.push({ role: 'assistant', content: '' });
+  chat.messages.push({ role: 'user', content: userContent });
+  input.value = '';
+  input.style.height = 'auto';
   save();
-  renderTabs();
-  render();
+  switchChat(state.activeChat);
+
+  const aiMsg = { role: 'assistant', content: '' };
+  chat.messages.push(aiMsg);
+  save();
+  switchChat(state.activeChat);
+
+  loading = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('send-btn').textContent = '...';
+
+  const reqBody = {
+    model,
+    messages: chat.messages.filter(m => m.role !== 'error').slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+    stream,
+    max_tokens: 4096,
+  };
+  if (webSearch) reqBody.web_search_options = { search_context_size: 'medium' };
+  if (deepThinking) reqBody.thinking = { type: 'enabled' };
 
   try {
-    const apiMsgs = chat.messages.filter(m => m.role !== 'error').slice(0, -1).map(m => ({ role: m.role, content: m.content }));
     const resp = await fetch(BASE + '/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
-      body: JSON.stringify({ model, messages: apiMsgs, stream: true, max_tokens: 4096 })
+      body: JSON.stringify(reqBody),
     });
 
     if (!resp.ok) {
-      const err = await resp.text();
-      let errMsg = 'HTTP ' + resp.status;
-      try { const j = JSON.parse(err); errMsg += ': ' + (j.error || j.message || err.substring(0, 100)); } catch { errMsg += ': ' + err.substring(0, 200); }
-      throw new Error(errMsg);
+      const errText = await resp.text();
+      throw new Error('HTTP ' + resp.status + ': ' + errText.substring(0, 300));
     }
 
-    const reader = resp.body.getReader();
-    const decoder = new TextDecoder();
-    let buf = '';
-    const ai = chat.messages[chat.messages.length - 1];
+    let usage = null;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      const lines = buf.split('\n');
-      buf = lines.pop() || '';
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
-        const d = line.slice(6).trim();
-        if (d === '[DONE]') continue;
-        try {
-          const delta = JSON.parse(d).choices?.[0]?.delta?.content;
-          if (delta) {
-            ai.content += delta;
-            // truncate if too long (avoid localStorage quota issues)
-            if (ai.content.length > 50000) ai.content = ai.content.slice(-50000);
-            save();
-            render();
-          }
-        } catch {}
+    if (stream) {
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') continue;
+          try {
+            const json = JSON.parse(data);
+            const delta = json.choices?.[0]?.delta;
+            if (delta?.content) {
+              aiMsg.content += delta.content;
+              save();
+              updateLastAiMessage(aiMsg);
+            }
+            if (delta?.reasoning_content) {
+              if (!aiMsg.reasoning) aiMsg.reasoning = '';
+              aiMsg.reasoning += delta.reasoning_content;
+              save();
+              updateLastAiMessage(aiMsg);
+            }
+            if (json.usage) usage = json.usage;
+          } catch {}
+        }
       }
+    } else {
+      const data = await resp.json();
+      const msg = data.choices?.[0]?.message;
+      aiMsg.content = msg?.content || JSON.stringify(data);
+      if (msg?.reasoning_content) aiMsg.reasoning = msg.reasoning_content;
+      if (data.usage) usage = data.usage;
+      save();
+      updateLastAiMessage(aiMsg);
     }
-    if (!ai.content) ai.content = '(空响应)';
+
+    if (!aiMsg.content) aiMsg.content = '(空响应)';
+
+    if (usage) {
+      if (!chat.usage) chat.usage = { prompt: 0, completion: 0 };
+      chat.usage.prompt += usage.prompt_tokens || 0;
+      chat.usage.completion += usage.completion_tokens || 0;
+      save();
+    }
   } catch (e) {
-    chat.messages[chat.messages.length - 1] = { role: 'error', content: e.message };
+    aiMsg.role = 'error';
+    aiMsg.content = e.message;
+    save();
+    updateLastAiMessage(aiMsg);
   }
 
-  sending = false; sendBtn.disabled = false; sendBtn.textContent = '发送';
-  save(); render(); input.focus();
+  loading = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('send-btn').textContent = '发送';
+  document.getElementById('user-input').focus();
+  updateTokenInfo();
 }
 
-// model change → save to current chat
-modelSelect.addEventListener('change', () => {
-  const chat = currentChat();
-  if (chat) { chat.model = modelSelect.value; save(); }
+function updateLastAiMessage(aiMsg) {
+  const msgsEl = document.getElementById('msgs');
+  const msgs = msgsEl.querySelector('.space-y-4');
+  if (!msgs) return;
+  const lastMsg = msgs.lastElementChild;
+  if (!lastMsg) return;
+  if (aiMsg.role === 'error') {
+    lastMsg.outerHTML = renderMessage(aiMsg);
+  } else {
+    const body = lastMsg.querySelector('.markdown-body');
+    if (body) body.innerHTML = formatContent(aiMsg.content);
+    if (aiMsg.reasoning) {
+      let rBlock = lastMsg.querySelector('.reasoning-block');
+      if (!rBlock) {
+        const rId = 'reasoning-' + Math.random().toString(36).slice(2, 8);
+        rBlock = document.createElement('div');
+        rBlock.className = 'reasoning-block';
+        rBlock.innerHTML = '<div class="reasoning-header" onclick="toggleReasoning(this)"><span>🧠 思考过程</span><span class="arrow open" id="' + rId + '-arrow">▶</span></div><div class="reasoning-body open" id="' + rId + '"></div>';
+        body.parentNode.insertBefore(rBlock, body);
+      }
+      const rBody = rBlock.querySelector('.reasoning-body');
+      if (rBody) rBody.textContent = aiMsg.reasoning;
+    }
+  }
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function toggleReasoning(header) {
+  const block = header.parentElement;
+  const body = block.querySelector('.reasoning-body');
+  const arrow = header.querySelector('.arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function updateTokenInfo() {
+  const chat = state.activeChat ? state.chats[state.activeChat] : null;
+  const el = document.getElementById('token-info');
+  if (chat) {
+    const count = chat.messages.filter(m => m.role !== 'error').length;
+    const u = chat.usage || { prompt: 0, completion: 0 };
+    const total = u.prompt + u.completion;
+    const fmt = n => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n;
+    el.innerHTML = '消息: ' + count + ' | 模型: ' + escHtml(chat.model.substring(0, 25)) + ' | 🔢 ' + fmt(total);
+  } else {
+    el.textContent = '';
+  }
+}
+
+// ── input handling ──
+function handleInputKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  setTimeout(() => {
+    const el = document.getElementById('user-input');
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+  }, 0);
+}
+
+function updateToggleButtons() {
+  document.getElementById('btn-image').classList.toggle('active', pendingImages.length > 0);
+  document.getElementById('btn-file').classList.toggle('active', pendingFiles.length > 0);
+}
+
+// ── file & image upload ──
+function pickFile() { document.getElementById('file-input').click(); }
+function pickImage() { document.getElementById('image-input').click(); }
+
+async function handleFilePick(e) {
+  const files = Array.from(e.target.files);
+  for (const f of files) {
+    if (f.size > 10 * 1024 * 1024) { alert(f.name + ' 超过 10MB 限制'); continue; }
+    try {
+      const text = await readFileContent(f);
+      pendingFiles.push({ name: f.name, text });
+    } catch (err) {
+      alert(f.name + ' 读取失败: ' + err.message);
+    }
+  }
+  e.target.value = '';
+  renderPreviews();
+  updateToggleButtons();
+}
+
+async function readFileContent(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (['png','jpg','jpeg','gif','webp','bmp','svg'].includes(ext)) return '[图片文件: ' + file.name + ' — 请通过图片按钮上传]';
+  if (ext === 'pdf') return '[PDF 文件: ' + file.name + ' — 暂不支持提取 PDF 文本]';
+  if (ext === 'docx') return '[Word 文件: ' + file.name + ' — 暂不支持提取 Word 文本]';
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('读取失败'));
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+function handleImagePick(e) {
+  const files = Array.from(e.target.files);
+  for (const f of files) {
+    if (f.size > 20 * 1024 * 1024) { alert(f.name + ' 超过 20MB 限制'); continue; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const mime = dataUrl.split(';')[0].split(':')[1] || 'image/png';
+      const base64 = dataUrl.split(',')[1];
+      pendingImages.push({ name: f.name, base64, mime, dataUrl });
+      renderPreviews();
+      updateToggleButtons();
+    };
+    reader.readAsDataURL(f);
+  }
+  e.target.value = '';
+}
+
+function removeFile(idx) { pendingFiles.splice(idx, 1); renderPreviews(); updateToggleButtons(); }
+function removeImage(idx) { pendingImages.splice(idx, 1); renderPreviews(); updateToggleButtons(); }
+
+function renderPreviews() {
+  const strip = document.getElementById('preview-strip');
+  let html = '';
+  pendingFiles.forEach((f, i) => {
+    html += '<div class="preview-chip"><span>📄</span><span class="chip-name">' + escHtml(f.name) + '</span><span class="chip-remove" onclick="removeFile(' + i + ')">✕</span></div>';
+  });
+  pendingImages.forEach((img, i) => {
+    html += '<div class="preview-chip"><img src="' + img.dataUrl + '" alt=""><span class="chip-name">' + escHtml(img.name) + '</span><span class="chip-remove" onclick="removeImage(' + i + ')">✕</span></div>';
+  });
+  strip.innerHTML = html;
+}
+
+// ── drag & drop ──
+let dragCounter = 0;
+document.addEventListener('dragenter', e => {
+  e.preventDefault(); dragCounter++;
+  if (dragCounter === 1) document.getElementById('drop-overlay').style.display = 'flex';
+});
+document.addEventListener('dragleave', e => {
+  e.preventDefault(); dragCounter--;
+  if (dragCounter === 0) document.getElementById('drop-overlay').style.display = 'none';
+});
+document.addEventListener('dragover', e => { e.preventDefault(); });
+document.addEventListener('drop', async e => {
+  e.preventDefault(); dragCounter = 0;
+  document.getElementById('drop-overlay').style.display = 'none';
+  const files = Array.from(e.dataTransfer.files);
+  for (const f of files) {
+    if (f.type.startsWith('image/')) {
+      await addImageFile(f);
+    } else {
+      if (f.size > 10 * 1024 * 1024) { alert(f.name + ' 超过 10MB 限制'); continue; }
+      try {
+        const text = await readFileContent(f);
+        pendingFiles.push({ name: f.name, text });
+      } catch (err) { alert(f.name + ' 读取失败: ' + err.message); }
+    }
+  }
+  renderPreviews();
+  updateToggleButtons();
 });
 
-// auto-resize textarea
-input.addEventListener('input', () => {
-  input.style.height = 'auto';
-  input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+function addImageFile(f) {
+  return new Promise(resolve => {
+    if (f.size > 20 * 1024 * 1024) { alert(f.name + ' 超过 20MB 限制'); resolve(); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const mime = dataUrl.split(';')[0].split(':')[1] || 'image/png';
+      const base64 = dataUrl.split(',')[1];
+      pendingImages.push({ name: f.name, base64, mime, dataUrl });
+      resolve();
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+// ── paste image ──
+document.addEventListener('paste', async e => {
+  if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') {
+    const items = Array.from(e.clipboardData.items);
+    const imageItems = items.filter(item => item.type.startsWith('image/'));
+    if (imageItems.length === 0) return;
+    e.preventDefault();
+    for (const item of imageItems) {
+      const blob = item.getAsFile();
+      blob.name = 'clipboard-' + Date.now() + '.png';
+      await addImageFile(blob);
+    }
+    renderPreviews();
+    updateToggleButtons();
+  }
 });
 
-// mobile sidebar toggle
+// ── model change ──
+document.getElementById('model-select').addEventListener('change', () => {
+  const chat = state.activeChat ? state.chats[state.activeChat] : null;
+  if (chat) { chat.model = document.getElementById('model-select').value; save(); }
+});
+
+// ── sidebar toggle ──
 function toggleSidebar() {
   const overlay = document.getElementById('sidebar-overlay');
   const sidebar = document.getElementById('mobile-sidebar');
@@ -280,23 +627,18 @@ function toggleSidebar() {
   sidebar.classList.toggle('-translate-x-full', !show);
 }
 
-// keyboard shortcut: Ctrl+N new chat
-document.addEventListener('keydown', (e) => {
+// keyboard: Ctrl+N new chat
+document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'n') { e.preventDefault(); newChat(); }
 });
 
-// update token count periodically (estimate)
-function updateCount() {
-  let total = 0;
-  Object.values(chats).forEach(c => {
-    c.messages.forEach(m => total += m.content ? m.content.length : 0);
-  });
-  tokenCount.textContent = total > 0 ? '~' + Math.ceil(total / 3).toLocaleString() + ' tokens' : '';
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-setInterval(updateCount, 3000);
-
-renderTabs();
-render();
+function escAttr(s) {
+  return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
 </script>
 </body>
 </html>
