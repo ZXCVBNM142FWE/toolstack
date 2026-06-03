@@ -169,31 +169,35 @@ function openAIToClaude(openaiResp, model) {
   };
 }
 
-// ── web search (DuckDuckGo) ──
+// ── web search (DuckDuckGo HTML) ──
 
-const DDG = 'https://lite.duckduckgo.com/lite/';
+const DDG = 'https://html.duckduckgo.com/html/';
 
 async function searchWeb(query) {
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     const resp = await fetch(DDG + '?q=' + encodeURIComponent(query), {
-      headers: { 'User-Agent': 'Toolstack/1.0' },
-      signal: AbortSignal.timeout(8000),
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Toolstack/1.0)' },
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     const html = await resp.text();
-    // scrape result links + snippets from DuckDuckGo Lite
+
     const results = [];
-    const linkRe = /<a[^>]*href="([^"]*)"[^>]*class="result-link"[^>]*>([^<]*)<\/a>/gi;
-    const snippetRe = /<td[^>]*class="result-snippet"[^>]*>([\s\S]*?)<\/td>/gi;
-    const urlRe = /uddg=([^'"]*)/g;
+    // scrape result__a for titles, result__snippet for snippets, result__url for urls
+    const linkRe = /<a[^>]*class="result__a"[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi;
+    const snippetRe = /<a[^>]*class="result__snippet"[^>]*href="[^"]*"[^>]*>([\s\S]*?)<\/a>/gi;
 
     let m;
-    while ((m = linkRe.exec(html)) !== null) {
+    while ((m = linkRe.exec(html)) !== null && results.length < 5) {
       let url = m[1];
-      // decode DuckDuckGo redirect
       const uddg = url.match(/uddg=([^'"]*)/);
       if (uddg) url = decodeURIComponent(uddg[1]);
-      results.push({ title: m[2].replace(/<[^>]*>/g, ''), url });
-      if (results.length >= 5) break;
+      const title = m[2].replace(/<[^>]*>/g, '').trim();
+      if (title && url.startsWith('http')) {
+        results.push({ title, url, snippet: '' });
+      }
     }
 
     let si = 0;
@@ -202,7 +206,7 @@ async function searchWeb(query) {
       si++;
     }
 
-    return results.filter(r => r.snippet && r.url.startsWith('http'));
+    return results.filter(r => r.snippet);
   } catch (e) {
     console.log('  ⚠️ Web search failed:', e.message);
     return [];
